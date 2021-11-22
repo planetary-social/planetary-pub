@@ -40,7 +40,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script: |
-          cd ~/node-github-demo
+          cd ~/planetary-pub
           git pull origin master
           npm install --production
           pm2 restart node-app
