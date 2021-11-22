@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/planetary-social/planetary-pub/issues"
   },
-  "homepage": "https://github.com/planetary-social/planetary-pub#readme"
+  "homepage": "https://github.com/planetary-social/planetary-pub#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
