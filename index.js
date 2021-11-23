@@ -6,7 +6,7 @@ var http = require('http')
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
     // .use(require('ssb-db2/compat')) // include all compatibility plugins
-    .call(null, { path: './db' })
+    .call(null, { path: '/var/db' })
 
 
 var server = http.createServer(function (req, res) {
