@@ -1,6 +1,7 @@
 const SecretStack = require('secret-stack')
 const caps = require('./caps')
 const { where, and, type, author, toCallback } = require('ssb-db2/operators')
+var http = require('http')
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
@@ -8,6 +9,13 @@ const sbot = SecretStack({ caps })
     .call(null, { path: './db' })
 
 
+var server = http.createServer(function (req, res) {
+    if (req.url === '/healthz')
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello World!');
+});
+
+server.listen(8888);
 
 
 // // importing express framework
