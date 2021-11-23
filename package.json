@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "secret-stack": "^6.4.0",
+    "ssb-caps": "^1.1.0",
+    "ssb-db2": "^2.8.1"
   }
 }
