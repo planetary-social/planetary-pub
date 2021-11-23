@@ -10,9 +10,13 @@ const sbot = SecretStack({ caps })
 
 
 var server = http.createServer(function (req, res) {
-    if (req.url === '/healthz')
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello World!');
+    if (req.url === '/healthz') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        return res.end('Hello World!');
+    }
+
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
+    res.end('aaaa')
 });
 
 server.listen(8888);
