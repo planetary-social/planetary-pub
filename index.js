@@ -17,6 +17,8 @@ var server = http.createServer(function (req, res) {
 
 server.listen(8888);
 
+console.log('listening on 8888')
+
 
 // // importing express framework
 // const express = require("express");
