@@ -5,10 +5,17 @@ var http = require('http')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
 const DB_PATH = process.env.DB_PATH || './db'
+// var faunadb = require('faunadb')
+
+// const client = new faunadb.Client({
+//     secret: process.env.FAUNA_SECRET,
+//     domain: 'db.us.fauna.com'
+// })
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
     .use(require('ssb-db2/compat/ebt'))
+    .use(require('ssb-friends'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
     .call(null, {
