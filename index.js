@@ -20,6 +20,8 @@ const sbot = SecretStack({ caps })
 
 // sbot.db.query(/*...*/)
 
+console.log('sbot', sbot.config.keys.public)
+
 
 var server = http.createServer(function (req, res) {
     if (req.url === '/healthz') {
@@ -28,7 +30,8 @@ var server = http.createServer(function (req, res) {
     }
 
     if (req.url === '/test') {
-        
+        res.writeHead(200, { 'Content-Type': 'text/plain'})
+        return res.end(sbot.config.keys.public)
     }
 
     res.writeHead(200, { 'Content-Type': 'text/plain' })
