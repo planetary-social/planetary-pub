@@ -21,6 +21,8 @@
   "dependencies": {
     "secret-stack": "^6.4.0",
     "ssb-caps": "^1.1.0",
-    "ssb-db2": "^2.8.1"
+    "ssb-conn": "^6.0.1",
+    "ssb-db2": "^2.8.1",
+    "ssb-ebt": "^8.1.0"
   }
 }

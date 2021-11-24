@@ -6,11 +6,10 @@ const ssbKeys = require('ssb-keys')
 const path = require('path')
 const DB_PATH = process.env.DB_PATH || './db'
 
-//  '/var/db'
-
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    // .use(require('ssb-db2/compat')) // include all compatibility plugins
+    .use(require('ssb-conn'))
+    .use(require('ssb-ebt'))
     .call(null, {
         path: DB_PATH,
 
@@ -29,6 +28,8 @@ var server = http.createServer(function (req, res) {
         return res.end('Hello World!');
     }
 
+    // this way you can call repeatedly and make sure the server has
+    // the same ID
     if (req.url === '/test') {
         res.writeHead(200, { 'Content-Type': 'text/plain'})
         return res.end(sbot.config.keys.public)
