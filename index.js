@@ -8,7 +8,7 @@ const DB_PATH = process.env.DB_PATH || './db'
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    .use(require('ssb-db2/compat'))
+    .use(require('ssb-db2/compat/ebt'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
     .call(null, {
