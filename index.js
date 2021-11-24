@@ -6,8 +6,24 @@ const ssbKeys = require('ssb-keys')
 const path = require('path')
 const DB_PATH = process.env.DB_PATH || './db'
 
+
+
+   /* via last index */
+//   db.getVectorClock = function (_, cb) {
+//     if (!cb) cb = _
+//     db.last.get(function (err, h) {
+//       if (err) return cb(err)
+//       var clock = {}
+//       for (var k in h) { clock[k] = h[k].sequence }
+//       cb(null, clock)
+//     })
+//   }
+
+
+
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
+    .use(require('ssb-db2/compat'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
     .call(null, {
