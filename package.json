@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
+    "@nichoth/ssc": "^0.0.20",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^10.0.0",
     "faunadb": "^4.4.1",
     "secret-stack": "^6.4.0",
     "ssb-caps": "^1.1.0",
