@@ -15,11 +15,11 @@ const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
     .use(require('ssb-db2/compat/ebt'))
     .use(require('ssb-friends'))
+    .use(require('ssb-replication-scheduler'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
     .call(null, {
         path: DB_PATH,
-
         // the server has an identity
         keys: ssbKeys.loadOrCreateSync(path.join(DB_PATH, 'secret'))
     })
@@ -128,7 +128,7 @@ var server = http.createServer(function onRequest (req, res) {
                 var q = faunadb.query
                 var client = new faunadb.Client({
                     // this is the secret for `planetary-pub` DB
-                    // https://dashboard.fauna.com/db/us/planetary-pub 
+                    // https://dashboard.fauna.com/db/us/planetary-pub
                     secret: process.env.FAUNADB_SECRET,
                     domain: 'db.us.fauna.com'
                 })
