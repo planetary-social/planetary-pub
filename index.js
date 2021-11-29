@@ -20,6 +20,9 @@ const sbot = SecretStack({ caps })
     .use(require('ssb-ebt'))
     .call(null, {
         path: DB_PATH,
+        friends: {
+            hops: 2
+        },
         // the server has an identity
         keys: ssbKeys.loadOrCreateSync(path.join(DB_PATH, 'secret'))
     })
