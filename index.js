@@ -15,16 +15,18 @@ var Viewer = require('planetary-ssb-viewer')
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    .use(require('ssb-db2/compat/ebt')) // ebt db helpers
-    .use(require('ssb-db2/compat/db')) // basic db compatibility
-    // .use(require('ssb-db2/compat')) // include all compatibility plugins
+    // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
+    // .use(require('ssb-db2/compat/db')) // basic db compatibility
+    .use(require('ssb-db2/compat')) // include all compatibility plugins
     .use(require('ssb-blobs'))
     // .use(require('ssb-backlinks'))
     //   TypeError: ssb._flumeUse is not a function
     .use(require('ssb-friends'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
+    // TypeError: sbot.links is not a function
     // .use(require('ssb-links'))
+    //   TypeError: ssb._flumeUse is not a function
     .use(require('ssb-replication-scheduler'))
     .call(null, {
         path: DB_PATH,
@@ -36,6 +38,11 @@ const sbot = SecretStack({ caps })
     })
 
 console.log('sbot', sbot.config.keys.public)
+
+var content = { type: 'test', text: 'woooo' }
+sbot.db.publish(content, (err, res) => {
+    console.log('done publishing', err, res)
+})
 
 // Viewer(sbot, 8889)
 Viewer.init(sbot, sbot.config)
