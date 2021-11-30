@@ -1,7 +1,7 @@
 require('dotenv').config()
 const SecretStack = require('secret-stack')
 const caps = require('./caps')
-const { where, and, type, author, toCallback } = require('ssb-db2/operators')
+// const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 var http = require('http')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
@@ -10,14 +10,18 @@ var faunadb = require('faunadb')
 var ssc = require('@nichoth/ssc')
 var bcrypt = require('bcrypt')
 var pwds = require('./passwords.json')
+// var Viewer = require('@planetary-ssb/viewer')
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    .use(require('ssb-db2/compat/ebt'))
+    .use(require('ssb-db2/compat/ebt')) // ebt db helpers
+    .use(require('ssb-db2/compat/db')) // basic db compatibility
+    .use(require('ssb-blobs'))
+    .use(require('ssb-backlinks'))
     .use(require('ssb-friends'))
-    .use(require('ssb-replication-scheduler'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
+    .use(require('ssb-replication-scheduler'))
     .call(null, {
         path: DB_PATH,
         friends: {
