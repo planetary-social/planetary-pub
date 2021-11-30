@@ -45,7 +45,7 @@ sbot.db.publish(content, (err, res) => {
 })
 
 // Viewer(sbot, 8889)
-Viewer.init(sbot, sbot.config)
+// Viewer.init(sbot, sbot.config)
 
 var server = http.createServer(function onRequest (req, res) {
     if (req.url === '/healthz') {
