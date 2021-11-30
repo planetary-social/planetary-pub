@@ -13,18 +13,18 @@ var pwds = require('./passwords.json')
 // var Viewer = require('@planetary-ssb/viewer')
 var Viewer = require('planetary-ssb-viewer')
 
-// var viewer = require('')
-
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
-    // .use(require('ssb-db2/compat/db')) // basic db compatibility
-    .use(require('ssb-db2/compat')) // include all compatibility plugins
+    .use(require('ssb-db2/compat/ebt')) // ebt db helpers
+    .use(require('ssb-db2/compat/db')) // basic db compatibility
+    // .use(require('ssb-db2/compat')) // include all compatibility plugins
     .use(require('ssb-blobs'))
     // .use(require('ssb-backlinks'))
+    //   TypeError: ssb._flumeUse is not a function
     .use(require('ssb-friends'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
+    // .use(require('ssb-links'))
     .use(require('ssb-replication-scheduler'))
     .call(null, {
         path: DB_PATH,
@@ -37,6 +37,7 @@ const sbot = SecretStack({ caps })
 
 console.log('sbot', sbot.config.keys.public)
 
+// Viewer(sbot, 8889)
 Viewer.init(sbot, sbot.config)
 
 var server = http.createServer(function onRequest (req, res) {

@@ -33,6 +33,7 @@
     "ssb-db2": "^2.8.1",
     "ssb-ebt": "^8.1.0",
     "ssb-friends": "^5.1.0",
+    "ssb-links": "^3.0.10",
     "ssb-replication-scheduler": "^1.0.1"
   }
 }
