@@ -24,6 +24,7 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
     "faunadb": "^4.4.1",
+    "planetary-ssb-viewer": "^0.0.0",
     "secret-stack": "^6.4.0",
     "ssb-backlinks": "^2.1.1",
     "ssb-blobs": "^2.0.1",

@@ -11,13 +11,17 @@ var ssc = require('@nichoth/ssc')
 var bcrypt = require('bcrypt')
 var pwds = require('./passwords.json')
 // var Viewer = require('@planetary-ssb/viewer')
+var Viewer = require('planetary-ssb-viewer')
+
+// var viewer = require('')
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
-    .use(require('ssb-db2/compat/ebt')) // ebt db helpers
-    .use(require('ssb-db2/compat/db')) // basic db compatibility
+    // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
+    // .use(require('ssb-db2/compat/db')) // basic db compatibility
+    .use(require('ssb-db2/compat')) // include all compatibility plugins
     .use(require('ssb-blobs'))
-    .use(require('ssb-backlinks'))
+    // .use(require('ssb-backlinks'))
     .use(require('ssb-friends'))
     .use(require('ssb-conn'))
     .use(require('ssb-ebt'))
@@ -32,6 +36,8 @@ const sbot = SecretStack({ caps })
     })
 
 console.log('sbot', sbot.config.keys.public)
+
+Viewer.init(sbot, sbot.config)
 
 var server = http.createServer(function onRequest (req, res) {
     if (req.url === '/healthz') {
