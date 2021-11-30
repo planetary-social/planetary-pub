@@ -10,8 +10,10 @@ var faunadb = require('faunadb')
 var ssc = require('@nichoth/ssc')
 var bcrypt = require('bcrypt')
 var pwds = require('./passwords.json')
-// var Viewer = require('@planetary-ssb/viewer')
-var Viewer = require('planetary-ssb-viewer')
+// this is a newer repo, doesn't do much
+var Viewer = require('@planetary-ssb/viewer')
+// this is the older ssb-db-1 repo
+// var Viewer = require('planetary-ssb-viewer')
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
@@ -44,14 +46,14 @@ sbot.db.publish(content, (err, res) => {
     console.log('done publishing', err, res)
 })
 
-// Viewer(sbot, 8889)
+Viewer(sbot, 8889)
 // Viewer.init(sbot, sbot.config)
 
 var server = http.createServer(function onRequest (req, res) {
-    if (req.url === '/healthz') {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        return res.end('Hello World!');
-    }
+    // if (req.url === '/healthz') {
+    //     res.writeHead(200, { 'Content-Type': 'text/plain' });
+    //     return res.end('Hello World!');
+    // }
 
     if (req.url === '/follow-me') {
         req.on('error', (err) => {
