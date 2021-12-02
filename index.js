@@ -5,7 +5,6 @@ const caps = require('./caps')
 // var http = require('http')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
-const DB_PATH = process.env.DB_PATH || './db'
 // var faunadb = require('faunadb')
 // var ssc = require('@nichoth/ssc')
 // var bcrypt = require('bcrypt')
@@ -14,6 +13,9 @@ const DB_PATH = process.env.DB_PATH || './db'
 var Viewer = require('@planetary-ssb/viewer')
 // this is the older ssb-db-1 repo
 // var Viewer = require('planetary-ssb-viewer')
+
+const DB_PATH = process.env.DB_PATH || './db'
+const PORT = 8888
 
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
@@ -41,7 +43,23 @@ const sbot = SecretStack({ caps })
 
 console.log('sbot', sbot.config.keys.public)
 
-Viewer(sbot, 8888)
+var viewer = Viewer(sbot)
+viewer.listen(PORT, '0.0.0.0', (err, address) => {
+    if (err) throw err
+    console.log(`Server is now listening on ${address}`)
+})
+
+// Viewer(sbot, 8888, (err, server) => {
+//     if (err) throw err
+
+//     // Declare a route
+//     // server.get('/healthz', (request, reply) => {
+//     //     reply.type('application/json').code(200)
+//     //     reply.send({ hello: 'world' })
+//     // })
+
+//     console.log('listening on 8888')
+// })
 
 // Viewer.init(sbot, sbot.config)
 
@@ -177,5 +195,4 @@ Viewer(sbot, 8888)
 
 // server.listen(8888);
 
-console.log('listening on 8888')
 
