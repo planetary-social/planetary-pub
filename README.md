@@ -6,9 +6,8 @@ See the [render.com deploy](https://dashboard.render.com/web/srv-c6elp2vh8vlcnln
 
 https://pub2.onrender.com/
 
-See [how the caps value is generates](https://www.npmjs.com/package/ssb-caps#shs-secret-handshake-connection-key)
+See [how the caps value is generated](https://www.npmjs.com/package/ssb-caps#shs-secret-handshake-connection-key)
 
 ## TODO
 
 * Write a viewer app
-
