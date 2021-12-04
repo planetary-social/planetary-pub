@@ -34,6 +34,12 @@ const sbot = SecretStack({ caps })
 console.log('sbot', sbot.config.keys.public)
 
 var viewer = Viewer(sbot)
+
+// add another route
+viewer.get('/healthz', (_, res) => {
+    res.send('ok')
+})
+
 viewer.listen(PORT, '0.0.0.0', (err, address) => {
     if (err) throw err
     console.log(`Server is now listening on ${address}`)
