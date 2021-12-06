@@ -4,7 +4,7 @@ const caps = require('./caps')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
 var Viewer = require('@planetary-ssb/viewer')
-const { where, and, type, author, toCallback } = require('ssb-db2/operators')
+// const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 const parallel = require('run-parallel')
 
 const user = require('./user.json')
@@ -73,6 +73,16 @@ function publishTestMsgs (user) {
         }
     }), function allDone (err, res) {
         console.log('**published everything**', err, res)
+        var [one] = res
+        var { key } = one
+        // now publish some threaded msgs
+        sbot.db.publishAs(userTwo, {
+            type: 'post',
+            text: 'four',
+            root: key
+        }, (err, res) => {
+            console.log('**published thread**', err, res)
+        })
     })
 }
 
