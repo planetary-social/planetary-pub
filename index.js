@@ -5,10 +5,7 @@ const ssbKeys = require('ssb-keys')
 const path = require('path')
 var Viewer = require('@planetary-ssb/viewer')
 // const { where, and, type, author, toCallback } = require('ssb-db2/operators')
-const parallel = require('run-parallel')
-
-const user = require('./user.json')
-const userTwo = require('./user-two.json')
+const init = require('./init')
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
@@ -41,51 +38,9 @@ console.log('sbot', sbot.config.keys.id)
 
 
 // can now add records to the DB
-parallel([user, userTwo].map(keys => {
-    return function (cb) {
-        sbot.db.deleteFeed(keys.id, (err, res) => {
-            if (err) return cb(err)
-            // there is no res
-            // cb(null, res)
-            cb(null, keys.id)
-        })
-    }
-}), function allDone (err, res) {
-    if (err) throw err
-    console.log('**deleted feeds**', res)
-    publishTestMsgs(user)
+init(sbot, (err, res) => {
+    console.log('*done adding to DB*', err, res)
 })
-
-
-function publishTestMsgs (user) {
-    var testMsgs = [
-        { type: 'post', text: 'one' },
-        { type: 'post', text: 'two' },
-        { type: 'post', text: 'three' }
-    ]
-
-    parallel(testMsgs.map(msg => {
-        return function postMsg (cb) {
-            sbot.db.publishAs(user, msg, (err, res) => {
-                if (err) return cb(err)
-                cb(null, res)
-            })
-        }
-    }), function allDone (err, res) {
-        console.log('**published everything**', err, res)
-        var [one] = res
-        var { key } = one
-        // now publish some threaded msgs
-        sbot.db.publishAs(userTwo, {
-            type: 'post',
-            text: 'four',
-            root: key
-        }, (err, res) => {
-            console.log('**published thread**', err, res)
-        })
-    })
-}
-
 
 
 var viewer = Viewer(sbot)
