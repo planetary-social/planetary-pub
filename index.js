@@ -45,6 +45,8 @@ init(sbot, (err, res) => {
 
 var viewer = Viewer(sbot)
 
+// enable cors
+viewer.register(require('fastify-cors'), {})
 
 // add another route
 viewer.get('/healthz', (_, res) => {

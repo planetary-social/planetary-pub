@@ -20,9 +20,10 @@
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
     "@nichoth/ssc": "^0.0.21",
-    "@planetary-ssb/viewer": "^0.0.7",
+    "@planetary-ssb/viewer": "^0.0.9",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
+    "fastify-cors": "^6.0.2",
     "faunadb": "^4.4.1",
     "planetary-ssb-viewer": "^0.0.0",
     "pull-pushable": "^2.2.0",
