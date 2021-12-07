@@ -15,14 +15,17 @@ module.exports = function init (sbot, _cb) {
         }
     }), function allDone (err, res) {
         if (err) return _cb(err)
-        publishTestMsgs(user)
+        publishTestMsgs(user, (err, res) => {
+            if (err) return _cb(err)
+            _cb(null, res)
+        })
     })
 
 
     // for posts with blobs, we need to publish a blob to the blob store
 
 
-    function publishTestMsgs (user) {
+    function publishTestMsgs (user, _cb) {
         var testMsgs = [
             { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },

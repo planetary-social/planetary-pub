@@ -10,6 +10,7 @@ const init = require('./init')
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
 
+// create the sbot
 const sbot = SecretStack({ caps })
     .use(require('ssb-db2'))
     // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
@@ -36,22 +37,23 @@ const sbot = SecretStack({ caps })
 console.log('sbot', sbot.config.keys.id)
 
 
-
 // can now add records to the DB
 init(sbot, (err, res) => {
     console.log('*done setting up DB*', err, res)
 })
 
+
 var viewer = Viewer(sbot)
+
 
 // add another route
 viewer.get('/healthz', (_, res) => {
     res.send('ok')
 })
 
+
 // `fastify` API
 viewer.listen(PORT, '0.0.0.0', (err, address) => {
     if (err) throw err
     console.log(`Server is now listening on ${address}`)
 })
-
