@@ -20,7 +20,7 @@
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
     "@nichoth/ssc": "^0.0.21",
-    "@planetary-ssb/viewer": "^0.0.5",
+    "@planetary-ssb/viewer": "^0.0.6",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
     "faunadb": "^4.4.1",
