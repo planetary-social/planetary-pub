@@ -1,12 +1,12 @@
 const parallel = require('run-parallel')
 
-const user = require('./user.json')
-const userTwo = require('./user-two.json')
+const user = require('./test-data/user.json')
+const userTwo = require('./test-data/user-two.json')
 
 module.exports = function init (sbot, _cb) {
     parallel([user, userTwo].map(keys => {
         return function (cb) {
-            sbot.db.deleteFeed(keys.id, (err, res) => {
+            sbot.db.deleteFeed(keys.id, (err, _) => {
                 if (err) return cb(err)
                 // there is no res
                 // cb(null, res)
@@ -19,11 +19,14 @@ module.exports = function init (sbot, _cb) {
     })
 
 
+    // for posts with blobs, we need to publish a blob to the blob store
+
+
     function publishTestMsgs (user) {
         var testMsgs = [
-            { type: 'post', text: 'one' },
+            { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },
-            { type: 'post', text: 'three' }
+            { type: 'post', text: 'three #test' }
         ]
 
         parallel(testMsgs.map(msg => {
@@ -49,6 +52,5 @@ module.exports = function init (sbot, _cb) {
             })
         })
     }
-
-
 }
+

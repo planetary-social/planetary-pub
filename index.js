@@ -39,9 +39,8 @@ console.log('sbot', sbot.config.keys.id)
 
 // can now add records to the DB
 init(sbot, (err, res) => {
-    console.log('*done adding to DB*', err, res)
+    console.log('*done setting up DB*', err, res)
 })
-
 
 var viewer = Viewer(sbot)
 
@@ -55,3 +54,4 @@ viewer.listen(PORT, '0.0.0.0', (err, address) => {
     if (err) throw err
     console.log(`Server is now listening on ${address}`)
 })
+
