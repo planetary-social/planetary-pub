@@ -1,5 +1,4 @@
 const parallel = require('run-parallel')
-
 const user = require('./test-data/user.json')
 const userTwo = require('./test-data/user-two.json')
 
@@ -15,14 +14,46 @@ module.exports = function init (sbot, _cb) {
         }
     }), function allDone (err, res) {
         if (err) return _cb(err)
-        publishTestMsgs(user, (err, res) => {
-            if (err) return _cb(err)
-            _cb(null, res)
+        parallel([
+            saveProfiles,
+            cb => {
+                publishTestMsgs(user, cb)
+            }
+        ], function allDone (err) {
+            _cb(err)
         })
     })
 
 
-    // for posts with blobs, we need to publish a blob to the blob store
+
+    function saveProfiles (cb) {
+        parallel(
+            [
+                cb => {
+                    sbot.db.publishAs(user, {
+                        type: 'about',
+                        about: user.id,
+                        name: 'alice'
+                    }, (err, res) => {
+                        cb(err, res)
+                    })
+                },
+                cb => {
+                    sbot.db.publishAs(userTwo, {
+                        type: 'about',
+                        about: userTwo.id,
+                        name: 'bob'
+                    }, (err, res) => {
+                        cb(err, res)
+                    })
+                }
+            ],
+            function done (err) {
+                cb(err)
+            }
+        )
+    }
+
 
 
     function publishTestMsgs (user, _cb) {

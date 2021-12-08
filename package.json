@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "build": "echo \"build\" && exit 0",
-    "test": "echo \"ok\" && exit 0"
+    "test": "tape test/index.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,8 @@
   "dependencies": {
     "@nichoth/ssc": "^0.0.21",
     "@planetary-ssb/viewer": "^0.0.9",
+    "after": "^0.8.2",
     "bcrypt": "^5.0.1",
-    "dotenv": "^10.0.0",
     "fastify-cors": "^6.0.2",
     "faunadb": "^4.4.1",
     "planetary-ssb-viewer": "^0.0.0",
@@ -38,5 +38,10 @@
     "ssb-friends": "^5.1.0",
     "ssb-links": "^3.0.10",
     "ssb-replication-scheduler": "^1.0.1"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.3.2"
   }
 }
