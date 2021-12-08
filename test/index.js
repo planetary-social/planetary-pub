@@ -11,8 +11,6 @@ test('setup', t => {
         _viewer = viewer
         t.end()
     })
-    // _sbot = sbot
-    // _viewer = viewer
 })
 
 test('usernames', t => {
