@@ -12,7 +12,6 @@ const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
 
 if (require.main === module) {
-    console.log('called directly');
     start()
 } 
 
