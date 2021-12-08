@@ -1,5 +1,5 @@
 {
-  "name": "planetary-pub",
+  "name": "@planetary-ssb/pub",
   "description": "A pub",
   "version": "0.0.0",
   "main": "index.js",
@@ -37,7 +37,8 @@
     "ssb-ebt": "^8.1.0",
     "ssb-friends": "^5.1.0",
     "ssb-links": "^3.0.10",
-    "ssb-replication-scheduler": "^1.0.1"
+    "ssb-replication-scheduler": "^1.0.1",
+    "ssb-suggest-lite": "^1.1.1"
   },
   "devDependencies": {
     "dotenv": "^10.0.0",

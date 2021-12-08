@@ -12,7 +12,13 @@ See [how the caps value is generated](https://www.npmjs.com/package/ssb-caps#shs
 
 -------------------------------------------------------
 
-example message
+## install
+
+```
+$ npm i -S @planetary-ssb/pub
+```
+
+## example message
 
 ```js
  {
@@ -36,3 +42,4 @@ example message
 see [pull-files](https://github.com/pull-stream/pull-files)
 [multiblob](https://github.com/ssbc/multiblob)
 [ssb-blobs](https://github.com/ssbc/ssb-blobs)
+

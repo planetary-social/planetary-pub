@@ -33,6 +33,7 @@ function start (cb) {
         .use(require('ssb-friends'))
         .use(require('ssb-conn'))
         .use(require('ssb-ebt'))
+        .use(require('ssb-suggest-lite'))
         // .use(require('ssb-links'))
         //   TypeError: ssb._flumeUse is not a function
         .use(require('ssb-replication-scheduler'))
