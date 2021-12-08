@@ -7,6 +7,8 @@ var Viewer = require('@planetary-ssb/viewer')
 // const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 const init = require('./init')
 var after = require('after')
+var user = require('./test-data/user.json')
+var userTwo = require('./test-data/user-two.json')
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
@@ -57,7 +59,7 @@ function start (cb) {
 
     // can now add records to the DB
     if (process.env.NODE_ENV === 'test') {
-        init(sbot, (err) => {
+        init(sbot, user, userTwo, (err) => {
             next(err)
         })
     }

@@ -1,8 +1,6 @@
 const parallel = require('run-parallel')
-const user = require('./test-data/user.json')
-const userTwo = require('./test-data/user-two.json')
 
-module.exports = function init (sbot, _cb) {
+module.exports = function init (sbot, user, userTwo, _cb) {
     parallel([user, userTwo].map(keys => {
         return function (cb) {
             sbot.db.deleteFeed(keys.id, (err, _) => {
