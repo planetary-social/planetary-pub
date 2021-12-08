@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "build": "echo \"build\" && exit 0",
+    "postversion": "git push && git push --tags && npm publish",
     "test": "tape test/index.js | tap-spec"
   },
   "repository": {
