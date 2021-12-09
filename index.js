@@ -14,7 +14,10 @@ const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
 
 if (require.main === module) {
-    start()
+    start(function (err) {
+        if (err) return console.log('errr', err)
+        console.log('server started')
+    })
 } 
 
 module.exports = start
