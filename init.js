@@ -1,6 +1,9 @@
 const parallel = require('run-parallel')
+var S = require('pull-stream')
+var { read } = require('pull-files')
 
 module.exports = function init (sbot, user, userTwo, _cb) {
+    // first delete existing mock data
     parallel([user, userTwo].map(keys => {
         return function (cb) {
             sbot.db.deleteFeed(keys.id, (err, _) => {
@@ -10,19 +13,28 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 cb(null, keys.id)
             })
         }
-    }), function allDone (err, res) {
+    }), function allDone (err) {
         if (err) return _cb(err)
+
+        // then create profile data and test messages
         parallel([
             saveProfiles,
             cb => {
                 publishTestMsgs(user, cb)
+            },
+            cb => {
+                S(
+                    read(__dirname + '/test-data/caracal.jpg'),
+                    S.map(file => file.data),
+                    sbot.blobs.add(function (err, blobId) {
+                        cb(err, blobId)
+                    })
+                )
             }
         ], function allDone (err) {
             _cb(err)
         })
     })
-
-
 
     function saveProfiles (cb) {
         parallel(
@@ -52,13 +64,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         )
     }
 
-
-
     function publishTestMsgs (user, _cb) {
+        // need some messages with just a blob (picture only)
+        // get the hash of a blob and save the blob first
         var testMsgs = [
             { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },
-            { type: 'post', text: 'three #test' }
+            { type: 'post', text: 'three #test' },
+            { type: 'post', text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' }
         ]
 
         parallel(testMsgs.map(msg => {
@@ -68,10 +81,9 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     cb(null, res)
                 })
             }
-        }), function allDone (err, res) {
+        }), function allDone (err, [msg]) {
             if (err) return _cb(err)
-            var [one] = res
-            var { key } = one
+            var { key } = msg
 
             // now publish some threaded msgs
             sbot.db.publishAs(userTwo, {

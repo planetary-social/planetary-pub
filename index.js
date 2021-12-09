@@ -29,6 +29,7 @@ function start (cb) {
         // .use(require('ssb-db2/compat/db')) // basic db compatibility
         .use(require('ssb-db2/compat')) // include all compatibility plugins
         .use(require('ssb-blobs'))
+        .use(require('ssb-serve-blobs'))
         // .use(require('ssb-backlinks'))
         //   TypeError: ssb._flumeUse is not a function
         .use(require('ssb-friends'))
@@ -52,7 +53,6 @@ function start (cb) {
     var _res
 
     var next = after(2, (err) => {
-        console.log('in here')
         if (err) return cb(err)
         cb(null, _res)
     })

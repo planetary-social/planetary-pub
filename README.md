@@ -43,3 +43,8 @@ see [pull-files](https://github.com/pull-stream/pull-files)
 [multiblob](https://github.com/ssbc/multiblob)
 [ssb-blobs](https://github.com/ssbc/ssb-blobs)
 
+------------------------------------------------------
+
+`blobId`:
+
+&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256

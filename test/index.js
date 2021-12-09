@@ -1,6 +1,5 @@
 var test = require('tape')
 var createSbot = require('../')
-
 var alice = require('../test-data/user.json')
 
 var _sbot, _viewer
@@ -20,6 +19,10 @@ test('usernames', t => {
         t.end()
     })
 })
+
+// test('blob', t => {
+
+// })
 
 test('all done', t => {
     _viewer.close(err => {
