@@ -27,17 +27,18 @@ function start (cb) {
     // create the sbot
     const sbot = SecretStack({ caps })
         .use(require('ssb-db2'))
+        .use(require('ssb-db2/compat')) // include all compatibility plugins
         .use(require('ssb-db2/about-self'))
+        .use(require('ssb-friends'))
+        .use(require('ssb-conn'))
+        .use(require('ssb-ebt'))
+        .use(require('ssb-threads'))
         // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
         // .use(require('ssb-db2/compat/db')) // basic db compatibility
-        .use(require('ssb-db2/compat')) // include all compatibility plugins
         .use(require('ssb-blobs'))
         .use(require('ssb-serve-blobs'))
         // .use(require('ssb-backlinks'))
         //   TypeError: ssb._flumeUse is not a function
-        .use(require('ssb-friends'))
-        .use(require('ssb-conn'))
-        .use(require('ssb-ebt'))
         .use(require('ssb-suggest-lite'))
         // .use(require('ssb-links'))
         //   TypeError: ssb._flumeUse is not a function
@@ -67,17 +68,15 @@ function start (cb) {
         })
     }
 
-
     var viewer = Viewer(sbot)
 
     // enable cors
-    viewer.register(require('fastify-cors'), {})
+    // viewer.register(require('fastify-cors'), {})
 
     // add another route
     viewer.get('/healthz', (_, res) => {
         res.code(200).send('ok')
     })
-
 
     // `fastify` API
     viewer.listen(PORT, '0.0.0.0', (err, address) => {

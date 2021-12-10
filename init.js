@@ -19,6 +19,13 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         // then create profile data and test messages
         parallel([
             saveProfiles,
+            // in here we need to follow people
+            cb => {
+                sbot.friends.follow(user.id, null, function (err, fol) {
+                    if (err) return cb(err)
+                    cb(null)
+                })
+            },
             cb => {
                 publishTestMsgs(user, cb)
             },
