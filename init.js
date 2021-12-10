@@ -21,7 +21,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             saveProfiles,
             // in here we need to follow people
             cb => {
-                sbot.friends.follow(user.id, null, function (err, fol) {
+                sbot.friends.follow(user.id, null, function (err) {
                     if (err) return cb(err)
                     cb(null)
                 })

@@ -71,7 +71,14 @@ function start (cb) {
     var viewer = Viewer(sbot)
 
     // enable cors
-    // viewer.register(require('fastify-cors'), {})
+    viewer.register(require('fastify-cors'), {})
+
+    // static files
+    viewer.register(require('fastify-static'), {
+        root: path.join(__dirname, 'public'),
+        dotfiles: 'allow'
+        // prefix: '/public/', // optional: default '/'
+    })
 
     // add another route
     viewer.get('/healthz', (_, res) => {

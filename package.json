@@ -25,6 +25,7 @@
     "after": "^0.8.2",
     "bcrypt": "^5.0.1",
     "fastify-cors": "^6.0.2",
+    "fastify-static": "^4.5.0",
     "faunadb": "^4.4.1",
     "planetary-ssb-viewer": "^0.0.0",
     "pull-files": "^1.1.0",
