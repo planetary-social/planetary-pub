@@ -54,20 +54,6 @@ function start (cb) {
 
     console.log('sbot', sbot.config.keys.id)
 
-    var _res
-
-    var next = after(2, (err) => {
-        if (err) return cb(err)
-        cb(null, _res)
-    })
-
-    // can now add records to the DB
-    if (process.env.NODE_ENV === 'test') {
-        init(sbot, user, userTwo, (err) => {
-            next(err)
-        })
-    }
-
     var viewer = Viewer(sbot)
 
     // enable cors
@@ -85,11 +71,27 @@ function start (cb) {
         res.code(200).send('ok')
     })
 
-    // `fastify` API
-    viewer.listen(PORT, '0.0.0.0', (err, address) => {
-        if (err) throw err
-        console.log(`Server is now listening on ${address}`)
-        _res = { viewer, sbot }
-        next(null)
-    })
+    // can now add records to the DB
+    if (process.env.NODE_ENV === 'test') {
+        var next = after(2, (err) => {
+            if (err) return cb(err)
+            cb(null, { viewer, sbot })
+        })
+
+        init(sbot, user, userTwo, (err) => {
+            next(err)
+        })
+
+        viewer.listen(PORT, '0.0.0.0', (err, address) => {
+            if (err) return next(err)
+            console.log(`Server is now listening on ${address}`)
+            next(null)
+        })
+    } else {
+        viewer.listen(PORT, '0.0.0.0', (err, address) => {
+            if (err) return cb(err)
+            console.log(`Server is now listening on ${address}`)
+            cb(null, { viewer, sbot })
+        })
+    }
 }
