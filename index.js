@@ -75,7 +75,7 @@ function start (cb) {
 
     // add another route
     viewer.get('/healthz', (_, res) => {
-        res.send('ok')
+        res.code(200).send('ok')
     })
 
 
