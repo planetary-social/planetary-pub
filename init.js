@@ -14,6 +14,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             })
         }
     }), function allDone (err) {
+        // done deleteing mock data
         if (err) return _cb(err)
 
         // then create profile data and test messages
