@@ -36,7 +36,7 @@ function start (cb) {
         // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
         // .use(require('ssb-db2/compat/db')) // basic db compatibility
         .use(require('ssb-blobs'))
-        .use(require('ssb-serve-blobs'))
+        // .use(require('ssb-serve-blobs'))
         // .use(require('ssb-backlinks'))
         //   TypeError: ssb._flumeUse is not a function
         .use(require('ssb-suggest-lite'))

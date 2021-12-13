@@ -27,7 +27,6 @@
     "fastify-cors": "^6.0.2",
     "fastify-static": "^4.5.0",
     "faunadb": "^4.4.1",
-    "planetary-ssb-viewer": "^0.0.0",
     "pull-files": "^1.1.0",
     "pull-stream": "^3.6.14",
     "run-parallel": "^1.2.0",
