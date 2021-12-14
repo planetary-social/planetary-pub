@@ -117,6 +117,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: 'four',
                 root: key
             }, (err, res) => {
+                console.log('published user two', res)
                 if (err) return _cb(err)
                 _cb(null, res)
             })
