@@ -12,17 +12,15 @@ test('setup', t => {
     })
 })
 
-test('usernames', t => {
+test('user profile', t => {
     _sbot.db.onDrain('aboutSelf', () => {
         const profile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
         t.equal(profile.name, 'alice', 'should have the name "alice"')
+        t.equal(profile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
+            'should have the right avatar for the user')
         t.end()
     })
 })
-
-// test('blob', t => {
-
-// })
 
 test('all done', t => {
     _viewer.close(err => {
