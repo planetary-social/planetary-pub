@@ -25,7 +25,16 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     read(__dirname + '/test-data/caracal.jpg'),
                     S.map(file => file.data),
                     sbot.blobs.add(function (err, blobId) {
-                        cb(err, blobId)
+                        if (err) return cb(err)
+
+                        S(
+                            read(__dirname + '/test-data/cinnamon-roll.jpg'),
+                            S.map(file => file.data),
+                            sbot.blobs.add((err, blobId) => {
+                                cb(err, blobId)
+                            })
+                        )
+
                     })
                 )
             },
@@ -61,7 +70,8 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     sbot.db.publishAs(user, {
                         type: 'about',
                         about: user.id,
-                        image: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256'
+                        // the cinnamon roll hash
+                        image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
                     }, cb)
                 },
                 cb => {
