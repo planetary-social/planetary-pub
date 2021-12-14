@@ -19,17 +19,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
         // then create profile data and test messages
         parallel([
-            saveProfiles,
-            // in here we need to follow people
-            cb => {
-                sbot.friends.follow(user.id, null, function (err) {
-                    if (err) return cb(err)
-                    cb(null)
-                })
-            },
-            cb => {
-                publishTestMsgs(user, cb)
-            },
+            // save blobs
             cb => {
                 S(
                     read(__dirname + '/test-data/caracal.jpg'),
@@ -38,7 +28,20 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                         cb(err, blobId)
                     })
                 )
-            }
+            },
+
+            saveProfiles,
+
+            // follow people
+            cb => {
+                sbot.friends.follow(user.id, null, function (err) {
+                    if (err) return cb(err)
+                    cb(null)
+                })
+            },
+
+            publishTestMsgs
+
         ], function allDone (err) {
             _cb(err)
         })
@@ -52,9 +55,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                         type: 'about',
                         about: user.id,
                         name: 'alice'
-                    }, (err, res) => {
-                        cb(err, res)
-                    })
+                    }, cb)
+                },
+                cb => {
+                    sbot.db.publishAs(user, {
+                        type: 'about',
+                        about: user.id,
+                        image: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256'
+                    }, cb)
                 },
                 cb => {
                     sbot.db.publishAs(userTwo, {
@@ -72,7 +80,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         )
     }
 
-    function publishTestMsgs (user, _cb) {
+    function publishTestMsgs (_cb) {
         // need some messages with just a blob (picture only)
         // get the hash of a blob and save the blob first
         var testMsgs = [
@@ -105,4 +113,3 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         })
     }
 }
-
