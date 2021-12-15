@@ -25,7 +25,7 @@ test('user profile', t => {
 
     _sbot.db.onDrain('aboutSelf', () => {
         const profile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
-        t.equal(profile.name, 'bob', 'should have the name "alice"')
+        t.equal(profile.name, 'bob', 'should have the name "bob"')
     })
 })
 
@@ -42,6 +42,7 @@ test('user profile by name', t => {
     _sbot.db.onDrain('aboutSelf', () => {
         _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
             console.log('err, etc', err, matches)
+            t.equal(matches[0].name, 'bob', 'should return the bob profile')
         })
     })
 })
