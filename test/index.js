@@ -30,20 +30,18 @@ test('user profile', t => {
 })
 
 test('user profile by name', t => {
-    t.plan(2)
+    t.plan(3)
 
     _sbot.suggest.profile({ text: 'alice' }, (err, matches) => {
         if (err) {
             return t.fail(err)
         }
-        t.equal(matches[0].name, 'alice', 'should return the right profile')
+        t.equal(matches[0].name, 'alice', 'should return the alice profile')
+        t.equal(matches[0].id, alice.id, 'should return the right id')
     })
 
-    _sbot.db.onDrain('aboutSelf', () => {
-        _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
-            console.log('err, etc', err, matches)
-            t.equal(matches[0].name, 'bob', 'should return the bob profile')
-        })
+    _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
+        t.equal(matches[0].name, 'bob', 'should return the bob profile')
     })
 })
 

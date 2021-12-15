@@ -43,7 +43,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
             // follow people
             cb => {
-                sbot.friends.follow(user.id, null, function (err) {
+                parallel([user, userTwo].map(keys => {
+                    return function (_cb) {
+                        sbot.friends.follow(keys.id, null, function (err) {
+                            if (err) return _cb(err)
+                            _cb(null)
+                        })
+                    }
+                }), (err, res) => {
                     if (err) return cb(err)
                     cb(null)
                 })
@@ -100,14 +107,16 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             { type: 'post', text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' }
         ]
 
-        parallel(testMsgs.map(msg => {
+        parallel(testMsgs.map((msg => {
             return function postMsg (cb) {
                 sbot.db.publishAs(user, msg, (err, res) => {
                     if (err) return cb(err)
                     cb(null, res)
                 })
             }
-        }), function allDone (err, [msg]) {
+        })).concat([cb => {
+            sbot.db.publishAs(userTwo, { type: 'post', text: 'aaa' }, cb)
+        }]), function allDone (err, [msg]) {
             if (err) return _cb(err)
             var { key } = msg
 
@@ -117,7 +126,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: 'four',
                 root: key
             }, (err, res) => {
-                console.log('published user two', res)
                 if (err) return _cb(err)
                 _cb(null, res)
             })

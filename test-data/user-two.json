@@ -1,6 +1,7 @@
 {
   "curve": "ed25519",
-  "public": "0O+1eSlQTG+6lufzxeYnySsER6/KWrp0S2maDIYzaLM=.ed25519",
-  "private": "XnbGbckBzGTILuuVo21E5uXNzGeBK1DeF8hztOLhLDjQ77V5KVBMb7qW5/PF5ifJKwRHr8paunRLaZoMhjNosw==.ed25519",
-  "id": "@0O+1eSlQTG+6lufzxeYnySsER6/KWrp0S2maDIYzaLM=.ed25519"
+  "public": "NoOZWqpkwfxcx9961k5huGe67ZhDTQC1UiHo71nvtNY=.ed25519",
+  "private": "xSnN+4o/xfxxGA1XaPMc5A6v77rt2gH5qAUdMMjnavk2g5laqmTB/FzH33rWTmG4Z7rtmENNALVSIejvWe+01g==.ed25519",
+  "id": "@NoOZWqpkwfxcx9961k5huGe67ZhDTQC1UiHo71nvtNY=.ed25519"
 }
+
