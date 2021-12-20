@@ -2,6 +2,7 @@ var test = require('tape')
 var createSbot = require('../')
 var alice = require('../test-data/user.json')
 var bob = require('../test-data/user-two.json')
+var S = require('pull-stream')
 
 var _sbot, _viewer
 test('setup', t => {
@@ -12,6 +13,8 @@ test('setup', t => {
         t.end()
     })
 })
+
+// we use the env var `test` to know to load the test data
 
 test('user profile', t => {
     t.plan(3)
@@ -43,6 +46,32 @@ test('user profile by name', t => {
     _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
         t.equal(matches[0].name, 'bob', 'should return the bob profile')
     })
+})
+
+test('get following count', t => {
+    var content = {
+        "type": "contact",
+        "contact": bob.id,
+        "following": true
+    }
+
+    _sbot.db.publishAs(alice, content, (err, res) => {
+        t.error(err)
+
+        // who are you following?
+        _sbot.friends.hops({
+            start: alice.id,
+            max: 1
+        }, (err, following) => {
+            t.error(err)
+            folArr = Object.keys(following).filter(id => {
+                return following[id] === 1
+            })
+            t.equal(folArr.length, 1, 'should be following 1 person')
+            t.end()
+        })
+    })
+
 })
 
 test('all done', t => {
