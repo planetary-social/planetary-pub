@@ -1,8 +1,9 @@
+const { where,  and, type, contact, toCallback } = require('ssb-db2/operators')
 var test = require('tape')
 var createSbot = require('../')
 var alice = require('../test-data/user.json')
 var bob = require('../test-data/user-two.json')
-var S = require('pull-stream')
+// var S = require('pull-stream')
 
 var _sbot, _viewer
 test('setup', t => {
@@ -71,6 +72,49 @@ test('get following count', t => {
             t.end()
         })
     })
+})
+
+test('get follower count', t => {
+
+    var content = {
+        "type": "contact",
+        "contact": alice.id,
+        "following": true
+    }
+
+    _sbot.db.publishAs(bob, content, (err, res) => {
+        t.error(err)
+
+        _sbot.db.query(
+            where(
+                contact(alice.id)
+            ),
+            toCallback((err, msgs) => {
+                t.error(err)
+
+                // console.log('**msgs**', JSON.stringify(msgs[0], null, 2))
+
+                var followers = msgs.reduce(function (acc, msg) {
+                    var auth = msg.value.author
+                    if (acc.indexOf(auth) > -1) return acc
+                    if (msg.value.content.following) {
+                        acc.push(auth)
+                        return acc
+                    }
+                    return acc
+                }, [])
+
+                t.equal(followers.length, 2, 'should have 2 followers')
+                t.ok(followers.includes(bob.id), 'should be followed by bob')
+                t.end()
+            })
+        )
+
+    })
+
+
+
+
 
 })
 
