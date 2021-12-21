@@ -103,8 +103,9 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         var testMsgs = [
             { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },
-            { type: 'post', text: 'three #test' }, {
+            {
                 type: 'post',
+                text: 'three #test',
                 mentions: [{
                     link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
                     name: 'caracal.jpg', // optional, but recommended
