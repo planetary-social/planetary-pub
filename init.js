@@ -24,7 +24,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 S(
                     read(__dirname + '/test-data/caracal.jpg'),
                     S.map(file => file.data),
-                    sbot.blobs.add(function (err, blobId) {
+                    sbot.blobs.add(function (err, _) {
                         if (err) return cb(err)
 
                         S(
@@ -50,7 +50,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                             _cb(null)
                         })
                     }
-                }), (err, res) => {
+                }), (err) => {
                     if (err) return cb(err)
                     cb(null)
                 })
@@ -103,8 +103,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         var testMsgs = [
             { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },
-            { type: 'post', text: 'three #test' },
-            { type: 'post', text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' }
+            { type: 'post', text: 'three #test' }, {
+                type: 'post',
+                mentions: [{
+                    link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
+                    name: 'caracal.jpg', // optional, but recommended
+                    type: 'image/jpeg' // optional, but recommended
+                }],
+                text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
+            }
         ]
 
         parallel(testMsgs.map((msg => {
