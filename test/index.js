@@ -92,8 +92,6 @@ test('get follower count', t => {
             toCallback((err, msgs) => {
                 t.error(err)
 
-                // console.log('**msgs**', JSON.stringify(msgs[0], null, 2))
-
                 var followers = msgs.reduce(function (acc, msg) {
                     var auth = msg.value.author
                     if (acc.indexOf(auth) > -1) return acc
