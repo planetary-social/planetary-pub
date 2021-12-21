@@ -93,10 +93,12 @@ test('get follower count', t => {
 
                 var followers = msgs.reduce(function (acc, msg) {
                     var auth = msg.value.author
-                    if (acc.indexOf(auth) > -1) return acc
-                    if (msg.value.content.following) {
+                    // duplicate, do nothing
+                    if (acc.indexOf(auth) > -1) return acc  
+                    // if they are following us,
+                    // add them to the list
+                    if (msg.value.content.following) {  
                         acc.push(auth)
-                        return acc
                     }
                     return acc
                 }, [])
