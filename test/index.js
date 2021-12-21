@@ -34,17 +34,16 @@ test('user profile', t => {
 })
 
 test('user profile by name', t => {
-    t.plan(3)
+    t.plan(5)
 
     _sbot.suggest.profile({ text: 'alice' }, (err, matches) => {
-        if (err) {
-            return t.fail(err)
-        }
+        t.error(err)
         t.equal(matches[0].name, 'alice', 'should return the alice profile')
         t.equal(matches[0].id, alice.id, 'should return the right id')
     })
 
     _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
+        t.error(err)
         t.equal(matches[0].name, 'bob', 'should return the bob profile')
     })
 })
