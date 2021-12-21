@@ -6,10 +6,8 @@ module.exports = function init (sbot, user, userTwo, _cb) {
     // first delete existing mock data
     parallel([user, userTwo].map(keys => {
         return function (cb) {
-            sbot.db.deleteFeed(keys.id, (err, _) => {
+            sbot.db.deleteFeed(keys.id, (err) => {
                 if (err) return cb(err)
-                // there is no res
-                // cb(null, res)
                 cb(null, keys.id)
             })
         }
@@ -98,21 +96,44 @@ module.exports = function init (sbot, user, userTwo, _cb) {
     }
 
     function publishTestMsgs (_cb) {
-        // need some messages with just a blob (picture only)
-        // get the hash of a blob and save the blob first
         var testMsgs = [
             { type: 'post', text: 'one #test' },
             { type: 'post', text: 'two' },
+            // post with an inline image only (no text or mentions)
             {
                 type: 'post',
-                text: 'three #test',
+                text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
+            },
+
+            // image only post (just message, nothing inline)
+            {
+                type: 'post',
+                text: '',
                 mentions: [{
                     link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
                     name: 'caracal.jpg', // optional, but recommended
                     type: 'image/jpeg' // optional, but recommended
-                }],
-                text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
-            }
+                }]
+            },
+
+            // post with text & inline image
+            {
+                type: 'post',
+                text: 'some example text ' +
+                    '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' +
+                    ' some more example text'
+            },
+
+            // post with image and text, separate
+            {
+                type: 'post',
+                text: 'example text, with a separate (not inline) image',
+                mentions: [{
+                    link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
+                    name: 'caracal.jpg', // optional, but recommended
+                    type: 'image/jpeg' // optional, but recommended
+                }]
+            },
         ]
 
         parallel(testMsgs.map((msg => {
