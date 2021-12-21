@@ -55,7 +55,7 @@ test('get following count', t => {
         "following": true
     }
 
-    _sbot.db.publishAs(alice, content, (err, res) => {
+    _sbot.db.publishAs(alice, content, (err) => {
         t.error(err)
 
         // who are you following?
@@ -68,6 +68,7 @@ test('get following count', t => {
                 return following[id] === 1
             })
             t.equal(folArr.length, 1, 'should be following 1 person')
+            t.ok(following[bob.id], 'should be following bob')
             t.end()
         })
     })
