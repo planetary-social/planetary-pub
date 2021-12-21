@@ -75,7 +75,6 @@ test('get following count', t => {
 })
 
 test('get follower count', t => {
-
     var content = {
         "type": "contact",
         "contact": alice.id,
@@ -107,13 +106,7 @@ test('get follower count', t => {
                 t.end()
             })
         )
-
     })
-
-
-
-
-
 })
 
 test('all done', t => {
