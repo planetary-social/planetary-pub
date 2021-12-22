@@ -81,7 +81,7 @@ test('get follower count', t => {
         "following": true
     }
 
-    _sbot.db.publishAs(bob, content, (err, res) => {
+    _sbot.db.publishAs(bob, content, (err) => {
         t.error(err)
 
         _sbot.db.query(
