@@ -149,8 +149,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             if (err) return _cb(err)
             var { key } = msg
 
-            console.log('msg', msg)
-
             // now publish some threaded msgs
             sbot.db.publishAs(userTwo, {
                 type: 'post',
