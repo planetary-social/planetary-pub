@@ -15,7 +15,8 @@ test('setup', t => {
     })
 })
 
-// we use the env var `test` to know to load the test data
+// we use the env var `test` to know to load the test data;
+// it is loaded in the `../index.js` file
 
 test('user profile', t => {
     t.plan(3)

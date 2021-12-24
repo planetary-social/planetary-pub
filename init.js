@@ -147,15 +147,18 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             sbot.db.publishAs(userTwo, { type: 'post', text: 'aaa' }, cb)
         }]), function allDone (err, [msg]) {
             if (err) return _cb(err)
-            var { key } = msg
+            // this should be the first msg published (user 1)
+
+            // console.log('**msg**', msg)
 
             // now publish some threaded msgs
             sbot.db.publishAs(userTwo, {
                 type: 'post',
                 text: 'four',
-                root: key
+                root: msg.key
             }, (err, res) => {
                 if (err) return _cb(err)
+                console.log('**res**', res)
                 _cb(null, res)
             })
         })
