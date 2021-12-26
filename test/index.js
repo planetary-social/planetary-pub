@@ -1,4 +1,4 @@
-const { where,  and, type, contact, toCallback } = require('ssb-db2/operators')
+const { where, and, type, contact, toCallback } = require('ssb-db2/operators')
 var test = require('tape')
 var createSbot = require('../')
 var alice = require('../test-data/user.json')
@@ -11,7 +11,18 @@ test('setup', t => {
         if (err) t.fail(err)
         _sbot = sbot
         _viewer = viewer
-        t.end()
+
+        sbot.db.query(
+            where(
+                type('post')
+            ),
+            toCallback((err, msgs) => {
+                t.error(err)
+                console.log('There are ' + msgs.length + ' messages of type "post"')
+                t.end()
+            })
+        )
+
     })
 })
 

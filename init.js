@@ -22,7 +22,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 S(
                     read(__dirname + '/test-data/caracal.jpg'),
                     S.map(file => file.data),
-                    sbot.blobs.add(function (err, _) {
+                    sbot.blobs.add(function (err) {
                         if (err) return cb(err)
 
                         S(
@@ -158,7 +158,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 root: msg.key
             }, (err, res) => {
                 if (err) return _cb(err)
-                console.log('**res**', res)
                 _cb(null, res)
             })
         })
