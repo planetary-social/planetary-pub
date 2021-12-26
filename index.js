@@ -6,7 +6,6 @@ const path = require('path')
 var Viewer = require('@planetary-ssb/viewer')
 // const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 const init = require('./init')
-var after = require('after')
 var user = require('./test-data/user.json')
 var userTwo = require('./test-data/user-two.json')
 const rimraf = require('rimraf')
@@ -19,7 +18,7 @@ if (require.main === module) {
         if (err) return console.log('errr', err)
         console.log('server started')
     })
-} 
+}
 
 module.exports = start
 

@@ -3,7 +3,6 @@ var test = require('tape')
 var createSbot = require('../')
 var alice = require('../test-data/user.json')
 var bob = require('../test-data/user-two.json')
-// var S = require('pull-stream')
 
 var _sbot, _viewer
 test('setup', t => {
