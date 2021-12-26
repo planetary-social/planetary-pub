@@ -57,11 +57,15 @@ test('user profile by name', t => {
         t.equal(matches[0].id, alice.id, 'should return the alice id')
     })
 
-    _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
-        t.error(err)
-        t.ok(matches[0], 'should return a profile for bob')
-        t.equal(matches[0].name, 'bob', 'should return the bob profile')
-    })
+    // this timeout is probably a bug with ssb-db2
+    // it is only relevant after you `rm -rf` ./db
+    setTimeout(() => {
+        _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
+            t.error(err)
+            t.ok(matches[0], 'should return a profile for bob')
+            t.equal(matches[0].name, 'bob', 'should return the bob profile')
+        })
+    }, 0)
 })
 
 test('get following count', t => {
