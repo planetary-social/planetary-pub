@@ -9,6 +9,7 @@ const init = require('./init')
 var after = require('after')
 var user = require('./test-data/user.json')
 var userTwo = require('./test-data/user-two.json')
+const rimraf = require('rimraf')
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
@@ -24,6 +25,35 @@ module.exports = start
 
 
 function start (cb) {
+    if (process.env.NODE_ENV === 'test') {
+        // first reset the DB by deleting it
+        rimraf(DB_PATH, (err) => {
+            if (err) return cb(err)
+            var { viewer, sbot } = _start()
+
+            // then write new records
+            init(sbot, user, userTwo, (err) => {
+                if (err) return cb(err)
+                viewer.listen(PORT, '0.0.0.0', (err, address) => {
+                    if (err) return cb(err)
+                    console.log(`Server is now listening on ${address}`)
+                    cb(null, { viewer, sbot })
+                })
+            })
+
+        })
+    } else {
+        var { viewer, sbot } = _start()
+        viewer.listen(PORT, '0.0.0.0', (err, address) => {
+            if (err) return next(err)
+            console.log(`Server is now listening on ${address}`)
+            cb(null, { viewer, sbot })
+        })
+    }
+}
+
+
+function _start () {
     // create the sbot
     const sbot = SecretStack({ caps })
         .use(require('ssb-db2'))
@@ -71,27 +101,5 @@ function start (cb) {
         res.code(200).send('ok')
     })
 
-    // can now add records to the DB
-    if (process.env.NODE_ENV === 'test') {
-        var next = after(2, (err) => {
-            if (err) return cb(err)
-            cb(null, { viewer, sbot })
-        })
-
-        init(sbot, user, userTwo, (err) => {
-            next(err)
-        })
-
-        viewer.listen(PORT, '0.0.0.0', (err, address) => {
-            if (err) return next(err)
-            console.log(`Server is now listening on ${address}`)
-            next(null)
-        })
-    } else {
-        viewer.listen(PORT, '0.0.0.0', (err, address) => {
-            if (err) return cb(err)
-            console.log(`Server is now listening on ${address}`)
-            cb(null, { viewer, sbot })
-        })
-    }
+    return { viewer, sbot }
 }

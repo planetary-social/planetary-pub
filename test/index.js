@@ -7,7 +7,8 @@ var bob = require('../test-data/user-two.json')
 
 var _sbot, _viewer
 test('setup', t => {
-    createSbot((err, { viewer, sbot }) => {
+    createSbot((err, args) => {
+        var { viewer, sbot } = args
         if (err) t.fail(err)
         _sbot = sbot
         _viewer = viewer
