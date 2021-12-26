@@ -1,4 +1,4 @@
-const { where, and, type, contact, toCallback } = require('ssb-db2/operators')
+const { where, and, type, contact, author, toCallback } = require('ssb-db2/operators')
 var test = require('tape')
 var createSbot = require('../')
 var alice = require('../test-data/user.json')
@@ -14,11 +14,16 @@ test('setup', t => {
 
         sbot.db.query(
             where(
-                type('post')
+                and(
+                    type('post'),
+                    author(alice.id)
+                )
             ),
             toCallback((err, msgs) => {
                 t.error(err)
-                console.log('There are ' + msgs.length + ' messages of type "post"')
+                console.log('There are ' +
+                    msgs.length + ' messages of type "post" from alice',
+                        alice.id)
                 t.end()
             })
         )
@@ -37,25 +42,24 @@ test('user profile', t => {
         t.equal(profile.name, 'alice', 'should have the name "alice"')
         t.equal(profile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
             'should have the right avatar for the user')
-    })
 
-    _sbot.db.onDrain('aboutSelf', () => {
-        const profile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
-        t.equal(profile.name, 'bob', 'should have the name "bob"')
+        const bobProfile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
+        t.equal(bobProfile.name, 'bob', 'should have the name "bob"')
     })
 })
 
 test('user profile by name', t => {
-    t.plan(5)
+    t.plan(6)
 
     _sbot.suggest.profile({ text: 'alice' }, (err, matches) => {
         t.error(err)
         t.equal(matches[0].name, 'alice', 'should return the alice profile')
-        t.equal(matches[0].id, alice.id, 'should return the right id')
+        t.equal(matches[0].id, alice.id, 'should return the alice id')
     })
 
     _sbot.suggest.profile({ text: 'bob' }, (err, matches) => {
         t.error(err)
+        t.ok(matches[0], 'should return a profile for bob')
         t.equal(matches[0].name, 'bob', 'should return the bob profile')
     })
 })

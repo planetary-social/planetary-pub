@@ -8,12 +8,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         return function (cb) {
             sbot.db.deleteFeed(keys.id, (err) => {
                 if (err) return cb(err)
+                console.log('deleted feed ' + keys.id)
                 cb(null, keys.id)
             })
         }
-    }), function allDone (err) {
+    }), function allDone (err, res) {
         // done deleteing mock data
         if (err) return _cb(err)
+
+        console.log('all done', res)
 
         // then create profile data and test messages
         parallel([
@@ -90,6 +93,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 }
             ],
             function done (err) {
+                console.log('done with profiles', err)
                 cb(err)
             }
         )
