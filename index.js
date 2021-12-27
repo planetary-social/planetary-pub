@@ -9,6 +9,7 @@ const init = require('./init')
 var user = require('./test-data/user.json')
 var userTwo = require('./test-data/user-two.json')
 const rimraf = require('rimraf')
+const path = require('path')
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
@@ -27,7 +28,7 @@ function start (cb) {
     var { NODE_ENV } = process.env
     if (NODE_ENV === 'test' || NODE_ENV === 'staging') {
         // first reset the DB by deleting it
-        rimraf(DB_PATH, (err) => {
+        rimraf(path.join(DB_PATH, 'db2'), (err) => {
             if (err) return cb(err)
             var { viewer, sbot } = _start()
 
