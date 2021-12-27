@@ -24,7 +24,8 @@ module.exports = start
 
 
 function start (cb) {
-    if (process.env.NODE_ENV === 'test') {
+    var { NODE_ENV } = process.env
+    if (NODE_ENV === 'test' || NODE_ENV === 'staging') {
         // first reset the DB by deleting it
         rimraf(DB_PATH, (err) => {
             if (err) return cb(err)
