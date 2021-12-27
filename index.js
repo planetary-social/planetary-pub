@@ -9,7 +9,6 @@ const init = require('./init')
 var user = require('./test-data/user.json')
 var userTwo = require('./test-data/user-two.json')
 const rimraf = require('rimraf')
-const path = require('path')
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
