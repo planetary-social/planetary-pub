@@ -42,6 +42,13 @@ Set `NODE_ENV` to `test` to re-write the DB with test data when the server start
 
 Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `./pubs.json`.
 
+----------------------------------------------------
+
+* [multiserver](https://github.com/ssb-js/multiserver)
+* [multiserver address](https://github.com/ssbc/multiserver-address)
+
+---------------------------------------------------
+
 ## example message
 
 ```js
