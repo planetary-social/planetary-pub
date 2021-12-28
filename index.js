@@ -25,7 +25,7 @@ module.exports = start
 
 function start (cb) {
     var { NODE_ENV } = process.env
-    if (NODE_ENV === 'test' || NODE_ENV === 'staging') {
+    if (NODE_ENV === 'test') {
         // first reset the DB by deleting it
         rimraf(path.join(DB_PATH, 'db2'), (err) => {
             if (err) return cb(err)
@@ -43,6 +43,7 @@ function start (cb) {
 
         })
     } else {
+        // don't reset the DB if we're not in `test` env
         var { viewer, sbot } = _start()
         viewer.listen(PORT, '0.0.0.0', (err, address) => {
             if (err) return next(err)
