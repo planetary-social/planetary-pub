@@ -14,9 +14,33 @@ See [how the caps value is generated](https://www.npmjs.com/package/ssb-caps#shs
 
 ## install
 
+Install as a dependency:
 ```
 $ npm i -S @planetary-ssb/pub
 ```
+
+Install as an app (git clone):
+```
+$ git clone git@github.com:planetary-social/planetary-pub.git pub
+```
+
+## start
+```
+$ node ./index.js
+```
+
+## env variables
+See `.env.example`
+
+```
+NODE_ENV="test"
+FAUNA_SECRET="123"
+TEST_PW="my-password"
+```
+
+Set `NODE_ENV` to `test` to re-write the DB with test data when the server starts.
+
+Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `./pubs.json`.
 
 ## example message
 
@@ -48,3 +72,4 @@ see [pull-files](https://github.com/pull-stream/pull-files)
 `blobId`:
 
 &SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256
+
