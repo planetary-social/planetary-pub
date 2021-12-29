@@ -69,15 +69,15 @@ function start (cb) {
                 console.log('**connect**', !!ssb)
             })
 
-            // sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
-            //     if (err) return console.log('aaaaaaa', err)
-            //     console.log('**follow**', res)
-            // })
+            sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
+                if (err) return console.log('aaaaaaa', err)
+                console.log('**follow**', res)
+            })
 
-            // sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
-            //     if (err) return console.log('*errrrr connect*', err)
-            //     console.log('**connect**', !!ssb)
-            // })
+            sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
+                if (err) return console.log('*errrrr connect*', err)
+                console.log('**connect**', !!ssb)
+            })
         }
 
         viewer.listen(PORT, '0.0.0.0', (err, address) => {
