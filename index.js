@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'test') {
 
 console.log('node env', process.env.NODE_ENV)
 
-const DB_PATH = process.env.DB_PATH || './db'
+const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
 const PORT = 8888
 
 if (require.main === module) {
