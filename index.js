@@ -1,14 +1,18 @@
 require('dotenv').config()
 const SecretStack = require('secret-stack')
-const caps = require('./caps')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
-var Viewer = require('@planetary-ssb/viewer')
+const Viewer = require('@planetary-ssb/viewer')
 // const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 const init = require('./init')
-var user = require('./test-data/user.json')
-var userTwo = require('./test-data/user-two.json')
+const user = require('./test-data/user.json')
+const userTwo = require('./test-data/user-two.json')
 const rimraf = require('rimraf')
+
+var caps = require('ssb-caps')
+if (process.env.NODE_ENV === 'test') {
+    caps = require('./caps-dev.js')
+}
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
