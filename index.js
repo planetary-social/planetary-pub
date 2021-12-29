@@ -8,11 +8,14 @@ const init = require('./init')
 const user = require('./test-data/user.json')
 const userTwo = require('./test-data/user-two.json')
 const rimraf = require('rimraf')
+const PUBS = require('./pubs.json')
 
 var caps = require('ssb-caps')
 if (process.env.NODE_ENV === 'test') {
     caps = require('./caps-dev.js')
 }
+
+console.log('node env', process.env.NODE_ENV)
 
 const DB_PATH = process.env.DB_PATH || './db'
 const PORT = 8888
@@ -49,6 +52,32 @@ function start (cb) {
     } else {
         // don't reset the DB if we're not in `test` env
         var { viewer, sbot } = _start()
+
+        if (NODE_ENV === 'staging') {
+            // follow some other pubs
+            // feedId should be the ID of the pub
+
+            sbot.friends.follow(PUBS.one.id, null, (err, res) => {
+                if (err) return console.log('errrrr', err)
+                console.log('**follow**', res)
+            })
+
+            sbot.conn.connect(PUBS.one.host, (err, ssb) => {
+                if (err) return console.log('*errrrr connect*', err)
+                console.log('**connect**', !!ssb)
+            })
+
+            // sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
+            //     if (err) return console.log('aaaaaaa', err)
+            //     console.log('**follow**', res)
+            // })
+
+            // sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
+            //     if (err) return console.log('*errrrr connect*', err)
+            //     console.log('**connect**', !!ssb)
+            // })
+        }
+
         viewer.listen(PORT, '0.0.0.0', (err, address) => {
             if (err) return next(err)
             console.log(`Server is now listening on ${address}`)
@@ -81,7 +110,7 @@ function _start () {
         .call(null, {
             path: DB_PATH,
             friends: {
-                hops: 2
+                hops: 3
             },
             // the server has an identity
             keys: ssbKeys.loadOrCreateSync(path.join(DB_PATH, 'secret'))
