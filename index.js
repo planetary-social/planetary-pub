@@ -43,7 +43,6 @@ function start (cb) {
             init(sbot, user, userTwo, (err) => {
                 if (err) return cb(err)
             })
-
         })
     } else {
         // don't reset the DB if we're not in `test` env
@@ -76,7 +75,7 @@ function start (cb) {
     }
 
     viewer.listen(PORT, '0.0.0.0', (err, address) => {
-        if (err) return next(err)
+        if (err) return cb(err)
         console.log(`Server is now listening on ${address}`)
         cb(null, { viewer, sbot })
     })
