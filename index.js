@@ -57,6 +57,8 @@ function start (cb) {
             // follow some other pubs
             // feedId should be the ID of the pub
 
+            console.log('**is staging**')
+
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) return console.log('errrrr', err)
                 console.log('**follow**', res)
