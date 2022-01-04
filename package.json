@@ -4,7 +4,7 @@
   "version": "0.2.3",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js --max_old_space_size=512",
+    "start": "node index.js",
     "build": "echo \"build\" && exit 0",
     "postversion": "git push && git push --tags && npm publish",
     "test": "NODE_ENV=test tape test/index.js | tap-spec"
