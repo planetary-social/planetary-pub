@@ -15,8 +15,6 @@ if (process.env.NODE_ENV === 'test') {
     caps = require('./caps-dev.js')
 }
 
-console.log('node env', process.env.NODE_ENV)
-
 const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
 const PORT = 8888
 
@@ -32,17 +30,25 @@ module.exports = start
 
 function start (cb) {
     var { NODE_ENV } = process.env
-    var { viewer, sbot } = _start()
 
     if (NODE_ENV === 'test') {
         // first reset the DB by deleting it
         rimraf(path.join(DB_PATH, 'db2'), (err) => {
             if (err) return cb(err)
 
+            var { viewer, sbot } = _start()
+
             // then write new records
             init(sbot, user, userTwo, (err) => {
                 if (err) return cb(err)
+
+                viewer.listen(PORT, '0.0.0.0', (err, address) => {
+                    if (err) return cb(err)
+                    console.log(`Server is now listening on ${address}`)
+                    cb(null, { viewer, sbot })
+                })
             })
+
         })
     } else {
         // don't reset the DB if we're not in `test` env
@@ -51,6 +57,8 @@ function start (cb) {
             // feedId should be the ID of the pub
 
             console.log('**is staging**')
+
+            var { viewer, sbot } = _start()
 
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) return console.log('errrrr', err)
@@ -63,22 +71,22 @@ function start (cb) {
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
-                if (err) return console.log('aaaaaaa', err)
                 console.log('**follow** cel', res)
             })
 
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
-                if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect** cel', !!ssb)
             })
+
+            viewer.listen(PORT, '0.0.0.0', (err, address) => {
+                if (err) return cb(err)
+                console.log(`Server is now listening on ${address}`)
+                cb(null, { viewer, sbot })
+            })
+
         }
     }
 
-    viewer.listen(PORT, '0.0.0.0', (err, address) => {
-        if (err) return cb(err)
-        console.log(`Server is now listening on ${address}`)
-        cb(null, { viewer, sbot })
-    })
 }
 
 

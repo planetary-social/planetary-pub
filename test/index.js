@@ -7,8 +7,12 @@ var bob = require('../test-data/user-two.json')
 var _sbot, _viewer
 test('setup', t => {
     createSbot((err, args) => {
+        if (err) {
+            t.fail(err)
+            return t.end()
+        }
+
         var { viewer, sbot } = args
-        if (err) t.fail(err)
         _sbot = sbot
         _viewer = viewer
 
@@ -21,8 +25,8 @@ test('setup', t => {
             ),
             toCallback((err, msgs) => {
                 t.error(err)
-                console.log('There are ' +
-                    msgs.length + ' messages of type "post" from alice',
+                console.log('There are ' + msgs.length +
+                    ' messages of type "post" from alice',
                         alice.id)
                 t.end()
             })

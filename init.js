@@ -3,64 +3,51 @@ var S = require('pull-stream')
 var { read } = require('pull-files')
 
 module.exports = function init (sbot, user, userTwo, _cb) {
-    // first delete existing mock data
-    parallel([user, userTwo].map(keys => {
-        return function (cb) {
-            sbot.db.deleteFeed(keys.id, (err) => {
-                if (err) return cb(err)
-                // console.log('deleted feed ' + keys.id)
-                cb(null, keys.id)
-            })
-        }
-    }), function allDone (err, res) {
-        // done deleteing mock data
-        if (err) return _cb(err)
-
-        // then create profile data and test messages
-        parallel([
-            // save blobs
-            cb => {
-                S(
-                    read(__dirname + '/test-data/caracal.jpg'),
-                    S.map(file => file.data),
-                    sbot.blobs.add(function (err) {
-                        if (err) return cb(err)
-
-                        S(
-                            read(__dirname + '/test-data/cinnamon-roll.jpg'),
-                            S.map(file => file.data),
-                            sbot.blobs.add((err, blobId) => {
-                                console.log('**saved blobs**')
-                                cb(err, blobId)
-                            })
-                        )
-
-                    })
-                )
-            },
-
-            saveProfiles,
-
-            // follow people
-            cb => {
-                parallel([user, userTwo].map(keys => {
-                    return function (_cb) {
-                        sbot.friends.follow(keys.id, null, function (err) {
-                            if (err) return _cb(err)
-                            _cb(null)
-                        })
-                    }
-                }), (err) => {
+    // create profile data and test messages
+    parallel([
+        // save blobs
+        cb => {
+            S(
+                read(__dirname + '/test-data/caracal.jpg'),
+                S.map(file => file.data),
+                sbot.blobs.add(function (err) {
                     if (err) return cb(err)
-                    cb(null)
+
+                    S(
+                        read(__dirname + '/test-data/cinnamon-roll.jpg'),
+                        S.map(file => file.data),
+                        sbot.blobs.add((err, blobId) => {
+                            console.log('**saved blobs**')
+                            cb(err, blobId)
+                        })
+                    )
+
                 })
-            },
+            )
+        },
 
-            publishTestMsgs
+        saveProfiles,
 
-        ], function allDone (err) {
-            _cb(err)
-        })
+        // follow people
+        cb => {
+            parallel([user, userTwo].map(keys => {
+                return function (_cb) {
+                    sbot.friends.follow(keys.id, null, function (err) {
+                        if (err) return _cb(err)
+                        _cb(null)
+                    })
+                }
+            }), (err) => {
+                if (err) return cb(err)
+                cb(null)
+            })
+        },
+
+        publishTestMsgs
+
+    ], function allDone (err) {
+        if (err) return _cb(err)
+        _cb(null)
     })
 
     function saveProfiles (cb) {
@@ -150,8 +137,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         }]), function allDone (err, [msg]) {
             if (err) return _cb(err)
             // this should be the first msg published (user 1)
-
-            // console.log('**msg**', msg)
 
             // now publish some threaded msgs
             sbot.db.publishAs(userTwo, {
