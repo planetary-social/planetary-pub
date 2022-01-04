@@ -86,15 +86,35 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
     function publishTestMsgs (_cb) {
         var testMsgs = [
-            { type: 'post', text: 'one #test' },
-            { type: 'post', text: 'two' },
+            { type: 'post', text: 'post with a hashtag #test' },
+            { type: 'post', text: 'post with just text' },
             // post with an inline image only (no text or mentions)
             {
                 type: 'post',
                 text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
             },
 
-            // image only post (just message, nothing inline)
+            // post with text, no image
+            {
+                type: 'post',
+                text: 'A post with only **markdown** text, no images.'
+            },
+
+            // everything -- text, inine image, attached image
+            {
+                type: 'post',
+                text: `# an everything post
+                    *markdown* text, inline image, and attached image
+                    ![caracal](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)
+                `,
+                mentions: [{
+                    link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
+                    name: 'caracal.jpg', // optional, but recommended
+                    type: 'image/jpeg' // optional, but recommended
+                }]
+            },
+
+            // image only post (just attached image, nothing inline)
             {
                 type: 'post',
                 text: '',
@@ -108,15 +128,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // post with text & inline image
             {
                 type: 'post',
-                text: 'some example text ' +
+                text: 'some example text with an inline image' +
                     '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' +
                     ' some more example text'
             },
 
-            // post with image and text, separate
+            // post with text and attached image
             {
                 type: 'post',
-                text: 'example text, with a separate (not inline) image',
+                text: 'example text, with an attached (not inline) image',
                 mentions: [{
                     link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
                     name: 'caracal.jpg', // optional, but recommended
