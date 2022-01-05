@@ -100,6 +100,20 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: 'A post with only **markdown** text, no images.'
             },
 
+            {
+                type: 'post',
+                text: 'A post with multiple attached images',
+                mentions: [{
+                    link: '&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256',
+                    name: 'caracal.jpg', // optional, but recommended
+                    type: 'image/jpeg' // optional, but recommended
+                }, {
+                    link: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
+                    name: 'cinnomon-roll.jpg',
+                    type: 'image/jpeg'
+                }]
+            },
+
             // everything -- text, inine image, attached image
             {
                 type: 'post',
