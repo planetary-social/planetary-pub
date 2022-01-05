@@ -100,6 +100,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: 'A post with only **markdown** text, no images.'
             },
 
+            // multiple images
             {
                 type: 'post',
                 text: 'A post with multiple attached images',
