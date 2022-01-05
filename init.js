@@ -158,6 +158,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     type: 'image/jpeg' // optional, but recommended
                 }]
             },
+
+            {
+                type: 'post',
+                text: 'mentioning a user, not a blob',
+                mentions: [{
+                    link: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
+                    name: 'alice'
+                }]
+            }
         ]
 
         parallel(testMsgs.map((msg => {
