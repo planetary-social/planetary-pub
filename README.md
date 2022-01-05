@@ -80,3 +80,13 @@ see [pull-files](https://github.com/pull-stream/pull-files)
 
 &SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256
 
+--------------------------------------------------------
+
+https://github.com/ssbc/ssb-server#install
+```bash
+#!/bin/bash
+while true; do
+  ssb-server start
+  sleep 3
+done
+```
