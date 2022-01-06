@@ -73,7 +73,7 @@ function start (cb) {
             })
 
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
-                console.log('**connect** cel', err, ssb)
+                console.log('**connect** cel', err, Object.keys(ssb))
             })
 
             viewer.listen(PORT, '0.0.0.0', (err, address) => {
