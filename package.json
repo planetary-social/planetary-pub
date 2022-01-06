@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
-    "@planetary-ssb/viewer": "^0.0.39",
+    "@planetary-ssb/viewer": "^0.0.40",
     "bcrypt": "^5.0.1",
     "fastify-cors": "^6.0.2",
     "fastify-static": "^4.5.0",
