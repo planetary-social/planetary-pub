@@ -63,9 +63,15 @@ function start (cb) {
                 console.log('**follow**', res)
             })
 
+
+            // add our current connections here
+            var peers = sbot.peers = []
+
+
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect pub one**', !!ssb)
+                peers.push(ssb)
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
@@ -73,7 +79,9 @@ function start (cb) {
             })
 
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
+                if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect** cel', err, !!ssb)
+                peers.push(ssb)
             })
 
             viewer.listen(PORT, '0.0.0.0', (err, address) => {

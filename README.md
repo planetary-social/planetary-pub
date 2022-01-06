@@ -90,3 +90,70 @@ while true; do
   sleep 3
 done
 ```
+
+
+--------------------------------------------------------------------
+
+```
+******peers*********** [
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:eight45.net:8008~shs:eM4e8pmRiZpeCBitqp6vq3lT8EwC5UjjKuajHbpWnNI=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640816091765,
+Jan 6 01:35:40 PM        key: '@eM4e8pmRiZpeCBitqp6vq3lT8EwC5UjjKuajHbpWnNI=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ],
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:fc56:8313:1e14:1a50:c01:850:a53e:7127:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640816092369,
+Jan 6 01:35:40 PM        key: '@5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ],
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:207.154.204.200:8008~shs:GF8UXwmSBvu/qcVrj18SUYPXzya694n7u30RUFajPws=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640816093046,
+Jan 6 01:35:40 PM        key: '@GF8UXwmSBvu/qcVrj18SUYPXzya694n7u30RUFajPws=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ],
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:pub.locksmithdon.net:8008~shs:5Iy0jt/wxI84VmdFeTdDedXjI1zyAU6BXQvb4DUyZIE=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640816093668,
+Jan 6 01:35:40 PM        key: '@5Iy0jt/wxI84VmdFeTdDedXjI1zyAU6BXQvb4DUyZIE=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ],
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:188.166.252.233:8008~shs:uRECWB4KIeKoNMis2UYWyB2aQPvWmS3OePQvBj2zClg=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640816923420,
+Jan 6 01:35:40 PM        key: '@uRECWB4KIeKoNMis2UYWyB2aQPvWmS3OePQvBj2zClg=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ],
+Jan 6 01:35:40 PM    [
+Jan 6 01:35:40 PM      'net:176.58.117.63:8008~shs:J+0DGLgRn8H5tVLCcRUfN7NfUcTGEZKqML3krEOJjDY=',
+Jan 6 01:35:40 PM      {
+Jan 6 01:35:40 PM        birth: 1640817208550,
+Jan 6 01:35:40 PM        key: '@J+0DGLgRn8H5tVLCcRUfN7NfUcTGEZKqML3krEOJjDY=.ed25519',
+Jan 6 01:35:40 PM        type: 'pub',
+Jan 6 01:35:40 PM        autoconnect: false
+Jan 6 01:35:40 PM      }
+Jan 6 01:35:40 PM    ]
+Jan 6 01:35:40 PM  ]
+```
+
+
+
+
+
