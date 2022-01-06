@@ -54,8 +54,6 @@ function start (cb) {
         // don't reset the DB if we're not in `test` env
         if (NODE_ENV === 'staging') {
             // follow some other pubs
-            // feedId should be the ID of the pub
-
             console.log('**is staging**')
 
             var { viewer, sbot } = _start()
@@ -67,7 +65,7 @@ function start (cb) {
 
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
-                console.log('**connect**', !!ssb)
+                console.log('**connect pub one**', !!ssb)
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
@@ -75,7 +73,7 @@ function start (cb) {
             })
 
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
-                console.log('**connect** cel', !!ssb)
+                console.log('**connect** cel', err, ssb)
             })
 
             viewer.listen(PORT, '0.0.0.0', (err, address) => {
