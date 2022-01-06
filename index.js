@@ -86,7 +86,6 @@ function start (cb) {
 
         }
     }
-
 }
 
 
@@ -98,8 +97,8 @@ function _start () {
         .use(require('ssb-db2/compat')) // include all compatibility plugins
         .use(require('ssb-db2/about-self'))
         .use(require('ssb-friends'))
-        .use(require('ssb-conn'))
-        .use(require('ssb-ebt'))
+        .use(require('ssb-conn'))  // [x]
+        .use(require('ssb-ebt'))  // [x]
         .use(require('ssb-threads'))
         // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
         // .use(require('ssb-db2/compat/db')) // basic db compatibility
@@ -110,7 +109,7 @@ function _start () {
         .use(require('ssb-suggest-lite'))
         // .use(require('ssb-links'))
         //   TypeError: ssb._flumeUse is not a function
-        .use(require('ssb-replication-scheduler'))
+        .use(require('ssb-replication-scheduler'))  // [x]
         .call(null, {
             path: DB_PATH,
             friends: {
