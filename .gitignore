@@ -92,3 +92,4 @@ bundle.js
 db/
 .env
 
+db-test/

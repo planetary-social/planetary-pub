@@ -1,4 +1,5 @@
 require('dotenv').config()
+var S = require('pull-stream')
 const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
@@ -39,6 +40,28 @@ function start (cb) {
             if (err) return cb(err)
 
             var { viewer, sbot } = _start()
+            var peers = sbot.peers = []
+
+            const testSbot = 'net:localhost:61335~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
+
+            sbot.conn.connect(testSbot, (err, ssb) => {
+                if (err) return console.log('*errrrr connect*', err)
+                console.log('**connect test sbot**', !!ssb)
+
+                // the wool hash
+                var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
+                S(
+                    ssb.blobs.get(woolHash),
+                    // add it to *our* sbot
+                    sbot.blobs.add(woolHash, (err, blobId) => {
+                        if (err) return console.log('errrrr', err)
+                        console.log('added blob locally', blobId)
+                    })
+                )
+
+                peers.push(ssb)
+            })
+
 
             // then write new records
             init(sbot, user, userTwo, (err) => {
