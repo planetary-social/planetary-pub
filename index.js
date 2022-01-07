@@ -100,17 +100,18 @@ function start (cb) {
 
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
-                console.log('**connect pub one**', !!ssb)
+                console.log('**connect pub one**', !!ssb.blobs)
                 peers.push(ssb)
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
+                if (err) return console.log('errrr', err)
                 console.log('**follow** cel', res)
             })
 
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
-                console.log('**connect** cel', err, !!ssb)
+                console.log('**connect** cel', !!ssb.blobs)
                 peers.push(ssb)
             })
 
