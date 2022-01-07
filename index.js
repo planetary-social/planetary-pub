@@ -58,9 +58,9 @@ function start (cb) {
             // follow some other pubs
             console.log('**is staging**')
 
-            console.log('**sbot.config**', sbot.config)
-
             var { viewer, sbot } = _start()
+            
+            console.log('**sbot.config**', sbot.config)
 
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) return console.log('errrrr', err)
