@@ -43,27 +43,33 @@ function start (cb) {
             
             var peers = sbot.peers = []
 
-            const testSbot = 'net:localhost:58166~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
+            const testSbot = 'net:localhost:59964~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
+
+            sbot.on('rpc:connect', (ev) => {
+                console.log('***rpc:connect***', ev.stream.address)
+            })
 
             sbot.conn.connect(testSbot, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect test sbot**', !!ssb)
+                peers.push(ssb)
 
-                // the wool hash
-                var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
+                getBlob()
+            })
+
+            function getBlob() {
                 // try transferring the blob from remote sbot to
                 // 'local' sbot
+                var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
                 S(
-                    ssb.blobs.get(woolHash),
+                    peers[0].blobs.get(woolHash),
                     // add it to *our* sbot
                     sbot.blobs.add(woolHash, (err, blobId) => {
                         if (err) return console.log('errrrr', err)
                         console.log('added blob locally', blobId)
                     })
                 )
-
-                peers.push(ssb)
-            })
+            }
 
 
             // then write new records
@@ -85,7 +91,7 @@ function start (cb) {
             console.log('**is staging**')
 
             var { viewer, sbot } = _start()
-            
+
             console.log('**sbot.config**', sbot.config)
 
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
@@ -93,15 +99,18 @@ function start (cb) {
                 console.log('**follow**', res)
             })
 
-
             // add our current connections here
             var peers = sbot.peers = []
-
+            sbot.on('rpc:connect', (ev) => {
+                console.log('***rpc:connect***', ev.stream.address)
+                peers.push(ev)
+            })
+            
 
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect pub one**', !!ssb.blobs)
-                peers.push(ssb)
+                // peers.push(ssb)
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
@@ -112,7 +121,7 @@ function start (cb) {
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect** cel', !!ssb.blobs)
-                peers.push(ssb)
+                // peers.push(ssb)
             })
 
             viewer.listen(PORT, '0.0.0.0', (err, address) => {
