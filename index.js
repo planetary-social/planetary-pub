@@ -18,6 +18,8 @@ if (process.env.NODE_ENV === 'test') {
 const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
 const PORT = 8888
 
+console.log('**DB PATH**', DB_PATH)
+
 if (require.main === module) {
     start(function (err) {
         if (err) return console.log('errr', err)
@@ -37,6 +39,8 @@ function start (cb) {
             if (err) return cb(err)
 
             var { viewer, sbot } = _start()
+
+            console.log('**sbot.config**', sbot.config)
 
             // then write new records
             init(sbot, user, userTwo, (err) => {
