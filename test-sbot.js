@@ -45,6 +45,7 @@ S(
     read(__dirname + '/test-data/wool.jpg'),
     S.map(file => file.data),
     sbot.blobs.add((err, blobId) => {
+        if (err) return console.log('errrr', err)
         console.log('**saved wool blob**', blobId)
     })
 )

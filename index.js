@@ -42,7 +42,7 @@ function start (cb) {
             var { viewer, sbot } = _start()
             var peers = sbot.peers = []
 
-            const testSbot = 'net:localhost:61335~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
+            const testSbot = 'net:localhost:58166~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
 
             sbot.conn.connect(testSbot, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
@@ -50,6 +50,8 @@ function start (cb) {
 
                 // the wool hash
                 var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
+                // try transferring the blob from remote sbot to
+                // 'local' sbot
                 S(
                     ssb.blobs.get(woolHash),
                     // add it to *our* sbot
