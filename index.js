@@ -40,8 +40,6 @@ function start (cb) {
 
             var { viewer, sbot } = _start()
 
-            console.log('**sbot.config**', sbot.config)
-
             // then write new records
             init(sbot, user, userTwo, (err) => {
                 if (err) return cb(err)
@@ -59,6 +57,8 @@ function start (cb) {
         if (NODE_ENV === 'staging') {
             // follow some other pubs
             console.log('**is staging**')
+
+            console.log('**sbot.config**', sbot.config)
 
             var { viewer, sbot } = _start()
 
