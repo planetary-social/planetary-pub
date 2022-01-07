@@ -41,29 +41,29 @@ function start (cb) {
 
             var { viewer, sbot } = _start()
             
-            // var peers = sbot.peers = []
+            var peers = sbot.peers = []
 
-            // const testSbot = 'net:localhost:58166~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
+            const testSbot = 'net:localhost:58166~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
 
-            // sbot.conn.connect(testSbot, (err, ssb) => {
-            //     if (err) return console.log('*errrrr connect*', err)
-            //     console.log('**connect test sbot**', !!ssb)
+            sbot.conn.connect(testSbot, (err, ssb) => {
+                if (err) return console.log('*errrrr connect*', err)
+                console.log('**connect test sbot**', !!ssb)
 
-            //     // the wool hash
-            //     var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
-            //     // try transferring the blob from remote sbot to
-            //     // 'local' sbot
-            //     S(
-            //         ssb.blobs.get(woolHash),
-            //         // add it to *our* sbot
-            //         sbot.blobs.add(woolHash, (err, blobId) => {
-            //             if (err) return console.log('errrrr', err)
-            //             console.log('added blob locally', blobId)
-            //         })
-            //     )
+                // the wool hash
+                var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
+                // try transferring the blob from remote sbot to
+                // 'local' sbot
+                S(
+                    ssb.blobs.get(woolHash),
+                    // add it to *our* sbot
+                    sbot.blobs.add(woolHash, (err, blobId) => {
+                        if (err) return console.log('errrrr', err)
+                        console.log('added blob locally', blobId)
+                    })
+                )
 
-            //     peers.push(ssb)
-            // })
+                peers.push(ssb)
+            })
 
 
             // then write new records
