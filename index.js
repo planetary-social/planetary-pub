@@ -91,6 +91,8 @@ function start (cb) {
             console.log('**is staging**')
 
             var { viewer, sbot } = _start()
+            // add our current connections here
+            var peers = sbot.peers = []
 
             console.log('**sbot.config**', sbot.config)
 
@@ -99,8 +101,6 @@ function start (cb) {
                 console.log('**follow**', res)
             })
 
-            // add our current connections here
-            var peers = sbot.peers = []
             sbot.on('rpc:connect', (ev) => {
                 console.log('***rpc:connect***', ev.stream.address)
                 peers.push(ev)

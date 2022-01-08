@@ -154,12 +154,19 @@ Jan 6 01:35:40 PM  ]
 ```
 
 
+-----------------------------------------------------------------
+
 
 ```
 Jan 6 03:01:23 PM  errrr Error: could not write to tmpfile    at /opt/render/project/src/node_modules/multiblob/index.js:235:31    at next (/opt/render/project/src/node_modules/pull-write-file/index.js:14:26)    at /opt/render/project/src/node_modules/pull-stream/throughs/map.js:19:9    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:19:9    at /opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:28:19    at /opt/render/project/src/node_modules/pull-stream/sources/error.js:5:5    at next (/opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:27:9)    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:16:14    at /opt/render/project/src/node_modules/pull-stream/throughs/map.js:11:7
 ```
 
 
+
 ```
- TypeError: Promise.any is not a function 
+"stack":"InternalServerError: Error: could not write to tmpfile\n    at /opt/render/project/src/node_modules/@planetary-ssb/viewer/index.js:206:54\n    at /opt/render/project/src/node_modules/multiblob/index.js:235:28\n    at next (/opt/render/project/src/node_modules/pull-write-file/index.js:14:26)\n    at /opt/render/project/src/node_modules/pull-stream/throughs/map.js:19:9\n    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:19:9\n    at /opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:28:19\n    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:19:9\n    at /opt/render/project/src/node_modules/pull-stream/sources/error.js:5:5\n    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:16:14\n    at next (/opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:27:9)","status":500,"statusCode":500,"expose":false},"msg":{}}
+```
+
+```
+Jan 7 01:44:11 PM  **blob errrr** Error: could not write to tmpfile    at /opt/render/project/src/node_modules/multiblob/index.js:235:31    at next (/opt/render/project/src/node_modules/pull-write-file/index.js:14:26)    at /opt/render/project/src/node_modules/pull-stream/throughs/map.js:19:9    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:19:9    at /opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:28:19    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:19:9    at /opt/render/project/src/node_modules/pull-stream/sources/error.js:5:5    at /opt/render/project/src/node_modules/pull-stream/throughs/through.js:16:14    at next (/opt/render/project/src/node_modules/pull-stream/throughs/async-map.js:27:9)
 ```
