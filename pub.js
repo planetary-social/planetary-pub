@@ -94,6 +94,8 @@ function start (cb) {
                 peers.push(ssb)
                 next(null, ssb)
             })
+
+            cb(null, sbot)
         }
     }
 }
