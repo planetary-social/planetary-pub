@@ -1,20 +1,20 @@
 const { where, and, type, contact, author, toCallback } = require('ssb-db2/operators')
 var test = require('tape')
-var createSbot = require('../')
+var createSbot = require('../pub')
 var alice = require('../test-data/user.json')
 var bob = require('../test-data/user-two.json')
 
-var _sbot, _viewer
+var _sbot
 test('setup', t => {
-    createSbot((err, args) => {
+    createSbot((err, sbot) => {
         if (err) {
             t.fail(err)
             return t.end()
         }
 
-        var { viewer, sbot } = args
+        // var { viewer, sbot } = args
         _sbot = sbot
-        _viewer = viewer
+        // _viewer = viewer
 
         sbot.db.query(
             where(
@@ -136,11 +136,8 @@ test('get follower count', t => {
 })
 
 test('all done', t => {
-    _viewer.close(err => {
+    _sbot.close(err => {
         if (err) t.fail(err)
-        _sbot.close(err => {
-            if (err) t.fail(err)
-            t.end()
-        })
+        t.end()
     })
 })
