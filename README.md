@@ -105,7 +105,10 @@ These are the endpoints available if you call `require('@planetary-ssb/pub/viewe
 `/%1HbhmsEc4OCiLD5o8raRl+x8QUO7Y6oZ3C57vwNM78c=.sha256`
 
 ### /blob/:blobId
-=> return a blob, indexed by blob hash, like `&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256`
+=> return a blob, indexed by blob hash
+
+#### example
+`/blob/&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256`
 
 ### /feed/:userName
 get a feed by display name. will return an array of JSON messages
