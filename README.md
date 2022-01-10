@@ -33,7 +33,19 @@ $ node ./index.js
 ```
 
 ### node
+```js
+var createSbot = require('@planetary-ssb/pub/pub')
+var Viewer = require('@planetary-ssb/pub/viewer')
 
+createSbot((err, sbot) => {
+  if (err) throw err
+  var viewer = Viewer(sbot)
+  viewer.listen(PORT, '0.0.0.0', (err, address) => {
+      if (err) return cb(err)
+      console.log(`Server is now listening on ${address}`)
+  })
+})
+```
 
 
 ## env variables
@@ -75,6 +87,10 @@ Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `
   timestamp: 1638820387618
 }
 ```
+
+---------------------------------------------------------------
+
+## http API
 
 ----------------------------------------------------------------
 

@@ -1,11 +1,7 @@
 require('dotenv').config()
-// var S = require('pull-stream')
 const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
-// const Viewer = require('@planetary-ssb/viewer')
-// const Viewer = require('./viewer')
-// const { where, and, type, author, toCallback } = require('ssb-db2/operators')
 const init = require('./init')
 const user = require('./test-data/user.json')
 const userTwo = require('./test-data/user-two.json')
@@ -19,16 +15,9 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
-const PORT = 8888
 
 console.log('**DB PATH**', DB_PATH)
 
-if (require.main === module) {
-    start(function (err) {
-        if (err) return console.log('errr', err)
-        console.log('server started')
-    })
-}
 
 module.exports = start
 
@@ -48,12 +37,6 @@ function start (cb) {
             init(sbot, user, userTwo, (err) => {
                 if (err) return cb(err)
                 cb(null, sbot)
-
-                // viewer.listen(PORT, '0.0.0.0', (err, address) => {
-                //     if (err) return cb(err)
-                //     console.log(`Server is now listening on ${address}`)
-                //     cb(null, { sbot })
-                // })
             })
 
         })
@@ -73,9 +56,11 @@ function start (cb) {
             
             var next = after(4, (err) => {
                 if (err) return cb(err)
-                cb(null)
+                cb(null, sbot)
             })
 
+            // TODO
+            // shouldn't the replication-scheduler plugin handle this?
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) {
                     console.log('errrrr', err)
@@ -109,8 +94,6 @@ function start (cb) {
                 peers.push(ssb)
                 next(null, ssb)
             })
-
-            cb(null, { sbot })
         }
     }
 }
