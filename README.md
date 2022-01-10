@@ -91,7 +91,7 @@ Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `
 ---------------------------------------------------------------
 
 ## http API
-These are the endpoints available if you call `require('@planetary-ssb/pub/viewer)(sbot)`
+These are the endpoints available if you call the http API
 
 ### /
 => `sbot.id | NODE_ENV`
