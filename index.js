@@ -41,36 +41,7 @@ function start (cb) {
 
             var { viewer, sbot } = _start()
             
-            var peers = sbot.peers = []
-
-            const testSbot = 'net:localhost:59964~shs:qZb+GjgFKFMLsFLosCxpwP80pNXrhhG5p7yDAKGT+e4='
-
-            sbot.on('rpc:connect', (ev) => {
-                console.log('***rpc:connect***', ev.stream.address)
-            })
-
-            sbot.conn.connect(testSbot, (err, ssb) => {
-                if (err) return console.log('*errrrr connect*', err)
-                console.log('**connect test sbot**', !!ssb)
-                peers.push(ssb)
-
-                getBlob()
-            })
-
-            function getBlob() {
-                // try transferring the blob from remote sbot to
-                // 'local' sbot
-                var woolHash = '&JGUyzXbUc46qaf50CUfJ9FjAuzuVGOBTJKY81RPLNoE=.sha256'
-                S(
-                    peers[0].blobs.get(woolHash),
-                    // add it to *our* sbot
-                    sbot.blobs.add(woolHash, (err, blobId) => {
-                        if (err) return console.log('errrrr', err)
-                        console.log('added blob locally', blobId)
-                    })
-                )
-            }
-
+            sbot.peers = []
 
             // then write new records
             init(sbot, user, userTwo, (err) => {
@@ -94,23 +65,20 @@ function start (cb) {
             // add our current connections here
             var peers = sbot.peers = []
 
-            console.log('**sbot.config**', sbot.config)
+            sbot.on('rpc:connect', (ev) => {
+                console.log('***rpc:connect***', ev.stream.address)
+            })
+            
 
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) return console.log('errrrr', err)
-                console.log('**follow**', res)
+                console.log('**follow pub one**', res)
             })
-
-            sbot.on('rpc:connect', (ev) => {
-                console.log('***rpc:connect***', ev.stream.address)
-                peers.push(ev)
-            })
-            
 
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect pub one**', !!ssb.blobs)
-                // peers.push(ssb)
+                peers.push(ssb)
             })
 
             sbot.friends.follow(PUBS.cel.id, null, (err, res) => {
@@ -121,7 +89,7 @@ function start (cb) {
             sbot.conn.connect(PUBS.cel.host, (err, ssb) => {
                 if (err) return console.log('*errrrr connect*', err)
                 console.log('**connect** cel', !!ssb.blobs)
-                // peers.push(ssb)
+                peers.push(ssb)
             })
 
             viewer.listen(PORT, '0.0.0.0', (err, address) => {
@@ -143,8 +111,7 @@ function _start () {
         .use(require('ssb-db2/compat')) // include all compatibility plugins
         .use(require('ssb-db2/about-self'))
         .use(require('ssb-friends'))
-        .use(require('ssb-conn'))  // [x]
-        .use(require('ssb-ebt'))  // [x]
+        .use(require('ssb-ebt'))
         .use(require('ssb-threads'))
         // .use(require('ssb-db2/compat/ebt')) // ebt db helpers
         // .use(require('ssb-db2/compat/db')) // basic db compatibility
@@ -155,7 +122,8 @@ function _start () {
         .use(require('ssb-suggest-lite'))
         // .use(require('ssb-links'))
         //   TypeError: ssb._flumeUse is not a function
-        .use(require('ssb-replication-scheduler'))  // [x]
+        .use(require('ssb-replication-scheduler'))
+        .use(require('ssb-conn'))
         .call(null, {
             path: DB_PATH,
             friends: {
