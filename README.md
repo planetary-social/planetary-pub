@@ -91,6 +91,13 @@ Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `
 ---------------------------------------------------------------
 
 ## http API
+### /
+
+
+
+fastify.get('/', (_, res) => {
+    res.send(sbot.config.keys.id + ' | ' + process.env.NODE_ENV)
+})
 
 ----------------------------------------------------------------
 
