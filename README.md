@@ -91,13 +91,46 @@ Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `
 ---------------------------------------------------------------
 
 ## http API
+These are the endpoints available if you call
+```js
+require('@planetary-ssb/pub/viewer)(sbot)
+```
+
 ### /
+=> `sbot.id | NODE_ENV`
 
+### /:message-id
+=> thread of messages related to that id, or just the message with id
+#### example
+`/%1HbhmsEc4OCiLD5o8raRl+x8QUO7Y6oZ3C57vwNM78c=.sha256`
 
+### /blob/:blobId
+=> return a blob, indexed by blob hash, like `&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256`
 
-fastify.get('/', (_, res) => {
-    res.send(sbot.config.keys.id + ' | ' + process.env.NODE_ENV)
-})
+### /feed/:userName
+get a feed by display name. will return an array of JSON messages
+
+#### example
+`/feed/nichoth`
+
+### /tag/:tagName
+Get all messages tagged with #tagName.
+
+#### example
+`/tag/example`
+
+### /profile/:username
+Get someone's avatar and description by username
+#### example
+`/profile/nichoth`
+
+### /counts/:username
+Get the number of posts, number of followers, and number of users followed for
+a given username
+
+#### example
+`/counts/nichoth`
+
 
 ----------------------------------------------------------------
 

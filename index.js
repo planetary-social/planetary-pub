@@ -6,7 +6,7 @@ Pub(function (err, sbot) {
     var viewer = Viewer(sbot)
 
     viewer.listen(8888, '0.0.0.0', (err, address) => {
-        next(err)
+        if (err) throw err
         console.log(`Server is now listening on ${address}`)
     })
 })
