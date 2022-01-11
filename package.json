@@ -30,6 +30,7 @@
     "faunadb": "^4.4.1",
     "http-errors": "^2.0.0",
     "pull-stream": "^3.6.14",
+    "pull-stream-to-stream": "^2.0.0",
     "run-parallel": "^1.2.0",
     "secret-stack": "^6.4.0",
     "ssb-blobs": "^2.0.1",
