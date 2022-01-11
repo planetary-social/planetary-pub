@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/planetary-social/planetary-pub#readme",
   "dependencies": {
-    "@planetary-ssb/viewer": "^0.0.57",
     "after": "^0.8.2",
     "bcrypt": "^5.0.1",
     "fastify": "^3.25.3",
