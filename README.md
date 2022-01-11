@@ -51,6 +51,17 @@ createSbot((err, sbot) => {
 
 __Connect to your pub__
 
+In another terminal/machine:
+```js
+var addr = 'net:localhost:62042~shs:LYknR3SSOEOrXD2yEQcHhIrUQmsPNo5+3ETvfjuf3Mw='
+
+// the `ssb-conn` plugin
+sbot.conn.connect(addr, (err, ssb) => {
+  if (err) return console.log('errrrr', err)
+  console.log('**connected to pub**', !!ssb)
+})
+```
+
 
 ## env variables
 See `.env.example`
