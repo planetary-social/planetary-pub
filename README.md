@@ -47,6 +47,10 @@ createSbot((err, sbot) => {
 })
 ```
 
+----------------------------------------------------------------
+
+__Connect to your pub__
+
 
 ## env variables
 See `.env.example`
@@ -97,7 +101,12 @@ These are the endpoints available if you call the http API
 => `sbot.id | NODE_ENV`
 #### example
 `/`
-=> `@upMlDAAk3CNsRevrmWKx3oVPs2ohu7XIbpAdBZJeR14=.ed25519 | staging`
+=>
+```
+address -- net:localhost:62042~shs:LYknR3SSOEOrXD2yEQcHhIrUQmsPNo5+3ETvfjuf3Mw=
+public keys -- @LYknR3SSOEOrXD2yEQcHhIrUQmsPNo5+3ETvfjuf3Mw=.ed25519
+NODE_ENV -- test
+```
 
 ### /:message-id
 => thread of messages related to that id, or just the message with id
