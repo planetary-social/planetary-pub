@@ -200,7 +200,7 @@ module.exports = function startServer (sbot) {
                     // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
                     // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
 
-                    getBlob(sbot, currentPeers, profile.image, (err) => {
+                    getBlob(sbot, [currentPeers[1]], profile.image, (err) => {
                         if (err) {
                             return res.send(
                                 createError.InternalServerError(err))
