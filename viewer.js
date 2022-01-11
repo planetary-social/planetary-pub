@@ -5,7 +5,6 @@ var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
-var toStream = require('pull-stream-to-stream')
 var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
