@@ -5,6 +5,8 @@ function getBlob (sbot, peers, blobId, cb) {
         S.values(peers),
         // this way you stop as soon as one blob is successful
         S.asyncMap((peer, cb) => {
+            console.log('**peeeeeeeer***', peer)
+
             try {
                 S(
                     peer.blobs.get(blobId),
