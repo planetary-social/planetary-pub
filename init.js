@@ -8,13 +8,13 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         // save blobs
         cb => {
             S(
-                read(__dirname + '/test-data/caracal.jpg'),
+                read(__dirname + '/test/test-data/caracal.jpg'),
                 S.map(file => file.data),
                 sbot.blobs.add(function (err) {
                     if (err) return cb(err)
 
                     S(
-                        read(__dirname + '/test-data/cinnamon-roll.jpg'),
+                        read(__dirname + '/test/test-data/cinnamon-roll.jpg'),
                         S.map(file => file.data),
                         sbot.blobs.add((err, blobId) => {
                             console.log('**saved demo blobs**')

@@ -1,8 +1,8 @@
 const { where, and, type, contact, author, toCallback } = require('ssb-db2/operators')
 var test = require('tape')
 var createSbot = require('../pub')
-var alice = require('../test-data/user.json')
-var bob = require('../test-data/user-two.json')
+var alice = require('./test-data/user.json')
+var bob = require('./test-data/user-two.json')
 
 var _sbot
 test('setup', t => {
