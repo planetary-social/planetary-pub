@@ -60,6 +60,8 @@ module.exports = function startServer (sbot) {
     fastify.get('/feed/:userName', (req, res) => {
         var { userName } = req.params
 
+        console.log('**req**', req.params.userName)
+
         sbot.suggest.profile({ text: userName }, (err, matches) => {
             if (err) {
                 console.log('OH no!', err)

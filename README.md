@@ -86,6 +86,8 @@ Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `
 $ NODE_ENV=staging npm start
 ```
 
+A `NODE_ENV` of `staging-local` means that you will connect to and follow other pubs automatically like above, but the DB will use a different directory, `db-staging`. Because that way you can run tests on your local machine using the `db` folder, and also make a pub that uses the folder `db-staging` for more real data.
+
 ----------------------------------------------------
 
 * [multiserver](https://github.com/ssb-js/multiserver)

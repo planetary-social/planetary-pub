@@ -9,12 +9,17 @@ const rimraf = require('rimraf')
 const PUBS = require('./pubs.json')
 var after = require('after')
 
+const { NODE_ENV } = process.env
+
 var caps = require('ssb-caps')
 if (process.env.NODE_ENV === 'test') {
     caps = require('./caps-dev.js')
 }
 
-const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
+var DB_PATH = process.env.DB_PATH || (__dirname + '/db')
+if (NODE_ENV === 'staging-local') {
+    DB_PATH = process.env.DB_PATH || __dirname + '/db-staging'
+}
 
 console.log('**DB PATH**', DB_PATH)
 
@@ -23,7 +28,6 @@ module.exports = start
 
 
 function start (cb) {
-    var { NODE_ENV } = process.env
 
     if (NODE_ENV === 'test') {
         // first reset the DB by deleting it
@@ -42,7 +46,7 @@ function start (cb) {
         })
     } else {
         // don't reset the DB if we're not in `test` env
-        if (NODE_ENV === 'staging') {
+        if (NODE_ENV === 'staging' || NODE_ENV === 'staging-local') {
             // follow some other pubs
             console.log('**is staging**')
 
