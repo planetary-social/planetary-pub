@@ -195,8 +195,9 @@ module.exports = function startServer (sbot) {
                     // this is something added only in the planetary pub
                     // this is something IPFS would help with b/c
                     // I think they handle routing requests
-                    var currentPeers = sbot.peers
-                    // var currentPeers = sbot.conn.dbPeers()	
+                    // var currentPeers = sbot.peers
+                    var currentPeers = sbot.conn.dbPeers()	
+                    console.log('**peers**', currentPeers)
 
                     // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
                     // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='

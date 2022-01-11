@@ -76,32 +76,20 @@ TEST_PW="my-password"
 
 Set `NODE_ENV` to `test` to re-write the DB with test data when the server starts.
 
+```
+$ NODE_ENV=test npm start
+```
+
 Set `NODE_ENV` to `staging` to automatically connect to and follow the pubs in `./pubs.json`.
+
+```
+$ NODE_ENV=staging npm start
+```
 
 ----------------------------------------------------
 
 * [multiserver](https://github.com/ssb-js/multiserver)
 * [multiserver address](https://github.com/ssbc/multiserver-address)
-
----------------------------------------------------
-
-## example message
-
-```js
- {
-  key: '%1HbhmsEc4OCiLD5o8raRl+x8QUO7Y6oZ3C57vwNM78c=.sha256',
-  value: {
-    previous: '%CCceib4KRShqtaN95hPGl0qORtefsTEb/qwbB0YZVyQ=.sha256',
-    sequence: 3,
-    author: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
-    timestamp: 1638820387617,
-    hash: 'sha256',
-    content: { type: 'post', text: 'three' },
-    signature: 'E2sC6mH9F+HhfIVl6MjobLdZX6RG3QRwFBiMoT5vb64L6XkS5TutPh2gYRRIqKZSzzW5ld0sLvvEc81pcrRtCQ==.sig.ed25519'
-  },
-  timestamp: 1638820387618
-}
-```
 
 ---------------------------------------------------------------
 
@@ -156,6 +144,26 @@ a given username
 
 
 ----------------------------------------------------------------
+
+## example message
+
+```js
+ {
+  key: '%1HbhmsEc4OCiLD5o8raRl+x8QUO7Y6oZ3C57vwNM78c=.sha256',
+  value: {
+    previous: '%CCceib4KRShqtaN95hPGl0qORtefsTEb/qwbB0YZVyQ=.sha256',
+    sequence: 3,
+    author: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
+    timestamp: 1638820387617,
+    hash: 'sha256',
+    content: { type: 'post', text: 'three' },
+    signature: 'E2sC6mH9F+HhfIVl6MjobLdZX6RG3QRwFBiMoT5vb64L6XkS5TutPh2gYRRIqKZSzzW5ld0sLvvEc81pcrRtCQ==.sig.ed25519'
+  },
+  timestamp: 1638820387618
+}
+```
+
+---------------------------------------------------
 
 ## blobs
 see [pull-files](https://github.com/pull-stream/pull-files)
