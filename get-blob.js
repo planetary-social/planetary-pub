@@ -25,6 +25,8 @@ function getBlob (sbot, peers, blobId, cb) {
         S.take(1),
         S.drain(blobId => {
             cb(null, blobId)
+        }, function onEnd (err) {
+            if (err) console.log('**oh no**', err)
         })
     )
 }
