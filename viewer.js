@@ -5,6 +5,7 @@ var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
+var toStream = require('pull-stream-to-stream')
 var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
@@ -200,13 +201,40 @@ module.exports = function startServer (sbot) {
                     // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
                     // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
 
-                    getBlob(sbot, [currentPeers[1]], profile.image, (err) => {
+                    // trying cel's pub
+                    var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+                    sbot.conn.connect(addr, (err, ssb) => {
                         if (err) {
-                            return res.send(
-                                createError.InternalServerError(err))
+                            console.log('oh no', err)
+                            return console.log('*errrrr connect*', err)
                         }
-                        res.send(profile)
+
+                        console.log('**aaaaaaaaaaa**', ssb.blobs)
+
+                        S(
+                            ssb.blobs.get(profile.image),
+                            // S.through(data => console.log('**data**', data)),
+                            sbot.blobs.add(profile.image, (err, blobId) => {
+                                if (err) {
+                                    res.send(createError.InternalServerError(err))
+                                    return console.log('**blob errrr**', err)
+                                }
+
+                                console.log('***got blob***', blobId)
+                                // TODO -- could return this before the 
+                                // blob has finished transferring
+                                res.send(profile)
+                            })
+                        )
                     })
+
+                    // getBlob(sbot, [currentPeers[1]], profile.image, (err) => {
+                    //     if (err) {
+                    //         return res.send(
+                    //             createError.InternalServerError(err))
+                    //     }
+                    //     res.send(profile)
+                    // })
                 })
             })
         })
