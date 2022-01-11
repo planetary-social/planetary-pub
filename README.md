@@ -97,7 +97,7 @@ These are the endpoints available if you call the http API
 => `sbot.id | NODE_ENV`
 #### example
 `/`
-=> `@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519 | staging`
+=> `@upMlDAAk3CNsRevrmWKx3oVPs2ohu7XIbpAdBZJeR14=.ed25519 | staging`
 
 ### /:message-id
 => thread of messages related to that id, or just the message with id
