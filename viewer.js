@@ -100,10 +100,10 @@ module.exports = function startServer (sbot) {
                 // TODO
                 // in here, get the blobs that are regerenced by messages
                 S.drain(msgs => {
+                    // now get the threads
                     // getThreads(msgs)
                     console.log('***got msgs***', msgs.length)
                     res.send(msgs)
-                    // now get the threads
                 })
             )
 
