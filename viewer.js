@@ -25,10 +25,12 @@ module.exports = function startServer (sbot) {
         `)
     })
 
-    fastify.get('/%:id', (req, res) => {
+    fastify.get('/msg/%:id', (req, res) => {
         var { id } = req.params
         id = '%' + id
-        id = decodeURIComponent(id)
+        // id = decodeURIComponent(id)
+
+        console.log('***id***   ', id)
 
         // get the message in question
         // so we can look for the `root` property and
@@ -91,9 +93,11 @@ module.exports = function startServer (sbot) {
                 toPullStream()
             )
 
+            // first get a page of posts by the user
             S(
                 source,
                 S.take(1),
+                // TODO
                 // in here, get the blobs that are regerenced by messages
                 S.drain(msgs => {
                     console.log('***got msgs***', msgs.length)

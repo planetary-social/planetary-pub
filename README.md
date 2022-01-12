@@ -99,6 +99,13 @@ $ NODE_ENV=staging-local npm start
 
 ---------------------------------------------------------------
 
+Use a 512 MB limnit on memory (so you can tell if it uses too much)
+```
+NODE_ENV=staging-local node --max-old-space-size=512 index.js
+```
+
+----------------------------------------------------------
+
 ## http API
 These are the endpoints available if you call the http API
 
