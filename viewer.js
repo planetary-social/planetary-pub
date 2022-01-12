@@ -6,7 +6,7 @@ var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
-var getBlob = require('./get-blob')
+// var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
     var fastify = Fastify({
@@ -62,7 +62,7 @@ module.exports = function startServer (sbot) {
     fastify.get('/feed/:userName', (req, res) => {
         var { userName } = req.params
 
-        console.log('**req**', req.params.userName)
+        console.log('**req name**', req.params.userName)
 
         sbot.suggest.profile({ text: userName }, (err, matches) => {
             if (err) {
@@ -100,48 +100,48 @@ module.exports = function startServer (sbot) {
                 // TODO
                 // in here, get the blobs that are regerenced by messages
                 S.drain(msgs => {
+                    getThreads(msgs)
                     console.log('***got msgs***', msgs.length)
-                    // console.log('**msgs**', msgs)
-
-                    res.send(msgs)
-
                     // now get the threads
-                    // S(
-                    //     S.values(msgs),
-
-                    //     S.map((msg) => {
-                    //         return sbot.threads.thread({
-                    //             root: msg.key,
-                    //             allowlist: ['post'],
-                    //             // threads sorted from most recent to
-                    //             // least recent
-                    //             reverse: true, 
-                    //             // at most 3 messages in each thread
-                    //             threadMaxSize: 3, 
-                    //         })
-                    //     }),
-
-                    //     S.flatten(),
-
-                    //     S.map(res => {
-                    //         // return either [post, post, ...]
-                    //         // or post (not in array)
-                    //         return res.messages.length > 1 ?
-                    //             res.messages :
-                    //             res.messages[0]
-                    //     }),
-
-                    //     S.collect((err, msgs) => {
-                    //         if (err) {
-                    //             return res.send(
-                    //                 createError.InternalServerError(err))
-                    //         }
-
-                    //         res.send(msgs)
-                    //     })
-                    // )
                 })
             )
+
+            function getThreads (msgs) {
+                S(
+                    S.values(msgs),
+
+                    S.map((msg) => {
+                        return sbot.threads.thread({
+                            root: msg.key,
+                            allowlist: ['post'],
+                            // threads sorted from most recent to
+                            // least recent
+                            reverse: true, 
+                            // at most 3 messages in each thread
+                            threadMaxSize: 3, 
+                        })
+                    }),
+
+                    S.flatten(),
+
+                    S.map(res => {
+                        // return either [post, post, ...]
+                        // or post (not in array)
+                        return res.messages.length > 1 ?
+                            res.messages :
+                            res.messages[0]
+                    }),
+
+                    S.collect((err, msgs) => {
+                        if (err) {
+                            return res.send(
+                                createError.InternalServerError(err))
+                        }
+
+                        res.send(msgs)
+                    })
+                )
+            }
         })
     })
 
@@ -160,11 +160,17 @@ module.exports = function startServer (sbot) {
     })
 
     fastify.get('/default', (_, res) => {
-        sbot.db.query(
-            where( type('post') ),
-            toCallback((err, msgs) => {
-                if (err) res.send(createError.InternalServerError())
-                res.send(msgs.reverse())
+        S(
+            sbot.db.query(
+                where( type('post') ),
+                descending(),
+                paginate(10),
+                toPullStream()
+            ),
+            S.take(1),
+            S.drain(msgs => {
+                console.log('***got msgs***', msgs.length)
+                res.send(msgs)
             })
         )
     })
