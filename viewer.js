@@ -25,7 +25,7 @@ module.exports = function startServer (sbot) {
         `)
     })
 
-    fastify.get('/msg/%:id', (req, res) => {
+    fastify.get('/%:id', (req, res) => {
         var { id } = req.params
         id = '%' + id
         // id = decodeURIComponent(id)
