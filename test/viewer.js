@@ -261,8 +261,9 @@ test('get default view', t => {
         fetch(BASE_URL + '/default')
             .then(res => res.ok ? res.json() : res.text())
             .then(res => {
-                t.equal(res[0].key, key,
+                t.equal(res[0].root.key, key,
                     'should return all messages that we know about')
+                t.equal(res.length, 10, 'should paginate response')
                 t.end()
             })
             .catch(err => {
