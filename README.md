@@ -199,3 +199,10 @@ while true; do
   sleep 3
 done
 ```
+
+
+## public web hosting
+
+```
+sbot publish --type about --about "@your.public.id.here" --publicWebHosting
+```

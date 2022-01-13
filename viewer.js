@@ -83,6 +83,8 @@ module.exports = function startServer (sbot) {
                 source,
                 S.take(10), // try this
                 S.map(thread => {
+                    // if it's a thread, return the thread
+                    // if not a thread, return a single message (not array)
                     return thread.messages.length > 1 ?
                         thread.messages :
                         thread.messages[0]
