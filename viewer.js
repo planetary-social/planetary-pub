@@ -113,16 +113,11 @@ module.exports = function startServer (sbot) {
 
     fastify.get('/default', (_, res) => {
         S(
-            sbot.db.query(
-                where( type('post') ),
-                descending(),
-                paginate(10),
-                toPullStream()
-            ),
-            S.take(1),
-            S.drain(msgs => {
-                console.log('***got msgs***', msgs.length)
-                res.send(msgs)
+            sbot.threads.publicSummary({ allowlist: ['post'] }),
+            S.take(10),
+            S.collect((err, sums) => {
+                if (err) return res.send(createError.InternalServerError(err))
+                res.send(sums)
             })
         )
     })

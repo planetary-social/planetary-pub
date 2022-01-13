@@ -250,9 +250,8 @@ test('get a non-existant feed', t => {
 
 test('get default view', t => {
     var content = { type: 'post', text: 'woooo' }
-    var key
     sbot.db.publish(content, (err, msg) => {
-        key = msg.key
+        var key = msg.key
         if (err) {
             t.fail(err.toString())
             return t.end()
@@ -261,8 +260,9 @@ test('get default view', t => {
         fetch(BASE_URL + '/default')
             .then(res => res.ok ? res.json() : res.text())
             .then(res => {
-                t.equal(res[0].key, key,
+                t.equal(res[0].root.key, key,
                     'should return all messages that we know about')
+                t.equal(res.length, 10, 'should paginate results')
                 t.end()
             })
             .catch(err => {
