@@ -60,8 +60,6 @@ module.exports = function startServer (sbot) {
     fastify.get('/feed/:userName', (req, res) => {
         var { userName } = req.params
 
-        console.log('**req name**', req.params.userName)
-
         sbot.suggest.profile({ text: userName }, (err, matches) => {
             if (err) {
                 console.log('OH no!', err)
@@ -79,68 +77,22 @@ module.exports = function startServer (sbot) {
                 return res.code(404).send('not found')
             }
 
-            var source = sbot.db.query(
-                where(
-                    and(
-                        type('post'),
-                        author(id)
-                    )
-                ),
-                descending(),
-                paginate(10),
-                toPullStream()
-            )
 
-            // first get a page of posts by the user
+            var source = sbot.threads.profile({ id: id })
+
             S(
                 source,
-                S.take(1),
-                // TODO
-                // in here, get the blobs that are regerenced by messages
-                S.drain(msgs => {
-                    // now get the threads
-                    // getThreads(msgs)
-                    console.log('***got msgs***', msgs.length)
-                    res.send(msgs)
+                S.take(10), // try this
+                S.map(thread => {
+                    return thread.messages.length > 1 ?
+                        thread.messages :
+                        thread.messages[0]
+                }),
+                S.collect(function (err, threads) {
+                    if (err) return console.log('aaaaaaaaa', err)
+                    res.send(threads)
                 })
             )
-
-            // function getThreads (msgs) {
-            //     S(
-            //         S.values(msgs),
-
-            //         S.map((msg) => {
-            //             return sbot.threads.thread({
-            //                 root: msg.key,
-            //                 allowlist: ['post'],
-            //                 // threads sorted from most recent to
-            //                 // least recent
-            //                 reverse: true, 
-            //                 // at most 3 messages in each thread
-            //                 threadMaxSize: 3, 
-            //             })
-            //         }),
-
-            //         S.flatten(),
-
-            //         S.map(res => {
-            //             // return either [post, post, ...]
-            //             // or post (not in array)
-            //             return res.messages.length > 1 ?
-            //                 res.messages :
-            //                 res.messages[0]
-            //         }),
-
-            //         S.collect((err, msgs) => {
-            //             if (err) {
-            //                 return res.send(
-            //                     createError.InternalServerError(err))
-            //             }
-
-            //             res.send(msgs)
-            //         })
-            //     )
-            // }
         })
     })
 
