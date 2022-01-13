@@ -30,8 +30,6 @@ module.exports = function startServer (sbot) {
         id = '%' + id
         id = decodeURIComponent(id)
 
-        console.log('***id***   ', id)
-
         // get the message in question
         // so we can look for the `root` property and
         // see if there is a thread for this
