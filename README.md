@@ -53,6 +53,7 @@ __Connect to your pub__
 
 In another terminal/machine:
 ```js
+// need to get this address from the other sbot
 var addr = 'net:localhost:62042~shs:LYknR3SSOEOrXD2yEQcHhIrUQmsPNo5+3ETvfjuf3Mw='
 
 // the `ssb-conn` plugin
