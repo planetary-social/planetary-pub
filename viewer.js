@@ -6,6 +6,7 @@ var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
+const bipf = require('bipf')
 // var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
@@ -126,11 +127,16 @@ module.exports = function startServer (sbot) {
         //     })
         // )
 
+        // get the latest 10 msgs that are not replies to
+        // other msgs
         S(
             sbot.db.query(
                 where(
                     and(
-                        absent('value.root', { indexType: 'roots' }),
+                        absent((buf) => {
+                            return bipf.seekKey(buf, 0,
+                                Buffer.from('root'))
+                        }, { indexType: 'roots' }),
                         type('post')
                     )
                 ),
