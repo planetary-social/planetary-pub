@@ -116,12 +116,12 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     link: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
                     name: 'alice'
                 }]
-            }
+            },
 
             // superpost based on %Fug4KlZ6wVgndMpsd08CtVmDpqUEp3Pq+EImZ6WNKBo=.sha256
             {
                 type: 'post',
-                text: '
+                text: `
                 > Here's what those docs look like already:
 
                 The anatomy of ssb "threads"
@@ -307,7 +307,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 -----
                 
                 *   algorithms
-                *   modules'
+                *   modules`
             }
         ]
 
