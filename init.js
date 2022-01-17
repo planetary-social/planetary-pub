@@ -148,26 +148,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                           signature: "uzmo6eaq/1nmpWLAAw0I02oWapAYgr5MWk2ZOf12Ysmy39eCxYfT1WrmGpih6QPubB9zuoiqjJoDDZSiaZg3CQ==.sig.ed25519"
                         }
                       }
-                    
-                
-                      const B = {
-                    +   key: "%PBvSj7XYtrJRUNcM837ZUMGuEVaC8a+0EF6J/BKzfdE=.sha256",
-                        value: {
-                          previous: "%+fBXl12aV1wpAdD62RMl1WRhwthDMuAuHH4iNWgB7jA=.sha256",
-                          author: "@ye+QM09iPcDJD6YvQYjoQc7sLF/IFhmNbEqgdzQo3lQ=.ed25519",
-                          sequence: 9725,
-                          timestamp: 1508232808994,
-                          hash: "sha256",
-                    +     content: {
-                    +       type: "post",
-                    +       root: "%+fBXl12aV1wpAdD62RMl1WRhwthDMuAuHH4iNWgB7jA=.sha256",
-                    +       branch: "%+fBXl12aV1wpAdD62RMl1WRhwthDMuAuHH4iNWgB7jA=.sha256",
-                    +       text: "Ok so ...",
-                    +     },
-                          signature: "5w5B5PzlKErEB6okv6//cUKbcEzWdGg9TsUb1VfQZW5f/7p8K32L1njBDxBBQV3g4hU3D2cdylJtuooWJNCWCQ==.sig.ed25519"
-                        }
-                      }
-                    
                 
                 For the rest of this documentation we're going to represent these like:
                 
@@ -238,22 +218,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                         *   FeedId - encypts to a device
                         *   GroupId - encrypts to a group you're a part of
                         *   POBoxiId - encrypts to a group you're not a part of
-                *   \`content.mentions\` _Array_
-                    *   used for clearly announcing cipherlinks, which is useful for searching for backlinks
-                        
-                            [
-                              {
-                                "link": "@6ilZq3kN0F+dXFHAPjAwMm87JEb/VdB+LC9eIMW3sa0=.ed25519",
-                                "name": "mikey"
-                              },
-                              {
-                                "link": "&JLRmiXbqcZu6ldRYItd4afVDprT3LHCdBmyDyG5koos=.sha256",
-                                "name": "20171017_215119.jpg",
-                                "type": "image/jpeg",
-                                "size": 41629
-                              }
-                            ]
-                            
                         
                     *   in Patchwork v1 (by @pfraze), feedIds were never included in the text, so mentions were essential to know what to link \`@mikey\` in \`context.text\`
                 *   \`content.channel\` _String_
@@ -263,14 +227,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 *   \`content.replies\`
                     
                     *   Patchwork specific one, requires more detail
-                    *   this existed to solve the problem you get when you have a \`branch\` listing messages you don't have.. . because MessageId's alone do not tell you where to get the message. I think the format was like
-                        
-                              {
-                                "%+fBXl12aV1w.....": "@ye+QM09iPcDJD6YvQY",
-                                // MsgId: FeedId
-                              }
-                            
-                        
                         *   this had the nice property that you could see when a message you write got replied to (this was only displayed in Patchbay AFIK)
                 
                 Gotchas
@@ -278,14 +234,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 
                 *   missing messages
                     *   if you are missing a message in the middle of your tangle graph, then we generally still want to try to rended what you have (any maybe alert )
-                *   \`content.recps\`
-                    *   sometimes this is \`null\`
-                *   \`content.branch\`
-                    *   sometimes it's a _String_, sometimes it's an _Array_ (yay no spec!)
-                    *   some devs confuse this with \`content.root\` or \`content.fork\` (similar name!)
-                *   \`content.mentions\`
-                    *   sometimes a "mention" is an _Object_ \`{ link, name, ... }\`
-                    *   sometimes a "mention" is a _String_ \`link\`
                 *   \`content.channel\`
                     *   may or may not include a #, be sure to trim!
                 
@@ -297,16 +245,11 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 _Someone should write the fork/ nested spec.... I have no idea how it actually got implemented_
                 
                 TODO:
-                
-                *   write \`root\` and \`branch\` of X, Y
-                *   write \`fork\` for X, Y
                 *   is there a _forked feed_ feature, or did the concept of _nested feed_ and _forked feed_ get merged
                 *   explain if it's possible to have multiple nests/ forks of a single node
                 
                 Tools
                 -----
-                
-                *   algorithms
                 *   modules`
             }
         ]
