@@ -116,12 +116,12 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     link: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
                     name: 'alice'
                 }]
-            }
+            },
 
             // superpost based on %Fug4KlZ6wVgndMpsd08CtVmDpqUEp3Pq+EImZ6WNKBo=.sha256
             {
                 type: 'post',
-                text: '
+                text: `
                 > Here's what those docs look like already:
 
                 The anatomy of ssb "threads"
@@ -131,7 +131,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 ------------
                 
                 Let's look at the first two messages in a thread. Here's what they look like in full.  
-                We only really need to pay attention to the `key` and `content` of each message
+                We only really need to pay attention to the \`key\` and \`content\` of each message
                 
                       const A = {
                     +   key: "%+fBXl12aV1wpAdD62RMl1WRhwthDMuAuHH4iNWgB7jA=.sha256",
@@ -199,16 +199,16 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 1.  **tangleId**
                     *   A unique identifier for a tangle, so you can identify messages that are part of it
                     *   here this id is the id of the root/ initial message in the thread
-                    *   this is the `content.root` (for `post` messages)
+                    *   this is the \`content.root\` (for \`post\` messages)
                 2.  **tangle position**
                     *   We express this by listing the ids of which messages have come _before_ this message in the tangle
                     *   Instead of listing _every_ previous messageId, if we build a _graph_ of the messages, we can just record the _tips_ of the graph that we're extending from
-                    *   this is the `content.branch` (for `post` messages)
+                    *   this is the \`content.branch\` (for \`post\` messages)
                     *   NOTE: because messages can be published concurrently there may be > 1 branch tips we're extending from
                 
                 ![image.png](/&Ng/8tFRwjelX5mZLrrWUSfC9ItpIayBbOnZCfqKwdzE=.sha256)
                 
-                Here the "root" message is `A`, and we know that `B` follows it because
+                Here the "root" message is \`A\`, and we know that \`B\` follows it because
                 
                     B.value.content.branch = [A.key]
                     
@@ -231,14 +231,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 Optional fields
                 ---------------
                 
-                *   `content.recps` _Array_
+                *   \`content.recps\` _Array_
                     *   used for encryption - your message will be automatically encrypted to those you list here
-                    *   all replies **should** copy the `recps` of the root message
+                    *   all replies **should** copy the \`recps\` of the root message
                     *   entries can be
                         *   FeedId - encypts to a device
                         *   GroupId - encrypts to a group you're a part of
                         *   POBoxiId - encrypts to a group you're not a part of
-                *   `content.mentions` _Array_
+                *   \`content.mentions\` _Array_
                     *   used for clearly announcing cipherlinks, which is useful for searching for backlinks
                         
                             [
@@ -255,15 +255,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                             ]
                             
                         
-                    *   in Patchwork v1 (by @pfraze), feedIds were never included in the text, so mentions were essential to know what to link `@mikey` in `context.text`
-                *   `content.channel` _String_
+                    *   in Patchwork v1 (by @pfraze), feedIds were never included in the text, so mentions were essential to know what to link \`@mikey\` in \`context.text\`
+                *   \`content.channel\` _String_
                     
                     *   the OG hashtag thing
                     *   ideally does not include
-                *   `content.replies`
+                *   \`content.replies\`
                     
                     *   Patchwork specific one, requires more detail
-                    *   this existed to solve the problem you get when you have a `branch` listing messages you don't have.. . because MessageId's alone do not tell you where to get the message. I think the format was like
+                    *   this existed to solve the problem you get when you have a \`branch\` listing messages you don't have.. . because MessageId's alone do not tell you where to get the message. I think the format was like
                         
                               {
                                 "%+fBXl12aV1w.....": "@ye+QM09iPcDJD6YvQY",
@@ -278,15 +278,15 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 
                 *   missing messages
                     *   if you are missing a message in the middle of your tangle graph, then we generally still want to try to rended what you have (any maybe alert )
-                *   `content.recps`
-                    *   sometimes this is `null`
-                *   `content.branch`
+                *   \`content.recps\`
+                    *   sometimes this is \`null\`
+                *   \`content.branch\`
                     *   sometimes it's a _String_, sometimes it's an _Array_ (yay no spec!)
-                    *   some devs confuse this with `content.root` or `content.fork` (similar name!)
-                *   `content.mentions`
-                    *   sometimes a "mention" is an _Object_ `{ link, name, ... }`
-                    *   sometimes a "mention" is a _String_ `link`
-                *   `content.channel`
+                    *   some devs confuse this with \`content.root\` or \`content.fork\` (similar name!)
+                *   \`content.mentions\`
+                    *   sometimes a "mention" is an _Object_ \`{ link, name, ... }\`
+                    *   sometimes a "mention" is a _String_ \`link\`
+                *   \`content.channel\`
                     *   may or may not include a #, be sure to trim!
                 
                 Nested Replies
@@ -298,8 +298,8 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 
                 TODO:
                 
-                *   write `root` and `branch` of X, Y
-                *   write `fork` for X, Y
+                *   write \`root\` and \`branch\` of X, Y
+                *   write \`fork\` for X, Y
                 *   is there a _forked feed_ feature, or did the concept of _nested feed_ and _forked feed_ get merged
                 *   explain if it's possible to have multiple nests/ forks of a single node
                 
@@ -307,7 +307,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 -----
                 
                 *   algorithms
-                *   modules'
+                *   modules`
             }
         ]
 
