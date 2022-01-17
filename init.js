@@ -121,7 +121,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // superpost based on %Fug4KlZ6wVgndMpsd08CtVmDpqUEp3Pq+EImZ6WNKBo=.sha256
             {
                 type: 'post',
-                text: String.raw`
+                text: `
                 > Here's what those docs look like already:
 
                 The anatomy of ssb "threads"
