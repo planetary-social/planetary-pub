@@ -1,12 +1,11 @@
 const { where,  and, type, contact, author,
     toCallback, descending, toPullStream,
-    paginate, absent } = require('ssb-db2/operators')
+    paginate, isRoot } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
-const bipf = require('bipf')
 // var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
@@ -132,13 +131,7 @@ module.exports = function startServer (sbot) {
         S(
             sbot.db.query(
                 where(
-                    and(
-                        absent((buf) => {
-                            return bipf.seekKey(buf, 0,
-                                Buffer.from('root'))
-                        }, { indexType: 'roots' }),
-                        type('post')
-                    )
+                    and( isRoot(), type('post') )
                 ),
                 descending(),
                 paginate(10),

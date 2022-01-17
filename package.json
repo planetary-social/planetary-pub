@@ -24,7 +24,6 @@
   "dependencies": {
     "after": "^0.8.2",
     "bcrypt": "^5.0.1",
-    "bipf": "^1.5.5",
     "fastify": "^3.25.3",
     "fastify-cors": "^6.0.2",
     "fastify-static": "^4.5.0",
