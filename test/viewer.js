@@ -261,8 +261,16 @@ test('get default view', t => {
         fetch(BASE_URL + '/default')
             .then(res => res.ok ? res.json() : res.text())
             .then(res => {
-                t.equal(res[0].root.key, key,
-                    'should return all messages that we know about')
+                var replies = res
+                    // return the root for the msg
+                    // (a list of only replies)
+                    .map(msg => msg.root) 
+                    // filter out msgs with no root
+                    // (filter messages that *are* a root msg)
+                    .filter(Boolean) 
+
+                // should not have any messages with a `root` (replies)
+                t.equal(replies.length, 0, 'should only return root messages')
                 t.equal(res.length, 10, 'should paginate response')
                 t.end()
             })

@@ -1,6 +1,6 @@
 const { where,  and, type, contact, author,
     toCallback, descending, toPullStream,
-    paginate, absent } = require('ssb-db2/operators')
+    paginate, isRoot } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
@@ -126,13 +126,12 @@ module.exports = function startServer (sbot) {
         //     })
         // )
 
+        // get the latest 10 msgs that are not replies to
+        // other msgs
         S(
             sbot.db.query(
                 where(
-                    and(
-                        absent('value.root', { indexType: 'roots' }),
-                        type('post')
-                    )
+                    and( isRoot(), type('post') )
                 ),
                 descending(),
                 paginate(10),
