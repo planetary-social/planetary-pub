@@ -25,6 +25,23 @@ $ git clone git@github.com:planetary-social/planetary-pub.git pub
 ```
 
 
+## git hooks
+
+We're using [husky](https://typicode.github.io/husky/#/) to automatically run tests and lint when you push to the 'main' branch.
+
+Setup husky:
+
+```bash
+npm set-script prepare "husky install"
+```
+
+Add the test script as a git hook. This way we can check which branch we're on in the git hook.
+
+```bash
+npx husky add .husky/pre-push "./test/githook/prepush.sh"
+```
+
+
 ## use
 
 ### cli
