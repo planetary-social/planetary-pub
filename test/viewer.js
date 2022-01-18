@@ -306,7 +306,7 @@ test('get a blob', t => {
 })
 
 test('get messages for a hashtag', t => {
-    t.plan(1)
+    t.plan(2)
 
     var content = { type: 'post', text: 'woooo #test', channel: '#test' }
 
@@ -317,6 +317,8 @@ test('get messages for a hashtag', t => {
             .then(res => res.ok ? res.json() : res.text())
             .then(res => {
                 t.equal(res[0].root.key, newMsg.key)
+                t.ok(res[0].root.value.content.text.includes('#test'),
+                    'should have the right message text')
             })
             .catch(err => t.fail(err))
     })

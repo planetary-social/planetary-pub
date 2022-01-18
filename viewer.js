@@ -106,6 +106,7 @@ module.exports = function startServer (sbot) {
             }),
             S.collect((err, msgs) => {
                 if (err) return res.send(createError.InternalServerError(err))
+                console.log('tags', msgs)
                 res.send(msgs)
             })
         )
