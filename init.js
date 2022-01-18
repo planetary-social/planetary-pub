@@ -88,7 +88,8 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
     function publishTestMsgs (_cb) {
         var testMsgs = [
-            { type: 'post', text: 'post with a hashtag #test' },
+            { type: 'post', text: 'post with a hashtag #test',
+                channel: '#test' },
             { type: 'post', text: 'post with just text' },
             // post with an inline image only (no text)
             {
