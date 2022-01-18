@@ -7,7 +7,7 @@
     "start": "node index.js",
     "lint": "eslint .",
     "build": "echo \"build\" && exit 0",
-    "postversion": "git push && git push --tags && npm publish",
+    "postversion": "git push --no-verify && git push --tags --no-verify && npm publish",
     "test": "NODE_ENV=test tape test/*.js | tap-spec",
     "test-viewer": "NODE_ENV=test node test/viewer.js | tap-spec",
     "test-pub": "NODE_ENV=test tape test/index.js | tap-spec",
