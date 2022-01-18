@@ -1,0 +1,18 @@
+{
+    "extends": [
+        "planetary-ssb"
+    ],
+    "env": {
+        "browser": false
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "prefer-const": 0,
+        "prefer-spread": 0,
+        "prefer-rest-params": 0,
+        "func-style": 0,
+        "indent": [2, 4, { "ignoredNodes": ["TemplateLiteral *"] }]
+    }
+}

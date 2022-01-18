@@ -66,6 +66,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                         type: 'about',
                         about: user.id,
                         // the cinnamon roll hash
+                        // eslint-disable-next-line
                         image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
                     }, cb)
                 },
@@ -92,6 +93,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // post with an inline image only (no text)
             {
                 type: 'post',
+                // eslint-disable-next-line
                 text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
             },
 
@@ -105,6 +107,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             {
                 type: 'post',
                 text: 'some example text with an inline image' +
+                    // eslint-disable-next-line
                     '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)' +
                     ' some more example text'
             },
@@ -114,11 +117,13 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 type: 'post',
                 text: 'mentioning a user, not a blob',
                 mentions: [{
+                    // eslint-disable-next-line
                     link: '@lV5MISER9oGaZJ7OLhlsUNVWHu982USYgMEWfIs6le0=.ed25519',
                     name: 'alice'
                 }]
             },
 
+            // eslint-disable-next-line
             // superpost based on %Fug4KlZ6wVgndMpsd08CtVmDpqUEp3Pq+EImZ6WNKBo=.sha256
             {
                 type: 'post',

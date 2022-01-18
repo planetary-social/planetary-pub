@@ -1,6 +1,9 @@
 var S = require('pull-stream')
+var Abortable = require('pull-abortable')
 
 function getBlob (sbot, peers, blobId, cb) {
+    var abortable = Abortable()
+
     S(
         S.values(peers),
         // this way you stop as soon as one blob is successful

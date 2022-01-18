@@ -1,4 +1,4 @@
-var fetch = require('node-fetch');
+var fetch = require('node-fetch')
 var test = require('tape')
 const crypto = require('crypto')
 const SecretStack = require('secret-stack')
@@ -198,7 +198,7 @@ test('get a feed', t => {
                             t.fail(err)
                             t.end()
                         })
-                    })
+                })
             })
         })
     })
@@ -250,9 +250,8 @@ test('get a non-existant feed', t => {
 
 test('get default view', t => {
     var content = { type: 'post', text: 'woooo' }
-    var key
+
     sbot.db.publish(content, (err, msg) => {
-        key = msg.key
         if (err) {
             t.fail(err.toString())
             return t.end()
@@ -359,8 +358,8 @@ test('get a profile', t => {
                 type: 'about',
                 about: alice.id,
                 image: {
-                link: blobId,       // required
-                type: 'image/jpeg' // optional, but recommended
+                    link: blobId,       // required
+                    type: 'image/jpeg' // optional, but recommended
                 }
             }, (err) => {
                 t.error(err)

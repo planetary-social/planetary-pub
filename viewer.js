@@ -213,6 +213,7 @@ module.exports = function startServer (sbot) {
                             // S.through(data => console.log('**data**', data)),
                             sbot.blobs.add(profile.image, (err, blobId) => {
                                 if (err) {
+                                    // eslint-disable-next-line
                                     res.send(createError.InternalServerError(err))
                                     return console.log('**blob errrr**', err)
                                 }
@@ -259,7 +260,7 @@ module.exports = function startServer (sbot) {
                             and(
                                 type('post'),
                                 author(id)
-                            ),
+                            )
                         ),
                         toCallback((err, res) => {
                             if (err) return reject(err)
@@ -275,7 +276,7 @@ module.exports = function startServer (sbot) {
                         max: 1
                     }, (err, following) => {
                         if (err) return reject(err)
-                        folArr = Object.keys(following).filter(id => {
+                        const folArr = Object.keys(following).filter(id => {
                             return following[id] === 1
                         })
                         resolve(folArr.length)

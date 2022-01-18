@@ -27,7 +27,7 @@ test('setup', t => {
                 t.error(err)
                 console.log('There are ' + msgs.length +
                     ' messages of type "post" from alice',
-                        alice.id)
+                alice.id)
                 t.end()
             })
         )
@@ -74,9 +74,9 @@ test('user profile by name', t => {
 
 test('get following count', t => {
     var content = {
-        "type": "contact",
-        "contact": bob.id,
-        "following": true
+        'type': 'contact',
+        'contact': bob.id,
+        'following': true
     }
 
     _sbot.db.publishAs(alice, content, (err) => {
@@ -88,7 +88,7 @@ test('get following count', t => {
             max: 1
         }, (err, following) => {
             t.error(err)
-            folArr = Object.keys(following).filter(id => {
+            const folArr = Object.keys(following).filter(id => {
                 return following[id] === 1
             })
             t.equal(folArr.length, 1, 'should be following 1 person')
@@ -100,9 +100,9 @@ test('get following count', t => {
 
 test('get follower count', t => {
     var content = {
-        "type": "contact",
-        "contact": alice.id,
-        "following": true
+        'type': 'contact',
+        'contact': alice.id,
+        'following': true
     }
 
     _sbot.db.publishAs(bob, content, (err) => {

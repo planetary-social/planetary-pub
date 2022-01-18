@@ -1,0 +1,5 @@
+node_modules/
+cypress
+public/*
+src/view/logo.js
+src/view/app-store.js
