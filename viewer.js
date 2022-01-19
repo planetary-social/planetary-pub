@@ -113,20 +113,6 @@ module.exports = function startServer (sbot) {
     })
 
     fastify.get('/default', (_, res) => {
-
-        // not working
-        // var msgs = []
-        // S(
-        //     sbot.threads.publicSummary({ allowlist: ['post'] }),
-        //     S.take(10),
-        //     S.drain(function onMsg (msg) {
-        //         msgs.push(msg)
-        //     }, function allDone (err) {
-        //         if (err) return res.send(createError.InternalServerError(err))
-        //         res.send(msgs)
-        //     })
-        // )
-
         // get the latest 10 msgs that are not replies to
         // other msgs
         S(
@@ -140,24 +126,9 @@ module.exports = function startServer (sbot) {
             ),
             S.take(1),
             S.drain(msgs => {
-                console.log('***got msgs***', msgs.length)
                 res.send(msgs)
             })
         )
-
-        // S(
-        //     sbot.db.query(
-        //         where( type('post') ),
-        //         descending(),
-        //         paginate(10),
-        //         toPullStream()
-        //     ),
-        //     S.take(1),
-        //     S.drain(msgs => {
-        //         console.log('***got msgs***', msgs.length)
-        //         res.send(msgs)
-        //     })
-        // )
     })
 
     fastify.get('/profile/:username', (req, res) => {
