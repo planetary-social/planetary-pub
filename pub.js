@@ -1,4 +1,6 @@
 require('dotenv').config()
+const { where,  and, type, toCallback, descending,
+    paginate, predicate } = require('ssb-db2/operators')
 const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
@@ -8,6 +10,7 @@ const userTwo = require('./test/test-data/user-two.json')
 const rimraf = require('rimraf')
 const PUBS = require('./pubs.json')
 var after = require('after')
+var bipf = require('bipf')
 
 const { NODE_ENV } = process.env
 
@@ -98,6 +101,42 @@ function start (cb) {
                 peers.push(ssb)
                 next(null, ssb)
             })
+
+
+            // The `seekType` function takes a buffer and uses `bipf` APIs to search for
+            // the fields we want.
+            // better for performance if defined outside
+            // const bValue = Buffer.from('value') 
+            // const bContent = Buffer.from('content')
+            // const bType = Buffer.from('type')
+
+            // function seekBlob (buf) {
+            //     // p stands for "position" in the buffer, offset from start
+            //     var p = 0 
+            //     p = bipf.seekKey(buf, p, bValue)
+            //     if (p < 0) return
+            //     p = bipf.seekKey(buf, p, bContent)
+            //     if (p < 0) return
+            //     return bipf.seekKey(buf, p, bType)
+            // }
+
+            // sbot.db.query(
+            //     where(
+            //         and(
+            //             type('post'),
+            //             predicate(seekBlob, arg => {
+            //                 console.log('***arg***', arg)
+            //             }, { name: 'blobs' })
+            //         )
+            //     ),
+            //     descending(),
+            //     paginate(10),
+            //     toCallback((err, res) => {
+            //         if (err) return console.log('arrrrr', err)
+            //         console.log('res', res)
+            //     })
+            // )
+
 
             cb(null, sbot)
         }
