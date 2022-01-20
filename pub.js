@@ -1,6 +1,6 @@
 require('dotenv').config()
-const { where,  and, type, toCallback, descending,
-    paginate, predicate } = require('ssb-db2/operators')
+// const { where,  and, type, toCallback, descending,
+//     paginate, predicate } = require('ssb-db2/operators')
 const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
@@ -10,7 +10,7 @@ const userTwo = require('./test/test-data/user-two.json')
 const rimraf = require('rimraf')
 const PUBS = require('./pubs.json')
 var after = require('after')
-var bipf = require('bipf')
+// var bipf = require('bipf')
 
 const { NODE_ENV } = process.env
 
