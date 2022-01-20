@@ -333,8 +333,6 @@ function getThread(sbot, rootId, cb) {
 
 
 function getBlob (sbot, blobId, cb) {
-    console.log('***cb***', cb)
-
     sbot.blobs.has(blobId, (err, has) => {
         if (err) {
             console.log('errrrr', err)
