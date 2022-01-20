@@ -293,7 +293,7 @@ test('get a blob', t => {
             fetch(BASE_URL + '/blob/' + encodeURIComponent(blobId))
                 .then(res => res.ok ? res.buffer() : res.text())
                 .then(buf => {
-                    t.equal(blobId, hash(buf), 'should serve the blob')
+                    t.equal(hash(buf), blobId, 'should serve the blob')
                     t.end()
                 })
                 .catch(err => {

@@ -53,8 +53,13 @@ module.exports = function startServer (sbot) {
         // TODO
         // * check if we have this blob, and if not, request it
         //   from the pub we're connected with
-        var source = sbot.blobs.get(blobId)
-        res.send(toStream.source(source))
+        // var source = sbot.blobs.get(blobId)
+        // res.send(toStream.source(source))
+
+        getBlob(sbot, blobId, (err, blobStream) => {
+            if (err) return res.send(createError.InternalServerError(err))
+            res.send(toStream.source(blobStream))
+        })
     })
 
     fastify.get('/feed/:userName', (req, res) => {
@@ -325,3 +330,58 @@ function getThread(sbot, rootId, cb) {
     )
 }
 
+
+
+function getBlob (sbot, blobId, cb) {
+    console.log('***cb***', cb)
+
+    sbot.blobs.has(blobId, (err, has) => {
+        if (err) {
+            console.log('errrrr', err)
+            return cb(err)
+        }
+
+        if (has) {
+            console.log('***has***', blobId)
+            return cb(null, sbot.blobs.get(blobId))
+        }
+
+        // we don't have the blob yet,
+        // so request it from a peer, then return a response
+
+        // this is something added only in the planetary pub
+        // this is something IPFS would help with b/c
+        // I think they handle routing requests
+        // var currentPeers = sbot.peers
+        // var currentPeers = sbot.conn.dbPeers()	
+        // console.log('**peers**', currentPeers)
+
+        // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
+        // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+
+        // trying cel's pub
+        var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+        sbot.conn.connect(addr, (err, ssb) => {
+            if (err) {
+                console.log('oh no', err)
+                return console.log('*errrrr connect*', err)
+            }
+
+            // console.log('**aaaaaaaaaaa**', ssb.blobs)
+
+            S(
+                ssb.blobs.get(blobId),
+                sbot.blobs.add(blobId, (err, _blobId) => {
+                    if (err) {
+                        // eslint-disable-next-line
+                        console.log('**blob errrr**', err)
+                        return cb(err)
+                    }
+
+                    console.log('***got blob***', _blobId)
+                    cb(null, sbot.blobs.get(_blobId))
+                })
+            )
+        })
+    })
+}
