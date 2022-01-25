@@ -136,6 +136,24 @@ module.exports = function startServer (sbot) {
         )
     })
 
+    fastify.post('/get-profiles', (req, res) => {
+        var ids
+        try {
+         ids = JSON.parse(req.body).ids
+        } catch (err) {
+            return res.send(createError.BadRequest('Invalid json'))
+        }
+
+        console.log('***req.body***', req.body)
+        console.log('ids', ids)
+
+        // how is there no async code here?
+        var profiles = ids.map(id => {
+            return sbot.db.getIndex('aboutSelf').getProfile(id)
+        })
+        res.send(profiles)
+    })
+
     fastify.get('/profile/:username', (req, res) => {
         var { username } = req.params
 

@@ -17,6 +17,7 @@ const caps = require('./caps.json')
 const user = require('./user.json')
 const userTwo = require('./user-two.json')
 const alice = user
+const bob = userTwo
 
 const PORT = 8888
 const BASE_URL = 'http://localhost:' + PORT
@@ -39,9 +40,17 @@ test('setup', t => {
         }, (err) => {
             t.error(err)
 
-            var next = after(2, (err) => {
+            var next = after(3, (err) => {
                 t.error(err)
                 t.end()
+            })
+
+            sbot.db.publishAs(bob, {
+                type: 'about',
+                about: bob.id,
+                name: 'bob'
+            }, (err) => {
+                next(err)
             })
 
             sbot.db.publish({ type: 'test', text: 'woooo 1' }, (err, msg) => {
@@ -343,7 +352,6 @@ test('get counts of messages', t => {
             t.fail(err)
             t.end()
         })
-
 })
 
 test('get a profile', t => {
@@ -385,7 +393,33 @@ test('get a profile', t => {
 
         })
     )
+})
 
+test('getProfiles route', t => {
+    // here you get a profile by id
+    fetch(BASE_URL + '/get-profiles', {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({ ids: [alice.id, bob.id] })
+    })
+        .then(res => {
+            if (!res.ok) {
+                t.fail('should not return invalid code')
+                return t.end()
+            }
+            return res.json()
+        })
+        .then(res => {
+            console.log('got profiles', res)
+            t.equal(res.length, 2, 'should return 2 profiles')
+            t.equal(res[0].name, 'alice', 'should have a name for alice')
+            t.equal(res[1].name, 'bob', 'should have bob')
+            t.end()
+        })
+        .catch(err => {
+            t.fail(err)
+            t.end()
+        })
 })
 
 function hash (buf) {
