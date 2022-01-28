@@ -139,7 +139,7 @@ module.exports = function startServer (sbot) {
     fastify.post('/get-profiles', (req, res) => {
         var ids
         try {
-         ids = JSON.parse(req.body).ids
+            ids = JSON.parse(req.body).ids
         } catch (err) {
             return res.send(createError.BadRequest('Invalid json'))
         }
