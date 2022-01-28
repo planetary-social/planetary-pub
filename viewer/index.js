@@ -1,6 +1,5 @@
-const { where,  and, type, contact, author,
-    toCallback, descending, toPullStream,
-    paginate, isRoot, batch } = require('ssb-db2/operators')
+const { where,  and, type, contact,
+    author, toCallback,  } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
@@ -198,75 +197,20 @@ module.exports = function startServer (sbot) {
 
 
     fastify.get('/default', (_, res) => {
-        // const source = publicSummary({
-        //     reverse: true,
-        //     threadMaxSize: 3,
-        //     allowlist: ['post']
-        // })
-
-        // const source = sbot.threads.publicSummary({
-        //     reverse: true,
-        //     threadMaxSize: 3,
-        //     allowlist: ['post']
-        // })
-
         const source = getThreads({ sbot })
 
         S(
             source,
-
-            // sbot.db.query(
-            //     where(type('post')),
-            //     descending(),
-            //     batch(10),
-            //     toPullStream()
-            // ),
-
             S.take(10),
-
-            // S.map(thread => {
-            //     if (thread.replyCount === 0) {
-            //         return S.values([thread])
-            //     }
-
-            //     return S(
-            //         sbot.threads.thread({ root: thread.root.key }),
-            //         S.map(thread => thread.messages)
-            //     )
-            // }),
-
-            // S.flatten(),
-
-            // S.drain(msgs => {
-            //     console.log('**msgs**', msgs)
-            //     res.send(msgs)
-            // }, err => {
-            //     if (err) res.send(createError.InternalServerError(err))
-            // })
-
             S.collect(function (err, threads) {
                 if (err) return console.log('err', err)
+
+                console.log('**threads in here***')
+                console.log(threads)
+
                 res.send(threads)
             })
         )
-
-
-        // the old way of doing this route
-        // S(
-        //     sbot.db.query(
-        //         where(
-        //             and( isRoot(), type('post') )
-        //         ),
-        //         descending(),
-        //         paginate(10),
-        //         toPullStream()
-        //     ),
-        //     S.take(1),
-        //     S.drain(msgs => {
-        //         res.send(msgs)
-        //     })
-        // )
-
     })
 
     fastify.post('/get-profiles', (req, res) => {

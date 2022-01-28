@@ -10,6 +10,14 @@ const BATCH_SIZE = 75;
 
 module.exports = publicSummary
 
+/**
+ * We are just re-implementing `ssb-threads` here.
+ * 
+ * `ssb-threads` was causing the server to crash b/c it was using too much
+ * memory. So I began experimenting here by adding just the minimum that
+ * we need to do this query. And now it works, but the bad part is I don't
+ * know _why_ it works here but not in `ssb-threads`.
+ */
 
 function publicSummary ({ sbot }) {
 
