@@ -268,18 +268,16 @@ test('get default view', t => {
 
         fetch(BASE_URL + '/default')
             .then(res => res.ok ? res.json() : res.text())
-            .then(res => {
-                var replies = res
-                    // return the root for the msg
-                    // (a list of only replies)
-                    .map(msg => msg.root) 
-                    // filter out msgs with no root
-                    // (filter messages that *are* a root msg)
-                    .filter(Boolean) 
+            .then(threads => {
+                console.log(JSON.stringify('**a thread**', threads[0]))
+                t.equal(threads.length, 10, 'should paginate response')
+                threads.forEach(thread => {
+                    t.ok(thread.root,
+                        'should have the root message in thread')
+                    t.ok(thread.replyCount !== undefined,
+                        'should have a reply count')
+                })
 
-                // should not have any messages with a `root` (replies)
-                t.equal(replies.length, 0, 'should only return root messages')
-                t.equal(res.length, 10, 'should paginate response')
                 t.end()
             })
             .catch(err => {
@@ -410,7 +408,6 @@ test('getProfiles route', t => {
             return res.json()
         })
         .then(res => {
-            console.log('got profiles', res)
             t.equal(res.length, 2, 'should return 2 profiles')
             t.equal(res[0].name, 'alice', 'should have a name for alice')
             t.equal(res[1].name, 'bob', 'should have bob')

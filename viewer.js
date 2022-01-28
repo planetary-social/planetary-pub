@@ -86,7 +86,7 @@ module.exports = function startServer (sbot) {
 
             S(
                 source,
-                S.take(10), // try this
+                S.take(10),
                 S.map(thread => {
                     // if it's a thread, return the thread
                     // if not a thread, return a single message (not array)
@@ -95,7 +95,7 @@ module.exports = function startServer (sbot) {
                         thread.messages[0]
                 }),
                 S.collect(function (err, threads) {
-                    if (err) return console.log('aaaaaaaaa', err)
+                    if (err) return console.log('err', err)
                     res.send(threads)
                 })
             )
@@ -111,7 +111,7 @@ module.exports = function startServer (sbot) {
             }),
             S.collect((err, msgs) => {
                 if (err) return res.send(createError.InternalServerError(err))
-                console.log('tags', msgs)
+                // console.log('tags', msgs)
                 res.send(msgs)
             })
         )
@@ -120,20 +120,44 @@ module.exports = function startServer (sbot) {
     fastify.get('/default', (_, res) => {
         // get the latest 10 msgs that are not replies to
         // other msgs
+
+        const source = sbot.threads.publicSummary({
+            reverse: true,
+            allowlist: ['post']
+        })
+
         S(
-            sbot.db.query(
-                where(
-                    and( isRoot(), type('post') )
-                ),
-                descending(),
-                paginate(10),
-                toPullStream()
-            ),
-            S.take(1),
-            S.drain(msgs => {
-                res.send(msgs)
+            source,
+            S.take(10),
+            S.map(thread => {
+                // if it's a thread, return the thread
+                // if not a thread, return a single message (not array)
+                // console.log('**thread**', JSON.stringify(thread, null, 2))
+                return thread
+                // return thread.messages.length > 1 ?
+                //     thread.messages :
+                //     thread.messages[0]
+            }),
+            S.collect(function (err, threads) {
+                if (err) return console.log('err', err)
+                res.send(threads)
             })
         )
+
+        // S(
+        //     sbot.db.query(
+        //         where(
+        //             and( isRoot(), type('post') )
+        //         ),
+        //         descending(),
+        //         paginate(10),
+        //         toPullStream()
+        //     ),
+        //     S.take(1),
+        //     S.drain(msgs => {
+        //         res.send(msgs)
+        //     })
+        // )
     })
 
     fastify.post('/get-profiles', (req, res) => {
@@ -144,8 +168,8 @@ module.exports = function startServer (sbot) {
             return res.send(createError.BadRequest('Invalid json'))
         }
 
-        console.log('***req.body***', req.body)
-        console.log('ids', ids)
+        // console.log('***req.body***', req.body)
+        // console.log('ids', ids)
 
         // how is there no async code here?
         var profiles = ids.map(id => {
@@ -176,7 +200,7 @@ module.exports = function startServer (sbot) {
                         return res.send(createError.InternalServerError(err))
                     }
 
-                    console.log('**has image**', has)
+                    // console.log('**has image**', has)
 
                     if (has) return res.send(profile)
 
