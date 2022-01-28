@@ -2,7 +2,8 @@
 
 A pub
 
-This creates an `sbot`, and imports and exposes the viewer app.
+This creates an `sbot`, and imports and exposes the viewer app. The viewer app
+is an http server for the pub.
 
 See the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
 
@@ -24,17 +25,15 @@ Install as an app (git clone):
 $ git clone git@github.com:planetary-social/planetary-pub.git pub
 ```
 
-
 ## git hooks
-
 We're using [husky](https://typicode.github.io/husky/#/) to automatically run tests and lint when you push to the 'main' branch.
 
+### setup git hooks
 Add the test script as a git hook. This way we can check which branch we're on in the git hook.
 
 ```bash
 npx husky add .husky/pre-push "./test/githook/prepush.sh"
 ```
-
 
 ## use
 
@@ -57,6 +56,29 @@ createSbot((err, sbot) => {
   })
 })
 ```
+
+
+## test
+Test the viewer
+```bash
+NODE_ENV=test node test/viewer.js | npx tap-spec
+```
+
+Test the pub
+```bash
+NODE_ENV=test node test/index.js | npx tap-spec
+```
+
+Start the pub using _real_ data, not test-data
+```bash
+NODE_ENV=staging-local node index.js
+```
+
+Use a 512 MB limit on memory (so you can tell if it uses too much)
+```
+NODE_ENV=staging-local node --max-old-space-size=512 index.js
+```
+
 
 ----------------------------------------------------------------
 

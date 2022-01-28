@@ -1,11 +1,12 @@
 const { where,  and, type, contact, author,
     toCallback, descending, toPullStream,
-    paginate, isRoot } = require('ssb-db2/operators')
+    paginate, isRoot, batch } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
+var getThreads = require('./threads')
 // var getBlob = require('./get-blob')
 
 module.exports = function startServer (sbot) {
@@ -117,160 +118,155 @@ module.exports = function startServer (sbot) {
         )
     })
 
+
+
+    // function publicSummary (opts) {
+    //     // const needsDescending = opts.reverse
+    //     // const filterOperator = type('post')
+    //     // const passesFilter = makePassesFilter(opts);
+    //     // const timestamps = new Map<MsgId, number>();
+
+    //     function hasNoBacklinks (msg) {
+    //         return (
+    //             !msg?.value?.content?.root &&
+    //             !msg?.value?.content?.branch &&
+    //             !msg?.value?.content?.fork
+    //         )
+    //     }
+
+    //     function getRootMsgId (msg) {
+    //         if (msg?.value?.content) {
+    //           const fork = msg.value.content.fork;
+    //           const root = msg.value.content.root;
+    //           if (fork && Ref.isMsgId(fork)) return fork;
+    //           if (root && Ref.isMsgId(root)) return root;
+    //         }
+    //         // this msg has no root so we assume this is a root
+    //         return msg.key;
+    //     }
+
+    //     function isUniqueMsgId (uniqueRoots) {
+    //         return function checkIsUnique_id (id) {
+    //             if (uniqueRoots.has(id)) {
+    //                 return false
+    //             } else {
+    //                 uniqueRoots.add(id)
+    //                 return true
+    //             }
+    //         };
+    //     }
+
+    //      /**
+    //      * Returns a pull-stream operator that:
+    //      * 1. Checks if there is a Msg in the cache for the source MsgId
+    //      * 2. If not in the cache, do a database lookup
+    //      */
+    //     fetchMsgFromIdIfItExists = (source) => {
+    //         return S(
+    //             source,
+    //             S.asyncMap((id, cb) => {
+    //                 sbot.db.getMsg(id, (err, msg) => {
+    //                     if (err) cb(null /* missing msg */);
+    //                     else cb(err, msg);
+    //                 });
+    //             }),
+    //             S.filter(), // remove missing msg
+    //         );
+    //     }
+    
+    //     return S(
+    //         sbot.db.query(
+    //             where(type('post')),
+    //             descending(),
+    //             batch(10),
+    //             toPullStream()
+    //         ),
+    //         // pull.through((msg) =>
+    //         //     timestamps.set(getRootMsgId(msg), getTimestamp(msg)),
+    //         // ),
+    //         S.map(getRootMsgId),
+    //         S.filter(isUniqueMsgId(new Set())),
+    //         fetchMsgFromIdIfItExists,
+    //         // S.filter(passesFilter),
+    //         // S.filter(isPublicType),
+    //         S.filter(hasNoBacklinks),
+    //         // this.removeMessagesFromBlocked,
+    //         // S.asyncMap(this.nonBlockedRootToSummary(filterOperator, timestamps)),
+    //     );
+    // };
+
+
+
     fastify.get('/default', (_, res) => {
-        // get the latest 10 msgs that are not replies to
-        // other msgs
-
-
-        // const source = sbot.threads.publicSummary({
+        // const source = publicSummary({
         //     reverse: true,
+        //     threadMaxSize: 3,
         //     allowlist: ['post']
         // })
 
-        // S(
-        //     source,
-        //     S.take(10),
-        //     // S.map(thread => {
-        //     //     // if it's a thread, return the thread
-        //     //     // if not a thread, return a single message (not array)
-        //     //     // console.log('**thread**', JSON.stringify(thread, null, 2))
-        //     //     return thread
-        //     //     // return thread.messages.length > 1 ?
-        //     //     //     thread.messages :
-        //     //     //     thread.messages[0]
-        //     // }),
+        // const source = sbot.threads.publicSummary({
+        //     reverse: true,
+        //     threadMaxSize: 3,
+        //     allowlist: ['post']
+        // })
 
-        //     // get the replies if applicable
-        //     // S.asyncMap(function (thread, cb) {
-        //     //     if (thread.replyCount === 0) {
-        //     //         return process.nextTick(() => {
-        //     //             cb(null, thread)
-        //     //         })
-        //     //     }
-
-        //     //     // TODO -- use pull.flatten or whatever
-        //     //     // here get the replies to the root
-        //     //     S(
-        //     //         sbot.threads.thread({ root: thread.root.key }),
-        //     //         S.drain(thread => {
-        //     //             cb(null, thread)
-        //     //         })
-        //     //     )
-        //     // }),
-
-        //     S.map(thread => {
-        //         if (thread.replyCount === 0) {
-        //             return S.values([thread])
-        //         }
-
-        //         return S(
-        //             sbot.threads.thread({ root: thread.root.key }),
-        //             S.map(thread => thread.messages)
-        //         )
-        //     }),
-
-        //     S.flatten(),
-
-        //     S.collect(function (err, threads) {
-        //         if (err) return console.log('err', err)
-        //         res.send(threads)
-        //     })
-        // )
+        const source = getThreads({ sbot })
 
         S(
-            sbot.db.query(
-                where(
-                    and( isRoot(), type('post') )
-                ),
-                descending(),
-                paginate(10),
-                toPullStream()
-            ),
-            S.take(1),
-            S.drain(msgs => {
-                res.send(msgs)
+            source,
+
+            // sbot.db.query(
+            //     where(type('post')),
+            //     descending(),
+            //     batch(10),
+            //     toPullStream()
+            // ),
+
+            S.take(10),
+
+            // S.map(thread => {
+            //     if (thread.replyCount === 0) {
+            //         return S.values([thread])
+            //     }
+
+            //     return S(
+            //         sbot.threads.thread({ root: thread.root.key }),
+            //         S.map(thread => thread.messages)
+            //     )
+            // }),
+
+            // S.flatten(),
+
+            // S.drain(msgs => {
+            //     console.log('**msgs**', msgs)
+            //     res.send(msgs)
+            // }, err => {
+            //     if (err) res.send(createError.InternalServerError(err))
+            // })
+
+            S.collect(function (err, threads) {
+                if (err) return console.log('err', err)
+                res.send(threads)
             })
         )
 
 
-
-
-
-
-
-
-
-        
-
-        // const source = sbot.threads.publicSummary({
-        //     reverse: true,
-        //     allowlist: ['post']
-        // })
-
+        // the old way of doing this route
         // S(
-        //     source,
-        //     S.take(10),
-        //     // S.map(thread => {
-        //     //     // if it's a thread, return the thread
-        //     //     // if not a thread, return a single message (not array)
-        //     //     // console.log('**thread**', JSON.stringify(thread, null, 2))
-        //     //     return thread
-        //     //     // return thread.messages.length > 1 ?
-        //     //     //     thread.messages :
-        //     //     //     thread.messages[0]
-        //     // }),
-
-        //     // get the replies if applicable
-        //     // S.asyncMap(function (thread, cb) {
-        //     //     if (thread.replyCount === 0) {
-        //     //         return process.nextTick(() => {
-        //     //             cb(null, thread)
-        //     //         })
-        //     //     }
-
-        //     //     // TODO -- use pull.flatten or whatever
-        //     //     // here get the replies to the root
-        //     //     S(
-        //     //         sbot.threads.thread({ root: thread.root.key }),
-        //     //         S.drain(thread => {
-        //     //             cb(null, thread)
-        //     //         })
-        //     //     )
-        //     // }),
-
-        //     S.map(thread => {
-        //         if (thread.replyCount === 0) {
-        //             return S.values([thread])
-        //         }
-
-        //         return S(
-        //             sbot.threads.thread({ root: thread.root.key }),
-        //             S.map(thread => thread.messages)
-        //         )
-        //     }),
-
-        //     S.flatten(),
-
-        //     S.collect(function (err, threads) {
-        //         if (err) return console.log('err', err)
-        //         res.send(threads)
+        //     sbot.db.query(
+        //         where(
+        //             and( isRoot(), type('post') )
+        //         ),
+        //         descending(),
+        //         paginate(10),
+        //         toPullStream()
+        //     ),
+        //     S.take(1),
+        //     S.drain(msgs => {
+        //         res.send(msgs)
         //     })
         // )
 
-        // // S(
-        // //     sbot.db.query(
-        // //         where(
-        // //             and( isRoot(), type('post') )
-        // //         ),
-        // //         descending(),
-        // //         paginate(10),
-        // //         toPullStream()
-        // //     ),
-        // //     S.take(1),
-        // //     S.drain(msgs => {
-        // //         res.send(msgs)
-        // //     })
-        // // )
     })
 
     fastify.post('/get-profiles', (req, res) => {
