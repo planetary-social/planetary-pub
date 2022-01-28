@@ -266,28 +266,47 @@ test('get default view', t => {
             return t.end()
         }
 
-        fetch(BASE_URL + '/default')
-            .then(res => res.ok ? res.json() : res.text())
-            .then(threads => {
-                console.log('**a thread**',
-                    JSON.stringify(threads[0], null, 2))
-                console.log('aaaaa', threads)
-                t.equal(threads[0].root.value.content.text, 'woooo',
-                    'has the most recent message')
-                t.equal(threads.length, 10, 'should paginate response')
-                threads.forEach(thread => {
-                    t.ok(thread.root,
-                        'should have the root message in thread')
-                    t.ok(thread.replyCount !== undefined,
-                        'should have a reply count')
-                })
+        const msgTwo = { type: 'post', text: 'ok', root: msg.key }
+        sbot.db.publish(msgTwo, (err, msg) => {
+            if (err) {
+                t.fail(err.toString())
+                return t.end()
+            }
 
-                t.end()
-            })
-            .catch(err => {
-                t.fail(err)
-                t.end()
-            })
+            fetch(BASE_URL + '/default')
+                .then(res => res.ok ? res.json() : res.text())
+                .then(threads => {
+                    console.log('**threads**',
+                        JSON.stringify(threads, null, 2))
+
+
+                    // threads[0] is the thread []
+                    // all others are { root: {}, replyCount: 0 }
+
+
+                    t.equal(threads[0].length, 2,
+                        'should return the threads as arrays')
+                    t.equal(threads[0][0].value.content.text, 'woooo',
+                        'has the most recent message as start of a thread')
+                    t.equal(threads[0][1].value.content.root,
+                        threads[0][0].key,
+                        'should have the right root for the reply')
+                    t.equal(threads.length, 10, 'should paginate response')
+                    // threads.forEach(thread => {
+                    //     t.ok(thread.root,
+                    //         'should have the root message in thread')
+                    //     t.ok(thread.replyCount !== undefined,
+                    //         'should have a reply count')
+                    // })
+
+                    t.end()
+                })
+                .catch(err => {
+                    t.fail(err)
+                    t.end()
+                })
+        })
+
     })
 })
 
