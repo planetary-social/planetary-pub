@@ -269,7 +269,11 @@ test('get default view', t => {
         fetch(BASE_URL + '/default')
             .then(res => res.ok ? res.json() : res.text())
             .then(threads => {
-                console.log(JSON.stringify('**a thread**', threads[0]))
+                console.log('**a thread**',
+                    JSON.stringify(threads[0], null, 2))
+                console.log('aaaaa', threads)
+                t.equal(threads[0].root.value.content.text, 'woooo',
+                    'has the most recent message')
                 t.equal(threads.length, 10, 'should paginate response')
                 threads.forEach(thread => {
                     t.ok(thread.root,
