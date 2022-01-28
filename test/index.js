@@ -1,4 +1,5 @@
-const { where, and, type, contact, author, toCallback } = require('ssb-db2/operators')
+const { where, and, type, contact, author,
+    toCallback } = require('ssb-db2/operators')
 var test = require('tape')
 var createSbot = require('../pub')
 var alice = require('./test-data/user.json')
@@ -12,9 +13,7 @@ test('setup', t => {
             return t.end()
         }
 
-        // var { viewer, sbot } = args
         _sbot = sbot
-        // _viewer = viewer
 
         sbot.db.query(
             where(
@@ -33,6 +32,27 @@ test('setup', t => {
         )
 
     })
+})
+
+test('bobs messages have a reply root set properly', t => {
+    _sbot.db.query(
+        where(
+            and(
+                type('post'),
+                author(bob.id)
+            )
+        ),
+        toCallback((err, msgs) => {
+            t.error(err)
+            t.equal(msgs.length, 2, 'should have 2 messages from bob')
+            console.log('**msgs**', JSON.stringify(msgs, null, 2))
+            t.equal(msgs[1].value.content.text, 'four',
+                'should have the right message content')
+            t.equal(msgs[1].value.content.root, msgs[0].key,
+                'should have the first message as root')
+            t.end()
+        })
+    )
 })
 
 // we use the env var `test` to know to load the test data;

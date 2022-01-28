@@ -45,7 +45,6 @@ function start (cb) {
                 if (err) return cb(err)
                 cb(null, sbot)
             })
-
         })
     } else {
         // don't reset the DB if we're not in `test` env

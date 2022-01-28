@@ -27,6 +27,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             )
         },
 
+        // create user profiles
         saveProfiles,
 
         // follow people
@@ -44,6 +45,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             })
         },
 
+        // publish demo posts
         publishTestMsgs
 
     ], function allDone (err) {
@@ -130,7 +132,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 type: 'post',
                 text: readFileSync(__dirname +
                     '/test/test-data/super-post.md', 'utf8')
-
             }
         ]
 
@@ -143,9 +144,10 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             }
         })).concat([cb => {
             sbot.db.publishAs(userTwo, { type: 'post', text: 'aaa' }, cb)
-        }]), function allDone (err, [msg]) {
+        }]), function allDone (err, msgs) {
             if (err) return _cb(err)
-            // this should be the first msg published (user 1)
+
+            var msg = msgs[msgs.length - 1]
 
             // now publish some threaded msgs
             sbot.db.publishAs(userTwo, {
