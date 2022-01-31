@@ -127,9 +127,6 @@ module.exports = function startServer (sbot) {
             S.collect(function (err, threads) {
                 if (err) return console.log('err', err)
 
-                console.log('**threads in here***')
-                console.log(threads)
-
                 res.send(threads)
             })
         )
