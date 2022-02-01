@@ -100,6 +100,20 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: '![a blob](&SNZQDvykMENRmJMVyLfG20vlvgelGwj03C3YjWEi0JQ=.sha256)'
             },
 
+            {
+                type: 'post',
+                text: 'a post with the same image inline and attached ' +
+                    // eslint-disable-next-line
+                    '![a blob](&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256)',
+                mentions: [{
+                    // eslint-disable-next-line
+                    link: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
+                    name: 'test.jpg', // optional, but recommended
+                    size: 12,          // optional, but recommended
+                    type: 'image/jpeg' // optional, but recommended
+                }]
+            },
+
             // post with text, no image
             {
                 type: 'post',

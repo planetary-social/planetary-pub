@@ -31,7 +31,6 @@ module.exports = start
 
 
 function start (cb) {
-
     if (NODE_ENV === 'test') {
         // first reset the DB by deleting it
         rimraf(path.join(DB_PATH, 'db2'), (err) => {
