@@ -32,7 +32,7 @@ function publicSummary ({ sbot }) {
                                 and(
                                     hasRoot(root.key),
                                     // filter,
-                                    privately ? isPrivate() : isPublic(),
+                                    (privately ? isPrivate() : isPublic()),
                                 )
                             ),
                             batch(BATCH_SIZE),
