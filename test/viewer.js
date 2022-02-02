@@ -19,6 +19,8 @@ const userTwo = require('./user-two.json')
 const alice = user
 const bob = userTwo
 
+const { where, author, toCallback } = require('ssb-db2/operators')
+
 const PORT = 8888
 const BASE_URL = 'http://localhost:' + PORT
 const DB_PATH = process.env.DB_PATH || (__dirname + '/db')
@@ -42,7 +44,19 @@ test('setup', t => {
 
             var next = after(3, (err) => {
                 t.error(err)
-                t.end()
+                console.log('sbot id', sbot.config.keys.id)
+
+                sbot.db.query(
+                    where(
+                        author(alice.id)
+                    ),
+                    toCallback((err, msgs) => {
+                        console.log('**messages**',
+                            JSON.stringify(msgs, null, 2))
+                        t.error(err)
+                        t.end()
+                    })
+                )
             })
 
             sbot.db.publishAs(bob, {
