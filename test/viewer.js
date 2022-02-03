@@ -258,6 +258,36 @@ test('feeds are paginated', t => {
     })
 })
 
+
+test('get counts by id', t => {
+    fetch(BASE_URL + '/counts-by-id/' + encodeURIComponent(alice.id))
+        .then(res => res.json())
+        .then(res => {
+            t.equal(res.userId, alice.id, 'shouold return the right user id')
+            t.equal(res.posts, 31, 'should count the posts')
+            t.equal(res.followers, 1, 'should count the folloers')
+            t.equal(res.following, 0, 'should count following')
+            t.end()
+        })
+})
+
+
+
+test('get a user by id', t => {
+    var id = encodeURIComponent(alice.id)
+    fetch(BASE_URL + '/feed-by-id/' + id)
+        .then(res => res.json())
+        .then(json => {
+            json.forEach(msg => {
+                t.equal(msg.value.author, alice.id, 'should return the' +
+                    'right feed')
+            })
+            t.end()
+        })
+})
+
+
+
 test('get a non-existant feed', t => {
     fetch(BASE_URL + '/feed/' + 'foo')
         .then(res => {

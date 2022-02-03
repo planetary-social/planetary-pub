@@ -62,6 +62,95 @@ module.exports = function startServer (sbot) {
         })
     })
 
+    fastify.get('/feed-by-id/:userId', (req, res) => {
+        var { userId } = req.params
+        var source = sbot.threads.profile({ id: userId })
+
+        S(
+            source,
+            S.take(10),
+            S.map(thread => {
+                // if it's a thread, return the thread
+                // if not a thread, return a single message (not array)
+                return thread.messages.length > 1 ?
+                    thread.messages :
+                    thread.messages[0]
+            }),
+            S.collect(function (err, threads) {
+                if (err) return console.log('err', err)
+                res.send(threads)
+            })
+        )
+    })
+
+    fastify.get('/counts-by-id/:userId', (req, res) => {
+        var { userId } = req.params
+
+        Promise.all([
+            new Promise((resolve, reject) => {
+                // get thier posts so we can count them
+                sbot.db.query(
+                    where(
+                        and(
+                            type('post'),
+                            author(userId)
+                        )
+                    ),
+                    toCallback((err, res) => {
+                        if (err) return reject(err)
+                        resolve(res.length)
+                    })
+                )
+            }),
+
+            // get the following count
+            new Promise((resolve, reject) => {
+                sbot.friends.hops({
+                    start: userId,
+                    max: 1
+                }, (err, following) => {
+                    if (err) return reject(err)
+                    const folArr = Object.keys(following).filter(id => {
+                        return following[id] === 1
+                    })
+                    resolve(folArr.length)
+                })
+            }),
+
+            // get the follower count
+            new Promise((resolve, reject) => {
+                sbot.db.query(
+                    where(
+                        contact(userId)
+                    ),
+                    toCallback((err, msgs) => {
+                        if (err) return reject(err)
+        
+                        var followers = msgs.reduce(function (acc, msg) {
+                            var author = msg.value.author
+                            // duplicate, do nothing
+                            if (acc.indexOf(author) > -1) return acc  
+                            // if they are following us,
+                            // add them to the list
+                            if (msg.value.content.following) {  
+                                acc.push(author)
+                            }
+                            return acc
+                        }, [])
+        
+                        resolve(followers.length)
+                    })
+                )
+            })
+        ])
+            .then(([posts, following, followers]) => {
+                res.send({ userId, posts, following, followers })
+            })
+            .catch(err => {
+                res.send(createError.InternalServerError(err))
+            })
+    })
+
     fastify.get('/feed/:userName', (req, res) => {
         var { userName } = req.params
 
