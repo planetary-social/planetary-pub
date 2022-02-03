@@ -274,6 +274,7 @@ test('get counts by id', t => {
 
 test('get a user by id', t => {
     var id = encodeURIComponent(alice.id)
+    console.log('**alice id** encoded', id)
     fetch(BASE_URL + '/feed-by-id/' + id)
         .then(res => res.json())
         .then(json => {
