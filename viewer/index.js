@@ -25,8 +25,9 @@ module.exports = function startServer (sbot) {
         `)
     })
 
-    fastify.get('/%:id', (req, res) => {
+    fastify.get('/msg/%:id', (req, res) => {
         var { id } = req.params
+
         id = '%' + id
         id = decodeURIComponent(id)
 
@@ -159,8 +160,6 @@ module.exports = function startServer (sbot) {
                 console.log('OH no!', err)
                 return res.send(createError.InternalServerError(err))
             }
-
-            console.log('**matches**', matches.length)
 
             // @TODO
             // return a list of id's if there is more than one

@@ -50,9 +50,7 @@ test('setup', t => {
                     where(
                         author(alice.id)
                     ),
-                    toCallback((err, msgs) => {
-                        console.log('**messages**',
-                            JSON.stringify(msgs, null, 2))
+                    toCallback((err) => {
                         t.error(err)
                         t.end()
                     })
@@ -99,7 +97,7 @@ test('server', t => {
 })
 
 test('get a message', t => {
-    fetch(BASE_URL + '/' + encodeURIComponent(msgKey))
+    fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
         .then(res => {
             if (!res.ok) {
                 return res.text().then(text => {
@@ -137,9 +135,10 @@ test('get a thread', t => {
 
         // we are requesting the 'root' message here
         // how to get a thread when you are given a child message?
-        fetch(BASE_URL + '/' + encodeURIComponent(msgKey))
+        fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
             .then(_res => _res.json())
-            .then(({ messages, full }) => {
+            .then((res) => {
+                var { messages, full } = res
                 t.equal(full, true, 'should have the full thread')
                 t.equal(messages.length, 2,
                     'should return all the messages in the thread')
@@ -155,7 +154,7 @@ test('get a thread', t => {
 })
 
 test('get a thread given a child message', t => {
-    fetch(BASE_URL + '/' + encodeURIComponent(childKey))
+    fetch(BASE_URL + '/msg/' + encodeURIComponent(childKey))
         .then(res => res.json())
         .then(({ messages }) => {
             t.equal(messages[0].key, msgKey,
