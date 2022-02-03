@@ -1,7 +1,7 @@
 {
   "name": "@planetary-ssb/pub",
   "description": "A pub",
-  "version": "0.2.34",
+  "version": "0.2.35",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
