@@ -17,6 +17,20 @@ module.exports = function startServer (sbot) {
         console.log('***rpc:connect in viewer***', ev.stream.address)
     })
 
+
+    // enable cors
+    fastify.register(require('fastify-cors'), {})
+
+    fastify.register(require('fastify-static'), {
+        root: path.join(__dirname, '..', 'public'),
+        dotfiles: 'allow',
+        prefix: '/public/' // optional: default '/'
+    })
+
+    fastify.get('/.well-known/apple-app-site-association', (_, res) => {
+        return res.sendFile('/.well-known/apple-app-site-association')
+    })
+
     fastify.get('/', (_, res) => {
         res.send(`
             address -- ${sbot.getAddress()}
@@ -396,16 +410,6 @@ module.exports = function startServer (sbot) {
                 })
         })
 
-    })
-
-    // enable cors
-    fastify.register(require('fastify-cors'), {})
-
-    // static files
-    fastify.register(require('fastify-static'), {
-        root: path.join(__dirname, 'public'),
-        dotfiles: 'allow'
-        // prefix: '/public/', // optional: default '/'
     })
 
     fastify.get('/healthz', (_, res) => {
