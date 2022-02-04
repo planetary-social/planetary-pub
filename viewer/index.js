@@ -252,6 +252,68 @@ module.exports = function startServer (sbot) {
         res.send(profiles)
     })
 
+    fastify.get('/profile-by-id/:userId', (req, res) => {
+        const { userId } = req.params
+
+        sbot.db.onDrain('aboutSelf', () => {
+            const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
+
+            // get the blob for avatar image
+            sbot.blobs.has(profile.image, (err, has) => {
+                if (err) {
+                    console.log('errrrr', err)
+                    return res.send(createError.InternalServerError(err))
+                }
+
+                // console.log('**has image**', has)
+
+                if (has) return res.send(profile)
+
+                // we don't have the blob yet,
+                // so request it from a peer, then return a response
+
+                // this is something added only in the planetary pub
+                // this is something IPFS would help with b/c
+                // I think they handle routing requests
+                // var currentPeers = sbot.peers
+                var currentPeers = sbot.conn.dbPeers()	
+                console.log('**peers**', currentPeers)
+
+                // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
+                // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+
+                // trying cel's pub
+                var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+                sbot.conn.connect(addr, (err, ssb) => {
+                    if (err) {
+                        console.log('oh no', err)
+                        return console.log('*errrrr connect*', err)
+                    }
+
+                    console.log('**aaaaaaaaaaa**', ssb.blobs)
+
+                    S(
+                        ssb.blobs.get(profile.image),
+                        // S.through(data => console.log('**data**', data)),
+                        sbot.blobs.add(profile.image, (err, blobId) => {
+                            if (err) {
+                                // eslint-disable-next-line
+                                res.send(createError.InternalServerError(err))
+                                return console.log('**blob errrr**', err)
+                            }
+
+                            console.log('***got blob***', blobId)
+                            // TODO -- could return this before the 
+                            // blob has finished transferring
+                            res.send(profile)
+                        })
+                    )
+                })
+            })
+
+        })
+    })
+
     fastify.get('/profile/:username', (req, res) => {
         var { username } = req.params
 
