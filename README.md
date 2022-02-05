@@ -2,11 +2,15 @@
 
 A pub
 
-A [ssb-db2](https://github.com/ssb-ngi-pointer/ssb-db2) database and http API server.
+An [ssb-db2](https://github.com/ssb-ngi-pointer/ssb-db2) database and http API server.
 
-See the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
+------------------------------------
 
-https://pub2.onrender.com/
+For the planetary instance, see the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
+
+The live http API -- https://pub2.onrender.com/
+
+------------------------------------
 
 See [how the caps value is generated](https://www.npmjs.com/package/ssb-caps#shs-secret-handshake-connection-key)
 
