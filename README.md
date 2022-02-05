@@ -2,8 +2,7 @@
 
 A pub
 
-This creates an `sbot`, and imports and exposes the viewer app. The viewer app
-is an http server for the pub.
+A [ssb-db2](https://github.com/ssb-ngi-pointer/ssb-db2) database and http API server.
 
 See the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
 
