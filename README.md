@@ -73,7 +73,7 @@ Test the pub
 NODE_ENV=test node test/index.js | npx tap-spec
 ```
 
-Start the pub using _real_ data, not test-data
+Start the pub locally, using _real_ data, not test-data
 ```bash
 NODE_ENV=staging-local node index.js
 ```
