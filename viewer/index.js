@@ -81,7 +81,7 @@ module.exports = function startServer (sbot) {
         var { userId } = req.params
         var source = sbot.threads.profile({
             id: userId,
-            allowlist: ['post']
+            // allowlist: ['post']
         })
 
         S(
