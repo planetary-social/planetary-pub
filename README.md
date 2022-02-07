@@ -2,12 +2,15 @@
 
 A pub
 
-This creates an `sbot`, and imports and exposes the viewer app. The viewer app
-is an http server for the pub.
+An [ssb-db2](https://github.com/ssb-ngi-pointer/ssb-db2) database and http API server.
 
-See the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
+------------------------------------
 
-https://pub2.onrender.com/
+For the planetary instance, see the [render.com dashboard](https://dashboard.render.com/web/srv-c6elp2vh8vlcnlnvsm5g/settings)
+
+The live http API -- https://pub2.onrender.com/
+
+------------------------------------
 
 See [how the caps value is generated](https://www.npmjs.com/package/ssb-caps#shs-secret-handshake-connection-key)
 
@@ -23,16 +26,6 @@ $ npm i -S @planetary-ssb/pub
 Install as an app (git clone):
 ```
 $ git clone git@github.com:planetary-social/planetary-pub.git pub
-```
-
-## git hooks
-We're using [husky](https://typicode.github.io/husky/#/) to automatically run tests and lint when you push to the 'main' branch.
-
-### setup git hooks
-Add the test script as a git hook. This way we can check which branch we're on in the git hook.
-
-```bash
-npx husky add .husky/pre-push "./test/githook/prepush.sh"
 ```
 
 ## use
@@ -57,8 +50,19 @@ createSbot((err, sbot) => {
 })
 ```
 
+## git hooks
+We're using [husky](https://typicode.github.io/husky/#/) to automatically run tests and lint when you push to the 'main' branch.
+
+### setup git hooks
+Add the test script as a git hook. This way we can check which branch we're on in the git hook.
+
+```bash
+npx husky add .husky/pre-push "./test/githook/prepush.sh"
+```
+
 
 ## test
+
 Test the viewer
 ```bash
 NODE_ENV=test node test/viewer.js | npx tap-spec
