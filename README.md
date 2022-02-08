@@ -63,26 +63,32 @@ npx husky add .husky/pre-push "./test/githook/prepush.sh"
 
 ## test
 
-Test the viewer
+### Test the viewer
 ```bash
 NODE_ENV=test node test/viewer.js | npx tap-spec
 ```
 
-Test the pub
+### Test the pub
 ```bash
 NODE_ENV=test node test/index.js | npx tap-spec
 ```
 
-Start the pub locally, using _real_ data, not test-data
+### Start the pub locally, using _real_ data, not test-data
 ```bash
 NODE_ENV=staging-local node index.js
 ```
 
-Use a 512 MB limit on memory (so you can tell if it uses too much)
+### Use a 512 MB limit on memory (so you can tell if it uses too much)
 ```
 NODE_ENV=staging-local node --max-old-space-size=512 index.js
 ```
 
+### Start the debugger, viewable in chrome:
+```bash
+NODE_ENV=staging-local node --inspect-brk --max-old-space-size=512 index.js
+```
+
+then open `chrome://inspect/`
 
 ----------------------------------------------------------------
 
