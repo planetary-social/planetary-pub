@@ -53,6 +53,11 @@ createSbot((err, sbot) => {
 ## git hooks
 We're using [husky](https://typicode.github.io/husky/#/) to automatically run tests and lint when you push to the 'main' branch.
 
+## push without running tests
+```bash
+git push --no-verify
+```
+
 ### setup git hooks
 Add the test script as a git hook. This way we can check which branch we're on in the git hook.
 
