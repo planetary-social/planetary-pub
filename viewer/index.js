@@ -250,7 +250,10 @@ module.exports = function startServer (sbot) {
 
         // how is there no async code here?
         var profiles = ids.map(id => {
-            return sbot.db.getIndex('aboutSelf').getProfile(id)
+            var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+            return Object.assign(profile, {
+                id: id
+            })
         })
         res.send(profiles)
     })
@@ -260,8 +263,6 @@ module.exports = function startServer (sbot) {
 
         sbot.db.onDrain('aboutSelf', () => {
             const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
-
-            console.log('***** profile ******', profile)
 
             // get the blob if they have a profile image
             if (profile && profile.image) {
@@ -295,8 +296,6 @@ module.exports = function startServer (sbot) {
                             console.log('oh no', err)
                             return console.log('*errrrr connect*', err)
                         }
-
-                        console.log('**aaaaaaaaaaa**', ssb.blobs)
 
                         S(
                             ssb.blobs.get(profile.image),

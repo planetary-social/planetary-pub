@@ -466,6 +466,7 @@ test('getProfiles route', t => {
         .then(res => {
             t.equal(res.length, 2, 'should return 2 profiles')
             t.equal(res[0].name, 'alice', 'should have a name for alice')
+            t.equal(res[0].id, alice.id, 'should return the user id')
             t.equal(res[1].name, 'bob', 'should have bob')
             t.end()
         })
