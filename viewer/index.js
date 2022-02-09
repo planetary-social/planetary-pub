@@ -81,7 +81,8 @@ module.exports = function startServer (sbot) {
         var { userId } = req.params
         var source = sbot.threads.profile({
             id: userId,
-            // allowlist: ['post']
+            allowlist: ['post'],
+            threadMaxSize: 3 // at most 3 messages in each thread
         })
 
         S(

@@ -167,7 +167,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // msg by alice
             sbot.db.publishAs(user, {
                 type: 'post',
-                text: 'testing replies',
+                text: 'testing replies. **some markown** [hurray](https://example.com/)',
                 root: msg.key
             }, (err, res) => {
                 if (err) return _cb(err)
