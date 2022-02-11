@@ -129,13 +129,7 @@ function publicSummary ({ sbot, userId }) {
         )
     }
 
-    var query = sbot.db.query(
-        where(type('post')),
-        descending(),
-        batch(10),
-        toPullStream()
-    )
-
+    var query
     if (userId) {
         query = sbot.db.query(
             // where(type('post')),
@@ -146,6 +140,13 @@ function publicSummary ({ sbot, userId }) {
                     type('post')
                 )
             ),
+            descending(),
+            batch(10),
+            toPullStream()
+        )
+    } else {
+        query = sbot.db.query(
+            where(type('post')),
             descending(),
             batch(10),
             toPullStream()
