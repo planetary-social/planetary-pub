@@ -1,6 +1,6 @@
 var S = require('pull-stream')
 const Ref = require('ssb-ref')
-const { where, type, descending,
+const { where, author, type, descending,
     toPullStream, and, batch, hasRoot,
     isPrivate, isPublic } = require('ssb-db2/operators')
 const cat = require('pull-cat')
@@ -19,7 +19,7 @@ module.exports = publicSummary
  * know _why_ it works here but not in `ssb-threads`.
  */
 
-function publicSummary ({ sbot }) {
+function publicSummary ({ sbot, userId }) {
 
     function nonBlockedRootToThread (maxSize, filter, privately = false) {
         return (root, cb) => {
@@ -129,20 +129,38 @@ function publicSummary ({ sbot }) {
         )
     }
 
-    return S(
-        sbot.db.query(
-            where(type('post')),
+    var query = sbot.db.query(
+        where(type('post')),
+        descending(),
+        batch(10),
+        toPullStream()
+    )
+
+    if (userId) {
+        query = sbot.db.query(
+            // where(type('post')),
+            where(
+                and(
+                    author(userId),
+                    // isPublic(),
+                    type('post')
+                )
+            ),
             descending(),
             batch(10),
             toPullStream()
-        ),
+        )
+    }
+
+    return S(
+        query,
         // S.through((msg) =>
         //     timestamps.set(getRootMsgId(msg), getTimestamp(msg)),
         // ),
         S.map(getRootMsgId),
         S.filter(isUniqueMsgId(new Set())),
         fetchMsgFromIdIfItExists,
-        S.filter(makePassesFilter()),
+        S.filter(makePassesFilter({ allowlist: ['post'] })),
         S.filter(isPublicType),
         S.filter(hasNoBacklinks),
         S.filter(Boolean),

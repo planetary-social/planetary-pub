@@ -79,11 +79,13 @@ module.exports = function startServer (sbot) {
 
     fastify.get('/feed-by-id/:userId', (req, res) => {
         var { userId } = req.params
-        var source = sbot.threads.profile({
-            id: userId,
-            // allowlist: ['post'],
-            threadMaxSize: 3 // at most 3 messages in each thread
-        })
+        // var source = sbot.threads.profile({
+        //     id: userId,
+        //     // allowlist: ['post'],
+        //     threadMaxSize: 3 // at most 3 messages in each thread
+        // })
+
+        var source = getThreads({ sbot, userId })
 
         S(
             source,
