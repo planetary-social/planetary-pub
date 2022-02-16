@@ -43,6 +43,7 @@ test('bobs messages have a reply root set properly', t => {
             )
         ),
         toCallback((err, msgs) => {
+            console.log('msgs', msgs)
             t.error(err)
             t.equal(msgs.length, 2, 'should have 2 messages from bob')
             console.log('**msgs**', JSON.stringify(msgs, null, 2))
