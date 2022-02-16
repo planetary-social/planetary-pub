@@ -182,13 +182,23 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 },
 
                 cb => {
+                    sbot.db.publishAs(userTwo, {
+                        type: 'vote',
+                        "vote": {
+                            link: msg.key,
+                            value: 1,
+                            expression: 'Like'
+                        }
+                    }, cb)
+                },
+
+                cb => {
                     sbot.db.publishAs(user, {
                         type: 'post',
                         text: 'testing replies. **some markown** [hurray](https://example.com/)',
                         root: msg.key
                     }, cb)
                 },
-
 
                 cb => {
                     sbot.db.publishAs(userTwo, {
@@ -197,8 +207,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                         root: msg.key
                     }, cb)
                 }
-
-
             ], (err, _msgs) => {
                 if (err) return _cb(err)
                 _cb(null, _msgs)
