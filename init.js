@@ -168,34 +168,48 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
             var msg = msgs[msgs.length - 1]
 
-            // add some more test data
-            sbot.db.publishAs(user, {
-                type: 'post',
-                text: `testing mentioning a user -- ${userTwo.id}
-                    as a md link  -- [another name](${user.id})
-                    and a msg -- ${msg.key}
-                    msg as md link -- [link](${msg.key})
-                `
-            }, (err) => {
-                if (err) return _cb(err)
-                // now publish some threaded msgs
-                // msg by alice
-                sbot.db.publishAs(user, {
-                    type: 'post',
-                    text: 'testing replies. **some markown** [hurray](https://example.com/)',
-                    root: msg.key
-                }, (err, res) => {
-                    if (err) return _cb(err)
-                    // msg by bob
+            // more test data
+            parallel([
+                cb => {
+                    sbot.db.publishAs(user, {
+                        type: 'post',
+                        text: `testing mentioning a user -- ${userTwo.id}
+                            as a md link  -- [another name](${user.id})
+                            and a msg -- ${msg.key}
+                            msg as md link -- [link](${msg.key})
+                        `
+                    }, cb)
+                },
+
+                cb => {
+                    sbot.db.publishAs(userTwo, {
+                        type: 'vote',
+                        "vote": {
+                            link: msg.key,
+                            value: 1,
+                            expression: 'Like'
+                        }
+                    }, cb)
+                },
+
+                cb => {
+                    sbot.db.publishAs(user, {
+                        type: 'post',
+                        text: 'testing replies. **some markown** [hurray](https://example.com/)',
+                        root: msg.key
+                    }, cb)
+                },
+
+                cb => {
                     sbot.db.publishAs(userTwo, {
                         type: 'post',
                         text: 'four',
                         root: msg.key
-                    }, (err, _res) => {
-                        if (err) return _cb(err)
-                        _cb(null, [res, _res])
-                    })
-                })
+                    }, cb)
+                }
+            ], (err, _msgs) => {
+                if (err) return _cb(err)
+                _cb(null, _msgs)
             })
         })
     }
