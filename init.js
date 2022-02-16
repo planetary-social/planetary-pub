@@ -54,38 +54,37 @@ module.exports = function init (sbot, user, userTwo, _cb) {
     })
 
     function saveProfiles (cb) {
-        parallel(
-            [
-                cb => {
-                    sbot.db.publishAs(user, {
-                        type: 'about',
-                        about: user.id,
-                        name: 'alice'
-                    }, cb)
-                },
-                cb => {
-                    sbot.db.publishAs(user, {
-                        type: 'about',
-                        about: user.id,
-                        // the cinnamon roll hash
-                        // eslint-disable-next-line
-                        image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
-                    }, cb)
-                },
-                cb => {
-                    sbot.db.publishAs(userTwo, {
-                        type: 'about',
-                        about: userTwo.id,
-                        name: 'bob'
-                    }, (err, res) => {
-                        cb(err, res)
-                    })
-                }
-            ],
-            function done (err) {
-                cb(err)
+        parallel([
+            cb => {
+                sbot.db.publishAs(user, {
+                    type: 'about',
+                    about: user.id,
+                    name: 'alice'
+                }, cb)
+            },
+            cb => {
+                sbot.db.publishAs(user, {
+                    type: 'about',
+                    about: user.id,
+                    // the cinnamon roll hash
+                    // eslint-disable-next-line
+                    image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
+                }, cb)
+            },
+            cb => {
+                sbot.db.publishAs(userTwo, {
+                    type: 'about',
+                    about: userTwo.id,
+                    name: 'bob'
+                }, (err, res) => {
+                    cb(err, res)
+                })
             }
-        )
+        ],
+
+        function done (err) {
+            cb(err)
+        })
     }
 
     function publishTestMsgs (_cb) {
@@ -156,32 +155,45 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                     cb(null, res)
                 })
             }
-        })).concat([cb => {
-            sbot.db.publishAs(userTwo, { type: 'post', text: 'aaa' }, cb)
-        }]), function allDone (err, msgs) {
+        })).concat([
+                cb => {
+                    sbot.db.publishAs(userTwo, {
+                        type: 'post',
+                        text: 'aaa'
+                    }, cb)
+                }
+            ]),
+            function allDone (err, msgs) {
             if (err) return _cb(err)
 
             var msg = msgs[msgs.length - 1]
 
-            // now publish some threaded msgs
-            // msg by alice
+            // add some more test data
             sbot.db.publishAs(user, {
                 type: 'post',
-                text: 'testing replies. **some markown** [hurray](https://example.com/)',
-                root: msg.key
-            }, (err, res) => {
+                text: `testing mentions -- ${userTwo.id}
+                    [another name](${user.id})`
+            }, (err) => {
                 if (err) return _cb(err)
-                // msg by bob
-                sbot.db.publishAs(userTwo, {
+                // now publish some threaded msgs
+                // msg by alice
+                sbot.db.publishAs(user, {
                     type: 'post',
-                    text: 'four',
+                    text: 'testing replies. **some markown** [hurray](https://example.com/)',
                     root: msg.key
-                }, (err, _res) => {
+                }, (err, res) => {
                     if (err) return _cb(err)
-                    _cb(null, [res, _res])
+                    // msg by bob
+                    sbot.db.publishAs(userTwo, {
+                        type: 'post',
+                        text: 'four',
+                        root: msg.key
+                    }, (err, _res) => {
+                        if (err) return _cb(err)
+                        _cb(null, [res, _res])
+                    })
                 })
             })
-
         })
     }
 }
