@@ -148,14 +148,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             }
         ]
 
-        parallel(testMsgs.map((msg => {
+        parallel(testMsgs.map(msg => {
             return function postMsg (cb) {
                 sbot.db.publishAs(user, msg, (err, res) => {
                     if (err) return cb(err)
                     cb(null, res)
                 })
             }
-        })).concat([
+        }).concat([
                 cb => {
                     sbot.db.publishAs(userTwo, {
                         type: 'post',
