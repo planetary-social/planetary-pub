@@ -171,8 +171,11 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // add some more test data
             sbot.db.publishAs(user, {
                 type: 'post',
-                text: `testing mentions -- ${userTwo.id}
-                    [another name](${user.id})`
+                text: `testing mentioning a user -- ${userTwo.id}
+                    as a md link  -- [another name](${user.id})
+                    and a msg -- ${msg.key}
+                    msg as md link -- [link](${msg.key})
+                `
             }, (err) => {
                 if (err) return _cb(err)
                 // now publish some threaded msgs
