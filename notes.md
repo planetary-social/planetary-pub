@@ -71,6 +71,7 @@ but if you are not replicating, just viewing the 20 most recent messages, then i
 * [fauna DB](https://fauna.com/)
 * [upstash](https://upstash.com/)
 * [xata](https://www.xata.io/)
+* [firebase](https://firebase.google.com/) -- local-first
 
 ### p2p DBs
 * [kappa DB](https://github.com/kappa-db/kappa-core)
