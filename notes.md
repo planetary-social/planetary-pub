@@ -72,3 +72,6 @@ but if you are not replicating, just viewing the 20 most recent messages, then i
 * [upstash](https://upstash.com/)
 * [xata](https://www.xata.io/)
 
+### p2p DBs
+* [kappa DB](https://github.com/kappa-db/kappa-core)
+

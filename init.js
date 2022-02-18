@@ -184,7 +184,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 cb => {
                     sbot.db.publishAs(userTwo, {
                         type: 'vote',
-                        "vote": {
+                        vote: {
                             link: msg.key,
                             value: 1,
                             expression: 'Like'
