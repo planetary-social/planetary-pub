@@ -51,6 +51,11 @@ module.exports = function startServer (sbot) {
         sbot.db.get(id, (err, msg) => {
             if (err) {
                 console.log('errrrr', err)
+
+                if (err.toString().includes('not found')) {
+                    return res.send(createError.NotFound(err))
+                }
+
                 return res.send(createError.InternalServerError(err))
             }
 

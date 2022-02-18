@@ -97,27 +97,34 @@ test('server', t => {
 })
 
 test('get a message', t => {
-    fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
-        .then(res => {
-            if (!res.ok) {
-                return res.text().then(text => {
-                    console.log('**failure text**', text)
-                    t.fail(text)
-                    t.end()
-                })
-            }
-            return res.json()
-        })
-        .then(({ messages }) => {
+    Promise.all([
+        fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => {
+                        console.log('**failure text**', text)
+                        t.fail(text)
+                    })
+                }
+
+                return res.json()
+            }),
+
+        fetch(BASE_URL + '/msg/' + 'foo' + encodeURIComponent(msgKey))
+    ])
+        .then(([{ messages }, badMsg]) => {
+            console.log('good msg', messages)
             t.equal(messages.length, 1, 'should return a single message')
             t.equal(messages[0].key, msgKey,
                 'should return the right message')
+
+            if (badMsg.ok) t.fail('should return a 404 status')
+            t.equal(badMsg.status, 404,
+                'should return 404 for missing msg')
+
             t.end()
         })
-        .catch(err => {
-            t.fail(err)
-            t.end()
-        })
+
 })
 
 var childKey
