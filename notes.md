@@ -73,6 +73,7 @@ but if you are not replicating, just viewing the 20 most recent messages, then i
 * [xata](https://www.xata.io/)
 * [firebase](https://firebase.google.com/) -- local-first
 * [rxdb](https://github.com/pubkey/rxdb)
+* [supabase](https://supabase.com/)
 
 ### p2p DBs
 * [kappa DB](https://github.com/kappa-db/kappa-core)
