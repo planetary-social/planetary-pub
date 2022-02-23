@@ -1,13 +1,13 @@
-const Viewer = require('./viewer')
-var Pub = require('./pub')
+const Viewer = require("./viewer");
+var Pub = require("./pub");
 
 Pub(function (err, sbot) {
-    if (err) throw err
+  if (err) throw err;
 
-    var viewer = Viewer(sbot)
+  var viewer = Viewer(sbot);
 
-    viewer.listen(8888, '0.0.0.0', (err, address) => {
-        if (err) throw err
-        console.log(`Server is now listening on ${address}`)
-    })
-})
+  viewer.listen(8888, "0.0.0.0", (err, address) => {
+    if (err) throw err;
+    console.log(`Server is now listening on ${address}`);
+  });
+});
