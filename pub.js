@@ -64,8 +64,18 @@ function start (cb) {
                 cb(null, sbot)
             })
 
-            // TODO
-            // shouldn't the replication-scheduler plugin handle this?
+
+            // friends.follow publishes this msg:
+
+            // const content = {
+                // type: 'contact',
+                // contact: feedId,
+                // following: 'state' in opts ? opts.state : true,
+                // recps: opts.recps
+            // }
+            // sbot.publish(content, cb)
+
+
             sbot.friends.follow(PUBS.one.id, null, (err, res) => {
                 if (err) {
                     console.log('errrrr', err)
@@ -75,6 +85,8 @@ function start (cb) {
                 console.log('**follow pub one**', res)
             })
 
+            // TODO
+            // shouldn't the replication-scheduler plugin handle this?
             sbot.conn.connect(PUBS.one.host, (err, ssb) => {
                 if (err) {
                     console.log('errrrr', err)
