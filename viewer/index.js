@@ -41,7 +41,6 @@ module.exports = function startServer (sbot) {
 
     fastify.get('/msg/%:id', (req, res) => {
         var { id } = req.params
-
         id = '%' + id
         id = decodeURIComponent(id)
 
@@ -504,7 +503,7 @@ function getThread(sbot, rootId, cb) {
             // @TODO
             allowlist: ['test', 'post'],
             reverse: true, // threads sorted from most recent to least recent
-            threadMaxSize: 3, // at most 3 messages in each thread
+            threadMaxSize: 20, // at most 3 messages in each thread
         }),
         S.collect((err, [thread]) => {
             if (err) return cb(err)
