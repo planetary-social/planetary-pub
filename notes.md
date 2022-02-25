@@ -78,6 +78,8 @@ but if you are not replicating, just viewing the 20 most recent messages, then i
 
 ### p2p DBs
 * [kappa DB](https://github.com/kappa-db/kappa-core)
+* [threads DB](https://docs.textile.io/threads/)
+* [orbit DB](https://orbitdb.org/)
 
 
 ---------------------------------------------------------------
