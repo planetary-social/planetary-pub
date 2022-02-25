@@ -75,6 +75,7 @@ but if you are not replicating, just viewing the 20 most recent messages, then i
 * [firebase](https://firebase.google.com/) -- local-first
 * [rxdb](https://github.com/pubkey/rxdb)
 * [supabase](https://supabase.com/)
+* [oriole DB](https://github.com/orioledb/orioledb)
 
 ### p2p DBs
 * [kappa DB](https://github.com/kappa-db/kappa-core)
