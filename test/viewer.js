@@ -18,6 +18,7 @@ const user = require('./user.json')
 const userTwo = require('./user-two.json')
 const alice = user
 const bob = userTwo
+const runSeries = require('run-series')
 
 const { where, author, toCallback } = require('ssb-db2/operators')
 
@@ -65,7 +66,7 @@ test('setup', t => {
                 next(err)
             })
 
-            sbot.db.publish({ type: 'test', text: 'woooo 1' }, (err, msg) => {
+            sbot.db.publish({ type: 'post', text: 'woooo 1' }, (err, msg) => {
                 msgKey = msg.key
                 next(err)
             })
@@ -130,7 +131,7 @@ test('get a message', t => {
 var childKey
 test('get a thread', t => {
     // var newKey
-    var content = { type: 'test', text: 'woooo 2', root: msgKey }
+    var content = { type: 'post', text: 'woooo 2', root: msgKey }
 
     sbot.db.publish(content, (err, res) => {
         if (err) {
@@ -173,6 +174,43 @@ test('get a thread given a child message', t => {
             t.fail(err)
             t.end()
         })
+})
+
+test('get a thread given a child msg, when there are many responses', t => {
+    var msgs = [{ type: 'post', text: 'woooo', root: msgKey }]
+    var i = 0
+    while (i++ < 10) {
+        msgs.push(Object.assign({}, msgs[0], { text: 'woooo ' + i }))
+    }
+
+    runSeries(msgs.map(msg => {
+        return function (cb) {
+            sbot.db.publishAs(alice, msg, cb)
+        }
+    }), (err, res) => {
+        console.log('res', res)
+        t.error(err)
+        // in here, fetch from the endpoint
+        fetch(BASE_URL + '/msg/' + encodeURIComponent(res[4].key))
+            .then(res => res.json())
+            .then(_res => {
+                // console.log('res from fetch', _res)
+                // console.log('res', res.map(msg => msg.key))
+                // console.log('_res 5', _res.messages.map(msg => msg.key))
+                var rootMsg = _res.messages.find(msg => msg.key === msgKey)
+                var sixthMsg = _res.messages.find(msg => {
+                    return msg.key === res[5].key
+                })
+                t.ok(sixthMsg, 'should return up to 20 messages in thread')
+                t.ok(rootMsg, 'should return the root message')
+                t.end()
+            })
+            .catch(err => {
+                t.error(err)
+                t.end()
+            })
+    })
+
 })
 
 test('get a feed', t => {
@@ -270,7 +308,7 @@ test('get counts by id', t => {
         .then(res => res.json())
         .then(res => {
             t.equal(res.userId, alice.id, 'shouold return the right user id')
-            t.equal(res.posts, 31, 'should count the posts')
+            t.equal(res.posts, 42, 'should count the posts')
             t.equal(res.followers, 1, 'should count the folloers')
             t.equal(res.following, 0, 'should count following')
             t.end()

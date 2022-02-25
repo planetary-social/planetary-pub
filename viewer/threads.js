@@ -47,9 +47,10 @@ function publicSummary ({ sbot, userId }) {
                     if (err2) return cb(err2)
                     const full = arr.length <= maxSize
                     sort(arr)
-                    if (arr.length > maxSize && arr.length >= 3) {
-                        arr.splice(1, 1)
-                    }
+                    // if (arr.length > maxSize) {
+                    //     // what is happening here?
+                    //     arr.splice(1, 1)
+                    // }
                     cb(null, { messages: arr, full })
                 })
             )
@@ -166,8 +167,8 @@ function publicSummary ({ sbot, userId }) {
         S.filter(hasNoBacklinks),
         S.filter(Boolean),
         removeMessagesFromBlocked,
-        S.asyncMap(nonBlockedRootToThread(3)),
-        // S.asyncMap(this.nonBlockedRootToSummary(filterOperator, timestamps)),
+        // nonBlockedRootToThread (maxSize, filter, privately = false) {
+        S.asyncMap(nonBlockedRootToThread(20)),
     )
 }
 
