@@ -319,10 +319,13 @@ test('get counts by id', t => {
 
 test('get a user by id', t => {
     var id = encodeURIComponent(alice.id)
-    console.log('**alice id** encoded', id)
+    // console.log('**alice id** encoded', id)
     fetch(BASE_URL + '/feed-by-id/' + id)
         .then(res => res.json())
         .then(json => {
+
+            console.log('***feed by id***', json)
+
             json.forEach(msg => {
                 t.equal(msg.value.author, alice.id, 'should return the' +
                     'right feed')

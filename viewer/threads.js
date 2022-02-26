@@ -92,9 +92,12 @@ function publicSummary ({ sbot, userId }) {
 
     function getRootMsgId (msg) {
         if (msg?.value?.content) {
-            const fork = msg.value.content.fork
+            // const fork = msg.value.content.fork
             const root = msg.value.content.root
-            if (fork && Ref.isMsgId(fork)) return fork
+
+            // temporarily disabling forked messages
+            // if (fork && Ref.isMsgId(fork)) return fork
+
             if (root && Ref.isMsgId(root)) return root
         }
         // this msg has no root so we assume this is a root
