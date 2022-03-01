@@ -2,7 +2,7 @@ var S = require('pull-stream')
 const Ref = require('ssb-ref')
 const { where, author, type, descending,
     toPullStream, and, batch, hasRoot,
-    isPrivate, isPublic } = require('ssb-db2/operators')
+    isPrivate, isPublic, startFrom } = require('ssb-db2/operators')
 const cat = require('pull-cat')
 const sort = require('ssb-sort')
 
@@ -19,7 +19,7 @@ module.exports = publicSummary
  * know _why_ it works here but not in `ssb-threads`.
  */
 
-function publicSummary ({ sbot, userId }) {
+function publicSummary ({ sbot, userId }, startingFrom) {
 
     function nonBlockedRootToThread (maxSize, filter, privately = false) {
         return (root, cb) => {
@@ -135,26 +135,51 @@ function publicSummary ({ sbot, userId }) {
 
     var query
     if (userId) {
-        query = sbot.db.query(
-            // where(type('post')),
-            where(
-                and(
-                    author(userId),
-                    // isPublic(),
-                    type('post')
-                )
-            ),
-            descending(),
-            batch(10),
-            toPullStream()
-        )
+        query = (startingFrom ?
+            sbot.db.query(
+                where(
+                    and(
+                        author(userId),
+                        // isPublic(),
+                        type('post')
+                    )
+                ),
+                descending(),
+                batch(10),
+                startFrom(startingFrom * 10),
+                toPullStream()
+            ) :
+
+            sbot.db.query(
+                // where(type('post')),
+                where(
+                    and(
+                        author(userId),
+                        // isPublic(),
+                        type('post')
+                    )
+                ),
+                descending(),
+                batch(10),
+                toPullStream()
+            ))
+
     } else {
-        query = sbot.db.query(
-            where(type('post')),
-            descending(),
-            batch(10),
-            toPullStream()
-        )
+        query = (startingFrom ?
+            sbot.db.query(
+                where(type('post')),
+                descending(),
+                batch(10),
+                startFrom(startingFrom * 10),
+                toPullStream()
+            ) :
+
+            sbot.db.query(
+                where(type('post')),
+                descending(),
+                batch(10),
+                toPullStream()
+            ))
     }
 
     return S(

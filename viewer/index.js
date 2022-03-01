@@ -230,8 +230,12 @@ module.exports = function startServer (sbot) {
     })
 
 
-    fastify.get('/default', (_, res) => {
-        const source = getThreads({ sbot })
+    fastify.get('/default', (req, res) => {
+        const { query } = req
+        const source = query.page ? 
+            getThreads({ sbot }, query.page) :
+            getThreads({ sbot })
+
 
         S(
             source,
