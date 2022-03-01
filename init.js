@@ -1,4 +1,5 @@
 const parallel = require('run-parallel')
+const series = require('run-series')
 var S = require('pull-stream')
 var { read } = require('pull-files')
 const { readFileSync } = require('fs')
@@ -91,7 +92,9 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         var testMsgs = [
             { type: 'post', text: 'post with a hashtag #test',
                 channel: '#test' },
+
             { type: 'post', text: 'post with just text' },
+
             // post with an inline image only (no text)
             {
                 type: 'post',
@@ -148,7 +151,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             }
         ]
 
-        parallel(testMsgs.map(msg => {
+        series(testMsgs.map(msg => {
             return function postMsg (cb) {
                 sbot.db.publishAs(user, msg, (err, res) => {
                     if (err) return cb(err)
@@ -156,20 +159,21 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 })
             }
         }).concat([
-                cb => {
-                    sbot.db.publishAs(userTwo, {
-                        type: 'post',
-                        text: 'aaa'
-                    }, cb)
-                }
-            ]),
-            function allDone (err, msgs) {
+            cb => {
+                sbot.db.publishAs(userTwo, {
+                    type: 'post',
+                    text: 'aaa'
+                }, cb)
+            }
+        ]),
+
+        function allDone (err, msgs) {
             if (err) return _cb(err)
 
             var msg = msgs[msgs.length - 1]
 
             // more test data
-            parallel([
+            series([
                 cb => {
                     sbot.db.publishAs(user, {
                         type: 'post',
@@ -195,7 +199,8 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 cb => {
                     sbot.db.publishAs(user, {
                         type: 'post',
-                        text: 'testing replies. **some markown** [hurray](https://example.com/)',
+                        text: `testing replies. **some markown**
+                            [hurray](https://example.com/)`,
                         root: msg.key
                     }, cb)
                 },
