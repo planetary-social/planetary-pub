@@ -89,13 +89,20 @@ module.exports = function init (sbot, user, userTwo, _cb) {
     }
 
     function publishTestMsgs (_cb) {
-        var testMsgs = [
+
+        // to test pagination
+        var testMsgs = Array.from({ length: 20 }).map((_, i) => {
+            return {
+                type: 'post',
+                text: 'test post ' + i
+            }
+        }).concat([
             { type: 'post', text: 'post with a hashtag #test',
                 channel: '#test' },
 
             { type: 'post', text: 'post with just text' },
 
-            // post with an inline image only (no text)
+            // post with an inline image only (no text) (caracal image)
             {
                 type: 'post',
                 // eslint-disable-next-line
@@ -105,6 +112,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             {
                 type: 'post',
                 text: 'a post with the same image inline and attached ' +
+                    // cinnamon roll
                     // eslint-disable-next-line
                     '![a blob](&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256)',
                 mentions: [{
@@ -149,7 +157,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 text: readFileSync(__dirname +
                     '/test/test-data/super-post.md', 'utf8')
             }
-        ]
+        ])
 
         series(testMsgs.map(msg => {
             return function postMsg (cb) {
@@ -169,7 +177,6 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
         function allDone (err, msgs) {
             if (err) return _cb(err)
-
             var msg = msgs[msgs.length - 1]
 
             // more test data
