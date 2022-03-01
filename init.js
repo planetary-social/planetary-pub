@@ -94,7 +94,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
         var testMsgs = Array.from({ length: 20 }).map((_, i) => {
             return {
                 type: 'post',
-                text: 'test post ' + i
+                text: 'pagination test ' + i
             }
         }).concat([
             { type: 'post', text: 'post with a hashtag #test',
