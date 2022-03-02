@@ -236,7 +236,6 @@ module.exports = function startServer (sbot) {
             getThreads({ sbot }, query.page) :
             getThreads({ sbot })
 
-
         S(
             source,
             S.take(10),

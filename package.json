@@ -13,11 +13,6 @@
     "prepare": "husky install",
     "pretty": "pretty-quick"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format-code-staged"
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/planetary-social/planetary-pub.git"
