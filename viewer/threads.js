@@ -140,7 +140,7 @@ function publicSummary ({ sbot, userId }, startingFrom) {
                 where(
                     and(
                         author(userId),
-                        // isPublic(),
+                        //isPublic(),
                         type('post')
                     )
                 ),
@@ -155,7 +155,7 @@ function publicSummary ({ sbot, userId }, startingFrom) {
                 where(
                     and(
                         author(userId),
-                        // isPublic(),
+                        //isPublic(),
                         type('post')
                     )
                 ),

@@ -1,8 +1,35 @@
+const dotenv = require('dotenv')
+const buf = Buffer.from('hello world')
+const opt = { debug: true }
+const config = dotenv.parse(buf, opt)
+
 const { where,  and, type, contact,
     author, toCallback,  } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
+const fastifyCaching = require('fastify-caching')
+const IORedis = require('ioredis')
+
+const redis = new IORedis({
+    port: process.env.REDIS_PORT, // Redis port
+    host: process.env.REDIS_HOST, // Redis host
+    username: process.env.REDIS_USERNAME, // needs Redis >= 6
+    password: process.env.REDIS_PASSWORD,
+    db: 0, // Defaults to 0
+    tls:{
+        rejectUnauthorized: false,
+    },
+});
+
+const abcache = require('abstract-cache')({
+    useAwait: false,
+    driver: {
+      name: 'abstract-cache-redis', 
+      options: {client: redis}
+    }
+  })
+
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
 var getThreads = require('./threads')
@@ -27,6 +54,10 @@ module.exports = function startServer (sbot) {
         prefix: '/public/' // optional: default '/'
     })
 
+    fastify.register(require('fastify-redis'), {client: redis})
+    fastify.register(require('fastify-caching'), {cache: abcache})
+            
+
     fastify.get('/.well-known/apple-app-site-association', (_, res) => {
         return res.sendFile('/.well-known/apple-app-site-association')
     })
@@ -43,42 +74,48 @@ module.exports = function startServer (sbot) {
         var { id } = req.params
         id = '%' + id
         id = decodeURIComponent(id)
+        console.log('request_message_id', id)
 
-        // get the message in question
-        // so we can look for the `root` property and
-        // see if there is a thread for this
-        sbot.db.get(id, (err, msg) => {
-            if (err) {
-                console.log('errrrr', err)
+        fastify.cache.set('msg', {id: id}, 3600000, (err) => {
+            // get the message in question
+            // so we can look for the `root` property and
+            // see if there is a thread for this
+            sbot.db.get(id, (err, msg) => {
+                if (err) {
+                    console.log('errrrr', err)
 
-                if (err.toString().includes('not found')) {
-                    return res.send(createError.NotFound(err))
+                    if (err.toString().includes('not found')) {
+                        return res.send(createError.NotFound(err))
+                    }
+
+                    return res.send(createError.InternalServerError(err))
                 }
 
-                return res.send(createError.InternalServerError(err))
-            }
+                var rootId = (msg.content && msg.content.root) || id
 
-            var rootId = (msg.content && msg.content.root) || id
-
-            getThread(sbot, rootId, (err, msgs) => {
-                if (err) return res.send(createError.InternalServerError(err))
-                res.send(msgs)
+                getThread(sbot, rootId, (err, msgs) => {
+                    if (err) return res.send(createError.InternalServerError(err))
+                    res.send(msgs)
+                })
             })
         })
     })
 
     fastify.get('/blob/:blobId', (req, res) => {
         var { blobId } = req.params
-        // TODO
-        // * check if we have this blob, and if not, request it
-        //   from the pub we're connected with
-        // var source = sbot.blobs.get(blobId)
-        // res.send(toStream.source(source))
 
-        getBlob(sbot, blobId, (err, blobStream) => {
-            if (err) return res.send(createError.InternalServerError(err))
-            res.send(toStream.source(blobStream))
-        })
+        //fastify.cache.set('blob', {id: blobId}, 3600000, (err) => {
+            // TODO
+            // * check if we have this blob, and if not, request it
+            //   from the pub we're connected with
+            // var source = sbot.blobs.get(blobId)
+            // res.send(toStream.source(source))
+
+            getBlob(sbot, blobId, (err, blobStream) => {
+                if (err) return res.send(createError.InternalServerError(err))
+                res.send(toStream.source(blobStream))
+            })
+        //})
     })
 
     fastify.get('/feed-by-id/:userId', (req, res) => {
@@ -86,99 +123,103 @@ module.exports = function startServer (sbot) {
         const { query } = req
         const page = query ? query.page : 0
 
-        // var source = sbot.threads.profile({
-        //     id: userId,
-        //     // allowlist: ['post'],
-        //     threadMaxSize: 3 // at most 3 messages in each thread
-        // })
+            fastify.cache.set('feed-by-id', {id: userId, page: page}, 3600000, (err) => {
+            // var source = sbot.threads.profile({
+            //     id: userId,
+            //     // allowlist: ['post'],
+            //     threadMaxSize: 3 // at most 3 messages in each thread
+            // })
 
-        var source = page ?
-            getThreads({ sbot, userId }, page) :
-            getThreads({ sbot, userId })
+            var source = page ?
+                getThreads({ sbot, userId }, page) :
+                getThreads({ sbot, userId })
 
-        S(
-            source,
-            S.take(10),
-            S.map(thread => {
-                // if it's a thread, return the thread
-                // if not a thread, return a single message (not array)
-                return thread.messages.length > 1 ?
-                    thread.messages :
-                    thread.messages[0]
-            }),
-            S.collect(function (err, threads) {
-                if (err) return console.log('err', err)
-                res.send(threads)
-            })
-        )
+            S(
+                source,
+                S.take(10),
+                S.map(thread => {
+                    // if it's a thread, return the thread
+                    // if not a thread, return a single message (not array)
+                    return thread.messages.length > 1 ?
+                        thread.messages :
+                        thread.messages[0]
+                }),
+                S.collect(function (err, threads) {
+                    if (err) return console.log('err', err)
+                    res.send(threads)
+                })
+            )
+        })
     })
 
     fastify.get('/counts-by-id/:userId', (req, res) => {
         var { userId } = req.params
+        fastify.cache.set('counts-by-id', {id: userId}, 3600000, (err) => {
 
-        Promise.all([
-            new Promise((resolve, reject) => {
-                // get thier posts so we can count them
-                sbot.db.query(
-                    where(
-                        and(
-                            type('post'),
-                            author(userId)
-                        )
-                    ),
-                    toCallback((err, res) => {
+            Promise.all([
+                new Promise((resolve, reject) => {
+                    // get thier posts so we can count them
+                    sbot.db.query(
+                        where(
+                            and(
+                                type('post'),
+                                author(userId)
+                            )
+                        ),
+                        toCallback((err, res) => {
+                            if (err) return reject(err)
+                            resolve(res.length)
+                        })
+                    )
+                }),
+
+                // get the following count
+                new Promise((resolve, reject) => {
+                    sbot.friends.hops({
+                        start: userId,
+                        max: 1
+                    }, (err, following) => {
                         if (err) return reject(err)
-                        resolve(res.length)
+                        const folArr = Object.keys(following).filter(id => {
+                            return following[id] === 1
+                        })
+                        resolve(folArr.length)
                     })
-                )
-            }),
+                }),
 
-            // get the following count
-            new Promise((resolve, reject) => {
-                sbot.friends.hops({
-                    start: userId,
-                    max: 1
-                }, (err, following) => {
-                    if (err) return reject(err)
-                    const folArr = Object.keys(following).filter(id => {
-                        return following[id] === 1
-                    })
-                    resolve(folArr.length)
+                // get the follower count
+                new Promise((resolve, reject) => {
+                    sbot.db.query(
+                        where(
+                            contact(userId)
+                        ),
+                        toCallback((err, msgs) => {
+                            if (err) return reject(err)
+            
+                            var followers = msgs.reduce(function (acc, msg) {
+                                var author = msg.value.author
+                                // duplicate, do nothing
+                                if (acc.indexOf(author) > -1) return acc  
+                                // if they are following us,
+                                // add them to the list
+                                if (msg.value.content.following) {  
+                                    acc.push(author)
+                                }
+                                return acc
+                            }, [])
+            
+                            resolve(followers.length)
+                        })
+                    )
                 })
-            }),
-
-            // get the follower count
-            new Promise((resolve, reject) => {
-                sbot.db.query(
-                    where(
-                        contact(userId)
-                    ),
-                    toCallback((err, msgs) => {
-                        if (err) return reject(err)
-        
-                        var followers = msgs.reduce(function (acc, msg) {
-                            var author = msg.value.author
-                            // duplicate, do nothing
-                            if (acc.indexOf(author) > -1) return acc  
-                            // if they are following us,
-                            // add them to the list
-                            if (msg.value.content.following) {  
-                                acc.push(author)
-                            }
-                            return acc
-                        }, [])
-        
-                        resolve(followers.length)
-                    })
-                )
-            })
-        ])
-            .then(([posts, following, followers]) => {
-                res.send({ userId, posts, following, followers })
-            })
-            .catch(err => {
-                res.send(createError.InternalServerError(err))
-            })
+            ])
+                .then(([posts, following, followers]) => {
+                    res.send({ userId, posts, following, followers })
+                })
+                .catch(err => {
+                    res.send(createError.InternalServerError(err))
+                })
+        })
     })
 
     fastify.get('/feed/:userName', (req, res) => {
@@ -236,20 +277,24 @@ module.exports = function startServer (sbot) {
 
 
     fastify.get('/default', (req, res) => {
-        const { query } = req
-        const source = query.page ? 
-            getThreads({ sbot }, query.page) :
-            getThreads({ sbot })
+        console.log("default path")
+        fastify.cache.set('default', {id: 'default'}, 3600000, (err) => {
 
-        S(
-            source,
-            S.take(10),
-            S.collect(function (err, threads) {
-                if (err) return console.log('err', err)
+            const { query } = req
+            const source = query.page ? 
+                getThreads({ sbot }, query.page) :
+                getThreads({ sbot })
 
-                res.send(threads)
-            })
-        )
+            S(
+                source,
+                S.take(10),
+                S.collect(function (err, threads) {
+                    if (err) return console.log('err', err)
+
+                    res.send(threads)
+                })
+            )
+        })
     })
 
     fastify.post('/get-profiles', (req, res) => {
@@ -259,80 +304,88 @@ module.exports = function startServer (sbot) {
         } catch (err) {
             return res.send(createError.BadRequest('Invalid json'))
         }
+        const idslist = ids.map(String)
 
-        // console.log('***req.body***', req.body)
-        // console.log('ids', ids)
+        // this is a bit hacky, we should instead be recording each aboutSelf in redis
+        // and then pulling them either from redis or from sbot - rabble
+        fastify.cache.set('get-profiles', {ids: idslist}, 3600000, (err) => {
+            // console.log('***req.body***', req.body)
+            // console.log('ids', ids)
 
-        // how is there no async code here?
-        var profiles = ids.map(id => {
-            var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
-            return Object.assign(profile, {
-                id: id
+            // how is there no async code here?
+            var profiles = ids.map(id => {
+                var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+                return Object.assign(profile, {
+                    id: id
+                })
             })
+            res.send(profiles)
         })
-        res.send(profiles)
     })
 
     fastify.get('/profile-by-id/:userId', (req, res) => {
         const { userId } = req.params
+        //console.log("profile-by-id", userId)
+        fastify.cache.set('profile-by-id', {id: userId}, 3600000, (err) => {
 
-        sbot.db.onDrain('aboutSelf', () => {
-            const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
+            sbot.db.onDrain('aboutSelf', () => {
+                const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
 
-            // get the blob if they have a profile image
-            if (profile && profile.image) {
-                return sbot.blobs.has(profile.image, (err, has) => {
-                    if (err) {
-                        console.log('errrrr', err)
-                        return res.send(createError.InternalServerError(err))
-                    }
-
-                    // console.log('**has image**', has)
-
-                    if (has) return res.send(profile)
-
-                    // we don't have the blob yet,
-                    // so request it from a peer, then return a response
-
-                    // this is something added only in the planetary pub
-                    // this is something IPFS would help with b/c
-                    // I think they handle routing requests
-                    // var currentPeers = sbot.peers
-                    var currentPeers = sbot.conn.dbPeers()	
-                    console.log('**peers**', currentPeers)
-
-                    // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
-                    // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
-
-                    // trying cel's pub
-                    var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
-                    sbot.conn.connect(addr, (err, ssb) => {
+                // get the blob if they have a profile image
+                if (profile && profile.image) {
+                    return sbot.blobs.has(profile.image, (err, has) => {
                         if (err) {
-                            console.log('oh no', err)
-                            return console.log('*errrrr connect*', err)
+                            console.log('errrrr', err)
+                            return res.send(createError.InternalServerError(err))
                         }
 
-                        S(
-                            ssb.blobs.get(profile.image),
-                            // S.through(data => console.log('**data**', data)),
-                            sbot.blobs.add(profile.image, (err, blobId) => {
-                                if (err) {
-                                    // eslint-disable-next-line
-                                    res.send(createError.InternalServerError(err))
-                                    return console.log('**blob errrr**', err)
-                                }
+                        // console.log('**has image**', has)
 
-                                console.log('***got blob***', blobId)
-                                // TODO -- could return this before the 
-                                // blob has finished transferring
-                                res.send(profile)
-                            })
-                        )
+                        if (has) return res.send(profile)
+
+                        // we don't have the blob yet,
+                        // so request it from a peer, then return a response
+
+                        // this is something added only in the planetary pub
+                        // this is something IPFS would help with b/c
+                        // I think they handle routing requests
+                        // var currentPeers = sbot.peers
+                        var currentPeers = sbot.conn.dbPeers()	
+                        console.log('**peers**', currentPeers)
+
+                        // var addr = 'net:one.planetary.pub:8008~shs:@CIlwTOK+m6v1hT2zUVOCJvvZq7KE/65ErN6yA2yrURY='
+                        // var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+
+                        // trying cel's pub
+                        var addr = 'net:ssb.celehner.com:8008~shs:5XaVcAJ5DklwuuIkjGz4lwm2rOnMHHovhNg7BFFnyJ8='
+                        sbot.conn.connect(addr, (err, ssb) => {
+                            if (err) {
+                                console.log('oh no', err)
+                                return console.log('*errrrr connect*', err)
+                            }
+
+                            S(
+                                ssb.blobs.get(profile.image),
+                                // S.through(data => console.log('**data**', data)),
+                                sbot.blobs.add(profile.image, (err, blobId) => {
+                                    if (err) {
+                                        // eslint-disable-next-line
+                                        res.send(createError.InternalServerError(err))
+                                        return console.log('**blob errrr**', err)
+                                    }
+
+                                    console.log('***got blob***', blobId)
+                                    // TODO -- could return this before the 
+                                    // blob has finished transferring
+                                    res.send(profile)
+                                })
+                            )
+                        })
                     })
-                })
-            }
+                }
 
-            res.send(profile)
+                res.send(profile)
+            })
         })
     })
 
@@ -418,80 +471,83 @@ module.exports = function startServer (sbot) {
     fastify.get('/counts/:username', (req, res) => {
         var { username } = req.params
 
-        sbot.suggest.profile({ text: username }, (err, matches) => {
-            if (err) {
-                return res.send(createError.InternalServerError(err))
-            }
+        fastify.cache.set('counts', {username: username}, 3600000, (err) => {
 
-            // TODO -- fix this part
-            // should return a list of user IDs or something if
-            // there is more than 1 match
-            const id = matches[0] && matches[0].id
-            if (!id) return res.send(createError.NotFound())
+            sbot.suggest.profile({ text: username }, (err, matches) => {
+                if (err) {
+                    return res.send(createError.InternalServerError(err))
+                }
 
-            Promise.all([
-                new Promise((resolve, reject) => {
-                    // then query for thier posts so we can count them
-                    sbot.db.query(
-                        where(
-                            and(
-                                type('post'),
-                                author(id)
-                            )
-                        ),
-                        toCallback((err, res) => {
+                // TODO -- fix this part
+                // should return a list of user IDs or something if
+                // there is more than 1 match
+                const id = matches[0] && matches[0].id
+                if (!id) return res.send(createError.NotFound())
+
+                Promise.all([
+                    new Promise((resolve, reject) => {
+                        // then query for thier posts so we can count them
+                        sbot.db.query(
+                            where(
+                                and(
+                                    type('post'),
+                                    author(id)
+                                )
+                            ),
+                            toCallback((err, res) => {
+                                if (err) return reject(err)
+                                resolve(res.length)
+                            })
+                        )
+                    }),
+
+                    // get the following count
+                    new Promise((resolve, reject) => {
+                        sbot.friends.hops({
+                            start: id,
+                            max: 1
+                        }, (err, following) => {
                             if (err) return reject(err)
-                            resolve(res.length)
+                            const folArr = Object.keys(following).filter(id => {
+                                return following[id] === 1
+                            })
+                            resolve(folArr.length)
                         })
-                    )
-                }),
+                    }),
 
-                // get the following count
-                new Promise((resolve, reject) => {
-                    sbot.friends.hops({
-                        start: id,
-                        max: 1
-                    }, (err, following) => {
-                        if (err) return reject(err)
-                        const folArr = Object.keys(following).filter(id => {
-                            return following[id] === 1
-                        })
-                        resolve(folArr.length)
+                    // get the follower count
+                    new Promise((resolve, reject) => {
+                        sbot.db.query(
+                            where(
+                                contact(id)
+                            ),
+                            toCallback((err, msgs) => {
+                                if (err) return reject(err)
+                
+                                var followers = msgs.reduce(function (acc, msg) {
+                                    var author = msg.value.author
+                                    // duplicate, do nothing
+                                    if (acc.indexOf(author) > -1) return acc  
+                                    // if they are following us,
+                                    // add them to the list
+                                    if (msg.value.content.following) {  
+                                        acc.push(author)
+                                    }
+                                    return acc
+                                }, [])
+                
+                                resolve(followers.length)
+                            })
+                        )
                     })
-                }),
-
-                // get the follower count
-                new Promise((resolve, reject) => {
-                    sbot.db.query(
-                        where(
-                            contact(id)
-                        ),
-                        toCallback((err, msgs) => {
-                            if (err) return reject(err)
-            
-                            var followers = msgs.reduce(function (acc, msg) {
-                                var author = msg.value.author
-                                // duplicate, do nothing
-                                if (acc.indexOf(author) > -1) return acc  
-                                // if they are following us,
-                                // add them to the list
-                                if (msg.value.content.following) {  
-                                    acc.push(author)
-                                }
-                                return acc
-                            }, [])
-            
-                            resolve(followers.length)
-                        })
-                    )
-                })
-            ])
-                .then(([posts, following, followers]) => {
-                    res.send({ username, id, posts, following, followers })
-                })
-                .catch(err => {
-                    res.send(createError.InternalServerError(err))
-                })
+                ])
+                    .then(([posts, following, followers]) => {
+                        res.send({ username, id, posts, following, followers })
+                    })
+                    .catch(err => {
+                        res.send(createError.InternalServerError(err))
+                    })
+            })
         })
 
     })
