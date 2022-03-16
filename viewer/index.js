@@ -1,8 +1,3 @@
-const dotenv = require('dotenv')
-const buf = Buffer.from('hello world')
-const opt = { debug: true }
-const config = dotenv.parse(buf, opt)
-
 const { where,  and, type, contact,
     author, toCallback,  } = require('ssb-db2/operators')
 var path = require('path')
@@ -11,16 +6,22 @@ const Fastify = require('fastify')
 const fastifyCaching = require('fastify-caching')
 const IORedis = require('ioredis')
 
-const redis = new IORedis({
+var redis_config = {
     port: process.env.REDIS_PORT, // Redis port
     host: process.env.REDIS_HOST, // Redis host
-    username: process.env.REDIS_USERNAME, // needs Redis >= 6
-    password: process.env.REDIS_PASSWORD,
     db: 0, // Defaults to 0
     tls:{
         rejectUnauthorized: false,
     },
-});
+};
+
+
+
+
+//username: process.env.REDIS_USERNAME, // needs Redis >= 6
+//password: process.env.REDIS_PASSWORD,
+
+const redis = new IORedis(redis_config);
 
 const abcache = require('abstract-cache')({
     useAwait: false,
