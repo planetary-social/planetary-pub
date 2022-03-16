@@ -3,33 +3,7 @@ const { where,  and, type, contact,
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
-const fastifyCaching = require('fastify-caching')
-const IORedis = require('ioredis')
-
-var redis_config = {
-    port: process.env.REDIS_PORT, // Redis port
-    host: process.env.REDIS_HOST, // Redis host
-    db: 0, // Defaults to 0
-    tls:{
-        rejectUnauthorized: false,
-    },
-};
-
-
-
-
-//username: process.env.REDIS_USERNAME, // needs Redis >= 6
-//password: process.env.REDIS_PASSWORD,
-
-const redis = new IORedis(redis_config);
-
-const abcache = require('abstract-cache')({
-    useAwait: false,
-    driver: {
-      name: 'abstract-cache-redis', 
-      options: {client: redis}
-    }
-  })
+const fastifyResponseCaching = require('fastify-response-caching')
 
 var S = require('pull-stream')
 var toStream = require('pull-stream-to-stream')
@@ -55,8 +29,8 @@ module.exports = function startServer (sbot) {
         prefix: '/public/' // optional: default '/'
     })
 
-    fastify.register(require('fastify-redis'), {client: redis})
-    fastify.register(require('fastify-caching'), {cache: abcache})
+    fastify.register(fastifyResponseCaching, {ttl: 500000})
+
             
 
     fastify.get('/.well-known/apple-app-site-association', (_, res) => {
@@ -77,7 +51,7 @@ module.exports = function startServer (sbot) {
         id = decodeURIComponent(id)
         console.log('request_message_id', id)
 
-        fastify.cache.set('msg', {id: id}, 3600000, (err) => {
+        //fastify.cache.set('msg', {id: id}, 3600000, (err) => {
             // get the message in question
             // so we can look for the `root` property and
             // see if there is a thread for this
@@ -99,7 +73,7 @@ module.exports = function startServer (sbot) {
                     res.send(msgs)
                 })
             })
-        })
+        //})
     })
 
     fastify.get('/blob/:blobId', (req, res) => {
@@ -124,7 +98,7 @@ module.exports = function startServer (sbot) {
         const { query } = req
         const page = query ? query.page : 0
 
-            fastify.cache.set('feed-by-id', {id: userId, page: page}, 3600000, (err) => {
+            //fastify.cache.set('feed-by-id', {id: userId, page: page}, 3600000, (err) => {
             // var source = sbot.threads.profile({
             //     id: userId,
             //     // allowlist: ['post'],
@@ -150,12 +124,12 @@ module.exports = function startServer (sbot) {
                     res.send(threads)
                 })
             )
-        })
+        //})
     })
 
     fastify.get('/counts-by-id/:userId', (req, res) => {
         var { userId } = req.params
-        fastify.cache.set('counts-by-id', {id: userId}, 3600000, (err) => {
+        //fastify.cache.set('counts-by-id', {id: userId}, 3600000, (err) => {
 
             Promise.all([
                 new Promise((resolve, reject) => {
@@ -220,7 +194,7 @@ module.exports = function startServer (sbot) {
                 .catch(err => {
                     res.send(createError.InternalServerError(err))
                 })
-        })
+       // })
     })
 
     fastify.get('/feed/:userName', (req, res) => {
@@ -279,7 +253,7 @@ module.exports = function startServer (sbot) {
 
     fastify.get('/default', (req, res) => {
         console.log("default path")
-        fastify.cache.set('default', {id: 'default'}, 3600000, (err) => {
+        //fastify.cache.set('default', {id: 'default'}, 3600000, (err) => {
 
             const { query } = req
             const source = query.page ? 
@@ -295,7 +269,7 @@ module.exports = function startServer (sbot) {
                     res.send(threads)
                 })
             )
-        })
+        //})
     })
 
     fastify.post('/get-profiles', (req, res) => {
@@ -309,7 +283,7 @@ module.exports = function startServer (sbot) {
 
         // this is a bit hacky, we should instead be recording each aboutSelf in redis
         // and then pulling them either from redis or from sbot - rabble
-        fastify.cache.set('get-profiles', {ids: idslist}, 3600000, (err) => {
+        //fastify.cache.set('get-profiles', {ids: idslist}, 3600000, (err) => {
             // console.log('***req.body***', req.body)
             // console.log('ids', ids)
 
@@ -321,13 +295,13 @@ module.exports = function startServer (sbot) {
                 })
             })
             res.send(profiles)
-        })
+        //})
     })
 
     fastify.get('/profile-by-id/:userId', (req, res) => {
         const { userId } = req.params
         //console.log("profile-by-id", userId)
-        fastify.cache.set('profile-by-id', {id: userId}, 3600000, (err) => {
+        //fastify.cache.set('profile-by-id', {id: userId}, 3600000, (err) => {
 
             sbot.db.onDrain('aboutSelf', () => {
                 const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
@@ -387,7 +361,7 @@ module.exports = function startServer (sbot) {
 
                 res.send(profile)
             })
-        })
+        //})
     })
 
     fastify.get('/profile/:username', (req, res) => {
@@ -472,7 +446,7 @@ module.exports = function startServer (sbot) {
     fastify.get('/counts/:username', (req, res) => {
         var { username } = req.params
 
-        fastify.cache.set('counts', {username: username}, 3600000, (err) => {
+        //fastify.cache.set('counts', {username: username}, 3600000, (err) => {
 
             sbot.suggest.profile({ text: username }, (err, matches) => {
                 if (err) {
@@ -549,7 +523,7 @@ module.exports = function startServer (sbot) {
                         res.send(createError.InternalServerError(err))
                     })
             })
-        })
+        //})
 
     })
 
