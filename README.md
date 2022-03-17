@@ -252,6 +252,8 @@ done
 
 ## public web hosting
 
+There is a convention on secure scuttlebutt for viewers that are publically acessible to respect a user's choice around putting their scuttlebutt content in a place it can be indexed by google and accessible without using a scuttlebutt application. In the planetary app users are asked during signup and can change it in their settings. For other scuttlebutt apps you need to manually add the setting to your log like this: 
+
 ```
 sbot publish --type about --about "@your.public.id.here" --publicWebHosting
 ```
