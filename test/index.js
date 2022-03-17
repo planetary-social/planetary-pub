@@ -4,6 +4,7 @@ var test = require('tape')
 var createSbot = require('../pub')
 var alice = require('./test-data/user.json')
 var bob = require('./test-data/user-two.json')
+var carol = require('./test-data/user-three.json')
 
 var _sbot
 test('setup', t => {
@@ -30,7 +31,6 @@ test('setup', t => {
                 t.end()
             })
         )
-
     })
 })
 
@@ -63,13 +63,21 @@ test('user profile', t => {
     t.plan(3)
 
     _sbot.db.onDrain('aboutSelf', () => {
-        const profile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
-        t.equal(profile.name, 'alice', 'should have the name "alice"')
-        t.equal(profile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
+        const aliceProfile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
+        t.equal(aliceProfile.name, 'alice', 'should have the name "alice"')
+        t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
             'should have the right avatar for the user')
-
+        t.equal(aliceProfile.publicWebhosting, undefined, 'alice should have undefinedpublic web hosting')
+        
+        
         const bobProfile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
         t.equal(bobProfile.name, 'bob', 'should have the name "bob"')
+        t.equal(bobProfile.publicWebhosting, true, 'bob should have public web hosting')
+
+
+        const carolProfile = _sbot.db.getIndex('aboutSelf').getProfile(carol.id)
+        t.equal(carolProfile.publicWebhosting, false, 'should not have public web hosting')
+
     })
 })
 
