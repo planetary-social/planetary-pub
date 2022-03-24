@@ -4,7 +4,7 @@ var S = require('pull-stream')
 var { read } = require('pull-files')
 const { readFileSync } = require('fs')
 
-module.exports = function init (sbot, user, userTwo, _cb) {
+module.exports = function init (sbot, alice, bob, carol, _cb) {
     // create profile data and test messages
     parallel([
         // save blobs
@@ -33,7 +33,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
         // follow people
         cb => {
-            parallel([user, userTwo].map(keys => {
+            parallel([alice, bob].map(keys => {
                 return function (_cb) {
                     sbot.friends.follow(keys.id, null, function (err) {
                         if (err) return _cb(err)
@@ -57,26 +57,37 @@ module.exports = function init (sbot, user, userTwo, _cb) {
     function saveProfiles (cb) {
         parallel([
             cb => {
-                sbot.db.publishAs(user, {
+                sbot.db.publishAs(alice, {
                     type: 'about',
-                    about: user.id,
+                    about: alice.id,
                     name: 'alice'
                 }, cb)
             },
             cb => {
-                sbot.db.publishAs(user, {
+                sbot.db.publishAs(alice, {
                     type: 'about',
-                    about: user.id,
+                    about: alice.id,
                     // the cinnamon roll hash
                     // eslint-disable-next-line
                     image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
                 }, cb)
             },
             cb => {
-                sbot.db.publishAs(userTwo, {
+                sbot.db.publishAs(bob, {
                     type: 'about',
-                    about: userTwo.id,
-                    name: 'bob'
+                    about: bob.id,
+                    name: 'bob',
+                    publicWebHosting: true,
+                }, (err, res) => {
+                    cb(err, res)
+                })
+            },
+            cb => {
+                sbot.db.publishAs(carol, {
+                    type: 'about',
+                    about: carol.id,
+                    name: 'carol',
+                    publicWebHosting: false,
                 }, (err, res) => {
                     cb(err, res)
                 })
@@ -161,14 +172,14 @@ module.exports = function init (sbot, user, userTwo, _cb) {
 
         series(testMsgs.map(msg => {
             return function postMsg (cb) {
-                sbot.db.publishAs(user, msg, (err, res) => {
+                sbot.db.publishAs(alice, msg, (err, res) => {
                     if (err) return cb(err)
                     cb(null, res)
                 })
             }
         }).concat([
             cb => {
-                sbot.db.publishAs(userTwo, {
+                sbot.db.publishAs(bob, {
                     type: 'post',
                     text: 'aaa'
                 }, cb)
@@ -182,10 +193,10 @@ module.exports = function init (sbot, user, userTwo, _cb) {
             // more test data
             series([
                 cb => {
-                    sbot.db.publishAs(user, {
+                    sbot.db.publishAs(alice, {
                         type: 'post',
-                        text: `testing mentioning a user -- ${userTwo.id}
-                            as a md link  -- [another name](${user.id})
+                        text: `testing mentioning a user -- ${bob.id}
+                            as a md link  -- [another name](${alice.id})
                             and a msg -- ${msg.key}
                             msg as md link -- [link](${msg.key})
                         `
@@ -193,7 +204,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 },
 
                 cb => {
-                    sbot.db.publishAs(userTwo, {
+                    sbot.db.publishAs(bob, {
                         type: 'vote',
                         vote: {
                             link: msg.key,
@@ -204,7 +215,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 },
 
                 cb => {
-                    sbot.db.publishAs(user, {
+                    sbot.db.publishAs(alice, {
                         type: 'post',
                         text: `testing replies. **some markown**
                             [hurray](https://example.com/)`,
@@ -213,7 +224,7 @@ module.exports = function init (sbot, user, userTwo, _cb) {
                 },
 
                 cb => {
-                    sbot.db.publishAs(userTwo, {
+                    sbot.db.publishAs(bob, {
                         type: 'post',
                         text: 'four',
                         root: msg.key

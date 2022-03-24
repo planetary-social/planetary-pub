@@ -93,21 +93,21 @@ module.exports = function startServer (sbot) {
         //})
     })
 
-    fastify.get('/feed-by-id/:userId', (req, res) => {
-        var { userId } = req.params
+    fastify.get('/feed-by-id/:id', (req, res) => {
+        var { id } = req.params
         const { query } = req
         const page = query ? query.page : 0
 
-            //fastify.cache.set('feed-by-id', {id: userId, page: page}, 3600000, (err) => {
+            //fastify.cache.set('feed-by-id', {id: id, page: page}, 3600000, (err) => {
             // var source = sbot.threads.profile({
-            //     id: userId,
+            //     id: id,
             //     // allowlist: ['post'],
             //     threadMaxSize: 3 // at most 3 messages in each thread
             // })
 
             var source = page ?
-                getThreads({ sbot, userId }, page) :
-                getThreads({ sbot, userId })
+                getThreads({ sbot, id }, page) :
+                getThreads({ sbot, id })
 
             S(
                 source,
@@ -127,9 +127,9 @@ module.exports = function startServer (sbot) {
         //})
     })
 
-    fastify.get('/counts-by-id/:userId', (req, res) => {
-        var { userId } = req.params
-        //fastify.cache.set('counts-by-id', {id: userId}, 3600000, (err) => {
+    fastify.get('/counts-by-id/:id', (req, res) => {
+        var { id } = req.params
+        //fastify.cache.set('counts-by-id', {id: id}, 3600000, (err) => {
 
             Promise.all([
                 new Promise((resolve, reject) => {
@@ -138,7 +138,7 @@ module.exports = function startServer (sbot) {
                         where(
                             and(
                                 type('post'),
-                                author(userId)
+                                author(id)
                             )
                         ),
                         toCallback((err, res) => {
@@ -151,7 +151,7 @@ module.exports = function startServer (sbot) {
                 // get the following count
                 new Promise((resolve, reject) => {
                     sbot.friends.hops({
-                        start: userId,
+                        start: id,
                         max: 1
                     }, (err, following) => {
                         if (err) return reject(err)
@@ -166,7 +166,7 @@ module.exports = function startServer (sbot) {
                 new Promise((resolve, reject) => {
                     sbot.db.query(
                         where(
-                            contact(userId)
+                            contact(id)
                         ),
                         toCallback((err, msgs) => {
                             if (err) return reject(err)
@@ -189,7 +189,7 @@ module.exports = function startServer (sbot) {
                 })
             ])
                 .then(([posts, following, followers]) => {
-                    res.send({ userId, posts, following, followers })
+                    res.send({ id, posts, following, followers })
                 })
                 .catch(err => {
                     res.send(createError.InternalServerError(err))
@@ -298,13 +298,13 @@ module.exports = function startServer (sbot) {
         //})
     })
 
-    fastify.get('/profile-by-id/:userId', (req, res) => {
-        const { userId } = req.params
-        //console.log("profile-by-id", userId)
-        //fastify.cache.set('profile-by-id', {id: userId}, 3600000, (err) => {
+    fastify.get('/profile-by-id/:id', (req, res) => {
+        const { id } = req.params
+        //console.log("profile-by-id", id)
+        //fastify.cache.set('profile-by-id', {id: id}, 3600000, (err) => {
 
             sbot.db.onDrain('aboutSelf', () => {
-                const profile = sbot.db.getIndex('aboutSelf').getProfile(userId)
+                const profile = sbot.db.getIndex('aboutSelf').getProfile(id)
 
                 // get the blob if they have a profile image
                 if (profile && profile.image) {

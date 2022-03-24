@@ -5,8 +5,9 @@ const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
 const path = require('path')
 const init = require('./init')
-const user = require('./test/test-data/user.json')
-const userTwo = require('./test/test-data/user-two.json')
+const alice = require('./test/test-data/user.json')
+const bob = require('./test/test-data/user-two.json')
+const carol = require('./test/test-data/user-three.json')
 const rimraf = require('rimraf')
 const PUBS = require('./pubs.json')
 var after = require('after')
@@ -40,7 +41,7 @@ function start (cb) {
             sbot.peers = []
 
             // then write new records
-            init(sbot, user, userTwo, (err) => {
+            init(sbot, alice, bob, carol, (err) => {
                 if (err) return cb(err)
                 cb(null, sbot)
             })
