@@ -25,9 +25,9 @@ test('setup', t => {
             ),
             toCallback((err, msgs) => {
                 t.error(err)
-                console.log('There are ' + msgs.length +
-                    ' messages of type "post" from alice',
-                alice.id)
+                //console.log('There are ' + msgs.length +
+                //    ' messages of type "post" from alice',
+                //alice.id)
                 t.end()
             })
         )
@@ -60,23 +60,28 @@ test('bobs messages have a reply root set properly', t => {
 // it is loaded in the `../index.js` file
 
 test('user profile', t => {
-    t.plan(3)
+    t.plan(6)
 
     _sbot.db.onDrain('aboutSelf', () => {
         const aliceProfile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
         t.equal(aliceProfile.name, 'alice', 'should have the name "alice"')
         t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
             'should have the right avatar for the user')
-        t.equal(aliceProfile.publicWebhosting, undefined, 'alice should have undefinedpublic web hosting')
+        t.equal(aliceProfile.publicWebHosting, true, 'alice should have web hosting')
         
         
         const bobProfile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
         t.equal(bobProfile.name, 'bob', 'should have the name "bob"')
-        t.equal(bobProfile.publicWebhosting, true, 'bob should have public web hosting')
+        t.equal(bobProfile.publicWebHosting, true, 'bob should have public web hosting')
 
 
         const carolProfile = _sbot.db.getIndex('aboutSelf').getProfile(carol.id)
-        t.equal(carolProfile.publicWebhosting, false, 'should not have public web hosting')
+        t.equal(carolProfile.publicWebHosting, false, 'should not have public web hosting')
+
+        const  danProfile = _sbot.db.getIndex('aboutSelf').getProfile(dan.id)
+        t.equal(danProfile.publicWebHosting, false, 'should not have public web hosting')
+
+     
 
     })
 })
