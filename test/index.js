@@ -25,9 +25,9 @@ test('setup', t => {
             ),
             toCallback((err, msgs) => {
                 t.error(err)
-                console.log('There are ' + msgs.length +
-                    ' messages of type "post" from alice',
-                alice.id)
+                //console.log('There are ' + msgs.length +
+                //    ' messages of type "post" from alice',
+                //alice.id)
                 t.end()
             })
         )
@@ -67,7 +67,7 @@ test('user profile', t => {
         t.equal(aliceProfile.name, 'alice', 'should have the name "alice"')
         t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
             'should have the right avatar for the user')
-        t.equal(aliceProfile.publicWebHosting, undefined, 'alice should have undefinedpublic web hosting')
+        t.equal(aliceProfile.publicWebHosting, true, 'alice should have web hosting')
         
         
         const bobProfile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
@@ -77,6 +77,11 @@ test('user profile', t => {
 
         const carolProfile = _sbot.db.getIndex('aboutSelf').getProfile(carol.id)
         t.equal(carolProfile.publicWebHosting, false, 'should not have public web hosting')
+
+        const  danProfile = _sbot.db.getIndex('aboutSelf').getProfile(dan.id)
+        t.equal(danProfile.publicWebHosting, false, 'should not have public web hosting')
+
+     
 
     })
 })

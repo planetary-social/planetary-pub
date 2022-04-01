@@ -8,6 +8,7 @@ const init = require('./init')
 const alice = require('./test/test-data/user.json')
 const bob = require('./test/test-data/user-two.json')
 const carol = require('./test/test-data/user-three.json')
+const dan = require('./test/test-data/non-public-user.json')
 const rimraf = require('rimraf')
 const PUBS = require('./pubs.json')
 var after = require('after')
@@ -41,7 +42,7 @@ function start (cb) {
             sbot.peers = []
 
             // then write new records
-            init(sbot, alice, bob, carol, (err) => {
+            init(sbot, alice, bob, carol, dan, (err) => {
                 if (err) return cb(err)
                 cb(null, sbot)
             })

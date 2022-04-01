@@ -4,7 +4,7 @@ var S = require('pull-stream')
 var { read } = require('pull-files')
 const { readFileSync } = require('fs')
 
-module.exports = function init (sbot, alice, bob, carol, _cb) {
+module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
     // create profile data and test messages
     parallel([
         // save blobs
@@ -69,7 +69,8 @@ module.exports = function init (sbot, alice, bob, carol, _cb) {
                     about: alice.id,
                     // the cinnamon roll hash
                     // eslint-disable-next-line
-                    image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256'
+                    image: '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
+                    publicWebHosting: true,
                 }, cb)
             },
             cb => {
@@ -87,6 +88,16 @@ module.exports = function init (sbot, alice, bob, carol, _cb) {
                     type: 'about',
                     about: carol.id,
                     name: 'carol',
+                    publicWebHosting: true,
+                }, (err, res) => {
+                    cb(err, res)
+                })
+            },
+            cb => {
+                sbot.db.publishAs(dan, {
+                    type: 'about',
+                    about: dan.id,
+                    name: 'dan',
                     publicWebHosting: false,
                 }, (err, res) => {
                     cb(err, res)
@@ -180,6 +191,13 @@ module.exports = function init (sbot, alice, bob, carol, _cb) {
         }).concat([
             cb => {
                 sbot.db.publishAs(bob, {
+                    type: 'post',
+                    text: 'aaa'
+                }, cb)
+            }
+        ]).concat([
+            cb => {
+                sbot.db.publishAs(dan, {
                     type: 'post',
                     text: 'aaa'
                 }, cb)
