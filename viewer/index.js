@@ -22,7 +22,7 @@ module.exports = function startServer (sbot) {
 
     // enable cors
     fastify.register(require('fastify-cors'), { 
-        orgin: true
+        orgin: false
       })
     
     fastify.register(require('fastify-static'), {
