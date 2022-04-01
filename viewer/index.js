@@ -21,13 +21,17 @@ module.exports = function startServer (sbot) {
 
 
     // enable cors
-    fastify.register(require('fastify-cors'), {})
-
+    fastify.register(require('fastify-cors'), { 
+        orgin: true
+      })
+    
     fastify.register(require('fastify-static'), {
         root: path.join(__dirname, '..', 'public'),
         dotfiles: 'allow',
         prefix: '/public/' // optional: default '/'
     })
+
+
 
     fastify.register(fastifyResponseCaching, {ttl: 500000})
 

@@ -30,7 +30,7 @@
     "bipf": "^1.5.5",
     "fastify": "^3.25.3",
     "fastify-caching": "^6.2.0",
-    "fastify-cors": "^6.0.2",
+    "fastify-cors": "^6.0.3",
     "fastify-redis": "^4.3.3",
     "fastify-response-caching": "0.0.3",
     "fastify-static": "^4.5.0",
