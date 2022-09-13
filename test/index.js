@@ -5,6 +5,7 @@ var createSbot = require('../pub')
 var alice = require('./test-data/user.json')
 var bob = require('./test-data/user-two.json')
 var carol = require('./test-data/user-three.json')
+var dan = require('./test-data/non-public-user.json')
 
 var _sbot
 test('setup', t => {
@@ -43,10 +44,9 @@ test('bobs messages have a reply root set properly', t => {
             )
         ),
         toCallback((err, msgs) => {
-            console.log('msgs', msgs)
             t.error(err)
             t.equal(msgs.length, 2, 'should have 2 messages from bob')
-            console.log('**msgs**', JSON.stringify(msgs, null, 2))
+            // console.log('**msgs**', JSON.stringify(msgs, null, 2))
             t.equal(msgs[1].value.content.text, 'four',
                 'should have the right message content')
             t.equal(msgs[1].value.content.root, msgs[0].key,
@@ -60,10 +60,11 @@ test('bobs messages have a reply root set properly', t => {
 // it is loaded in the `../index.js` file
 
 test('user profile', t => {
-    t.plan(6)
+    t.plan(7)
 
     _sbot.db.onDrain('aboutSelf', () => {
         const aliceProfile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
+
         t.equal(aliceProfile.name, 'alice', 'should have the name "alice"')
         t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
             'should have the right avatar for the user')

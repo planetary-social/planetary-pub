@@ -105,7 +105,8 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
             }
         ],
 
-        function done (err) {
+        function done (err, messages) {
+            // console.log({ messages: messages.map(m => m.value.content) })
             cb(err)
         })
     }
@@ -181,32 +182,28 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
             }
         ])
 
-        series(testMsgs.map(msg => {
-            return function postMsg (cb) {
-                sbot.db.publishAs(alice, msg, (err, res) => {
-                    if (err) return cb(err)
-                    cb(null, res)
-                })
-            }
-        }).concat([
+        series([
+            ...testMsgs.map(msg => {
+                return function postMsg (cb) {
+                    sbot.db.publishAs(alice, msg, (err, res) => {
+                        if (err) return cb(err)
+                        cb(null, res)
+                    })
+                }
+            }),
             cb => {
                 sbot.db.publishAs(bob, {
                     type: 'post',
                     text: 'aaa'
                 }, cb)
             }
-        ]).concat([
-            cb => {
-                sbot.db.publishAs(dan, {
-                    type: 'post',
-                    text: 'aaa'
-                }, cb)
-            }
-        ]),
+        ],
 
         function allDone (err, msgs) {
             if (err) return _cb(err)
             var msg = msgs[msgs.length - 1]
+
+
 
             // more test data
             series([
@@ -245,6 +242,14 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                     sbot.db.publishAs(bob, {
                         type: 'post',
                         text: 'four',
+                        root: msg.key
+                    }, cb)
+                },
+
+                cb => {
+                    sbot.db.publishAs(dan, {
+                        type: 'post',
+                        text: 'aaa',
                         root: msg.key
                     }, cb)
                 }

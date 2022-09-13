@@ -540,7 +540,7 @@ function getThread(sbot, rootId, cb) {
         sbot.threads.thread({
             root: rootId,
             // @TODO
-            allowlist: ['test', 'post'],
+            // allowlist: ['test', 'post'],
             reverse: true, // threads sorted from most recent to least recent
             threadMaxSize: 20, // at most 3 messages in each thread
         }),

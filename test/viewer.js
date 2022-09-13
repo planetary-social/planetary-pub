@@ -133,13 +133,14 @@ test('get a thread', t => {
     // var newKey
     var content = { type: 'post', text: 'woooo 2', root: msgKey }
 
-    sbot.db.publish(content, (err, res) => {
+    sbot.db.publishAs(alice, content, (err, res) => {
         if (err) {
             t.fail(err.toString())
             return t.end()
         }
 
         childKey = res.key
+        console.log(msgKey)
 
         // we are requesting the 'root' message here
         // how to get a thread when you are given a child message?
@@ -147,6 +148,7 @@ test('get a thread', t => {
             .then(_res => _res.json())
             .then((res) => {
                 var { messages, full } = res
+                console.log({ messages: messages.map(m => m.value.content)})
                 t.equal(full, true, 'should have the full thread')
                 t.equal(messages.length, 2,
                     'should return all the messages in the thread')
