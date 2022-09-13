@@ -130,6 +130,7 @@ module.exports = function startServer (sbot) {
 
     fastify.get('/counts-by-id/:id', (req, res) => {
         var { id } = req.params
+
         //fastify.cache.set('counts-by-id', {id: id}, 3600000, (err) => {
 
             Promise.all([
@@ -216,7 +217,6 @@ module.exports = function startServer (sbot) {
                 return res.code(404).send('not found')
             }
 
-            console.log({ progress: sbot.db.getStatus().value.progress })
             S(
                 sbot.threads.profile({ id }),
                 S.take(10),

@@ -282,7 +282,7 @@ test('feeds are paginated', t => {
           }, cb)
       }),
       async (err, data) => {
-        if (err) throw err
+        t.error(err)
         t.equal(data?.length, 30, 'alice posts 30 root messages')
 
         // call the http API
@@ -309,9 +309,9 @@ test('get counts by id', t => {
     fetch(BASE_URL + '/counts-by-id/' + encodeURIComponent(alice.id))
         .then(res => res.json())
         .then(res => {
-            t.equal(res.userId, alice.id, 'shouold return the right user id')
+            t.equal(res.id, alice.id, 'should return the right user id')
             t.equal(res.posts, 42, 'should count the posts')
-            t.equal(res.followers, 1, 'should count the folloers')
+            t.equal(res.followers, 1, 'should count the followers')
             t.equal(res.following, 0, 'should count following')
             t.end()
         })
