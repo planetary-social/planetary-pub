@@ -29,9 +29,10 @@ module.exports = function startServer (sbot) {
         prefix: '/public/' // optional: default '/'
     })
 
-    fastify.register(fastifyResponseCaching, {ttl: 500000})
+    if (process.env.NODE_ENV !== 'test') {
+      fastify.register(fastifyResponseCaching, {ttl: 600000}) // 10 min cache
+    }
 
-            
 
     fastify.get('/.well-known/apple-app-site-association', (_, res) => {
         return res.sendFile('/.well-known/apple-app-site-association')
@@ -215,17 +216,18 @@ module.exports = function startServer (sbot) {
                 return res.code(404).send('not found')
             }
 
-            var source = sbot.threads.profile({ id: id })
-
+            console.log({ progress: sbot.db.getStatus().value.progress })
             S(
-                source,
+                sbot.threads.profile({ id }),
                 S.take(10),
                 S.map(thread => {
                     // if it's a thread, return the thread
                     // if not a thread, return a single message (not array)
-                    return thread.messages.length > 1 ?
-                        thread.messages :
-                        thread.messages[0]
+                    return thread.messages.length > 1
+                        ? thread.messages
+                        : thread.messages[0]
+                    // 2022-09-13 TODO (mix) AARRr why? review this to see if there is any sane
+                    // reason for the API to do this.
                 }),
                 S.collect(function (err, threads) {
                     if (err) return console.log('err', err)
@@ -252,7 +254,6 @@ module.exports = function startServer (sbot) {
 
 
     fastify.get('/default', (req, res) => {
-        console.log("default path")
         //fastify.cache.set('default', {id: 'default'}, 3600000, (err) => {
 
             const { query } = req

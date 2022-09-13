@@ -1,18 +1,18 @@
-var fetch = require('node-fetch')
-var test = require('tape')
+const fetch = require('node-fetch')
+const test = require('tape')
 const crypto = require('crypto')
 const SecretStack = require('secret-stack')
 const ssbKeys = require('ssb-keys')
-var path = require('path')
-var { read } = require('pull-files')
-var S = require('pull-stream')
+const path = require('path')
+const { read } = require('pull-files')
+const S = require('pull-stream')
 const _ = {
     flatten: require('lodash.flatten')
 }
 const rimraf = require('rimraf')
 const after = require('after')
 const series = require('run-series')
-var Server = require('../viewer')
+const Server = require('../viewer')
 const caps = require('./caps.json')
 const user = require('./user.json')
 const userTwo = require('./user-two.json')
@@ -30,55 +30,55 @@ const SERVER_KEYS = ssbKeys.loadOrCreateSync(path.join(DB_PATH, 'secret'))
 var msgKey
 var server
 var sbot
-test('setup', t => {
+
+function setup (cb) {
     rimraf(DB_PATH + '/db2', (err) => {
-        t.error(err)
+        if (err) return cb(err)
         sbot = createSbot({ DB_PATH })
         server = Server(sbot)
+        
+        console.log('sbot id', sbot.config.keys.id)
 
-        sbot.db.publishAs(alice, {
-            type: 'about',
-            about: alice.id,
-            name: 'alice'
-        }, (err) => {
-            t.error(err)
+        series(
+          [
+            cb => sbot.db.publishAs(alice, { type: 'about', about: alice.id, name: 'alice' }, cb),
 
-            var next = after(3, (err) => {
-                t.error(err)
-                console.log('sbot id', sbot.config.keys.id)
+            cb => sbot.db.publishAs(bob, { type: 'about', about: bob.id, name: 'bob' }, cb),
+
+            cb => sbot.db.publish({ type: 'post', text: 'woooo 1' }, (err, msg) => {
+                if (err) return cb(err)
+                msgKey = msg.key
+                cb(null, msg)
+            }),
+
+            cb => sbot.friends.follow(alice.id, { state: true }, cb)
+            // NOTE we have to follow alice so that ssb-suggest-lite will recommend her
+            // when we GET /feed/alice
+          ],
+          // onDone
+          (err, msgs) => {
+            if (err) return cb(err)
+            server.listen(8888, '0.0.0.0', (err, address) => {
+                if (err) throw err
+                console.log(`Server is now listening on ${address}`)
 
                 sbot.db.query(
                     where(
                         author(alice.id)
                     ),
-                    toCallback((err) => {
-                        t.error(err)
-                        t.end()
-                    })
+                    toCallback(cb)
                 )
             })
-
-            sbot.db.publishAs(bob, {
-                type: 'about',
-                about: bob.id,
-                name: 'bob'
-            }, (err) => {
-                next(err)
-            })
-
-            sbot.db.publish({ type: 'post', text: 'woooo 1' }, (err, msg) => {
-                msgKey = msg.key
-                next(err)
-            })
-
-            // Run the server!
-            server.listen(8888, '0.0.0.0', (err, address) => {
-                next(err)
-                console.log(`Server is now listening on ${address}`)
-            })
-        })
+          }
+        )
     })
+}
 
+test('setup', t => {
+  setup(err => {
+    t.error(err)
+    t.end()
+  })
 })
 
 test('server', t => {
@@ -114,7 +114,7 @@ test('get a message', t => {
         fetch(BASE_URL + '/msg/' + 'foo' + encodeURIComponent(msgKey))
     ])
         .then(([{ messages }, badMsg]) => {
-            console.log('good msg', messages)
+            // console.log('good msg', messages)
             t.equal(messages.length, 1, 'should return a single message')
             t.equal(messages[0].key, msgKey,
                 'should return the right message')
@@ -133,14 +133,13 @@ test('get a thread', t => {
     // var newKey
     var content = { type: 'post', text: 'woooo 2', root: msgKey }
 
-    sbot.db.publishAs(alice, content, (err, res) => {
+    sbot.db.publish(content, (err, res) => {
         if (err) {
             t.fail(err.toString())
             return t.end()
         }
 
         childKey = res.key
-        console.log(msgKey)
 
         // we are requesting the 'root' message here
         // how to get a thread when you are given a child message?
@@ -148,7 +147,6 @@ test('get a thread', t => {
             .then(_res => _res.json())
             .then((res) => {
                 var { messages, full } = res
-                console.log({ messages: messages.map(m => m.value.content)})
                 t.equal(full, true, 'should have the full thread')
                 t.equal(messages.length, 2,
                     'should return all the messages in the thread')
@@ -185,12 +183,10 @@ test('get a thread given a child msg, when there are many responses', t => {
         msgs.push(Object.assign({}, msgs[0], { text: 'woooo ' + i }))
     }
 
-    runSeries(msgs.map(msg => {
-        return function (cb) {
-            sbot.db.publishAs(alice, msg, cb)
-        }
-    }), (err, res) => {
-        console.log('res', res)
+    runSeries(
+      msgs.map(msg => cb => sbot.db.publishAs(alice, msg, cb)),
+      (err, res) => {
+        // console.log('res', res)
         t.error(err)
         // in here, fetch from the endpoint
         fetch(BASE_URL + '/msg/' + encodeURIComponent(res[4].key))
@@ -278,21 +274,24 @@ test('feeds are paginated', t => {
     var postsContent = Array.from({ length: 30 }, (_, i) => i)
 
     // post all the test content we just made
-    series(postsContent.map(content => {
-        return cb => {
-            sbot.db.publishAs(alice, {
-                type: 'post',
-                text: 'test post ' + content
-            }, cb)
-        }
-    }), () => {
+    series(
+      postsContent.map(content => cb => {
+          sbot.db.publishAs(alice, {
+              type: 'post',
+              text: 'test post ' + content
+          }, cb)
+      }),
+      async (err, data) => {
+        if (err) throw err
+        t.equal(data?.length, 30, 'alice posts 30 root messages')
+
         // call the http API
-        fetch(BASE_URL + '/feed/' + 'alice')
-            .then(res => res.ok ? res.json() : res.text())
+        fetch(BASE_URL + '/feed/' + 'alice?cacheInvalidate=' + Date.now())
+            // NOTE - adding custom query invalidates the cache, which forces fresh results
+            .then(res => res.json())
             .then(res => {
                 t.equal(res.length, 10, 'should paginate the results')
-                t.equal(res[0].value.content.text, 'test post 29',
-                    'should return messages in reverse order')
+                t.equal(res[0].value.content.text, 'test post 29', 'should return messages in reverse order')
                 t.end()
             })
             .catch(err => {
@@ -301,7 +300,8 @@ test('feeds are paginated', t => {
                 t.end()
             })
 
-    })
+      }
+    )
 })
 
 
@@ -317,16 +317,13 @@ test('get counts by id', t => {
         })
 })
 
-
-
 test('get a user by id', t => {
     var id = encodeURIComponent(alice.id)
     // console.log('**alice id** encoded', id)
     fetch(BASE_URL + '/feed-by-id/' + id)
         .then(res => res.json())
         .then(json => {
-
-            console.log('***feed by id***', json)
+            // console.log('***feed by id***', json)
 
             json.forEach(msg => {
                 t.equal(msg.value.author, alice.id, 'should return the' +

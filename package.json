@@ -7,7 +7,7 @@
     "start": "node index.js",
     "build": "echo \"build\" && exit 0",
     "postversion": "git push --no-verify && git push --tags --no-verify && npm publish",
-    "test": "NODE_ENV=test tape test/*.js | tap-arc --bail",
+    "test": "NODE_ENV=test tape test/*.js | tap-arc",
     "test-viewer": "NODE_ENV=test node test/viewer.js | tap-arc --bail",
     "test-pub": "NODE_ENV=test tape test/index.js | tap-arc --bail",
     "prepare": "husky install",
