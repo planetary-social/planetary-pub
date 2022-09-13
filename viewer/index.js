@@ -289,6 +289,7 @@ module.exports = function startServer (sbot) {
             // console.log('ids', ids)
 
             // how is there no async code here?
+            // TODO: replace with ssb-about-self API
             var profiles = ids.map(id => {
                 var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
                 return Object.assign(profile, {

@@ -60,30 +60,29 @@ test('bobs messages have a reply root set properly', t => {
 // it is loaded in the `../index.js` file
 
 test('user profile', t => {
-    t.plan(7)
-
-    _sbot.db.onDrain('aboutSelf', () => {
-        const aliceProfile = _sbot.db.getIndex('aboutSelf').getProfile(alice.id)
-
+    t.plan(11)
+    
+    _sbot.aboutSelf.get(alice.id, (err, aliceProfile) => {
+        t.error(err)
         t.equal(aliceProfile.name, 'alice', 'should have the name "alice"')
-        t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256',
-            'should have the right avatar for the user')
+        t.equal(aliceProfile.image, '&Ho1XhW2dp4bNJLZrYkurZPxlUhqrknD/Uu/nDp+KnMg=.sha256', 'should have the right avatar for the user')
         t.equal(aliceProfile.publicWebHosting, true, 'alice should have web hosting')
+
+        _sbot.aboutSelf.get(bob.id, (err, bobProfile) => {
+            t.error(err)
+            t.equal(bobProfile.name, 'bob', 'should have the name "bob"')
+            t.equal(bobProfile.publicWebHosting, true, 'bob should have public web hosting')
         
-        
-        const bobProfile = _sbot.db.getIndex('aboutSelf').getProfile(bob.id)
-        t.equal(bobProfile.name, 'bob', 'should have the name "bob"')
-        t.equal(bobProfile.publicWebHosting, true, 'bob should have public web hosting')
+            _sbot.aboutSelf.get(carol.id, (err, carolProfile) => {
+                t.error(err)
+                t.equal(carolProfile.publicWebHosting, false, 'should not have public web hosting')
 
-
-        const carolProfile = _sbot.db.getIndex('aboutSelf').getProfile(carol.id)
-        t.equal(carolProfile.publicWebHosting, false, 'should not have public web hosting')
-
-        const  danProfile = _sbot.db.getIndex('aboutSelf').getProfile(dan.id)
-        t.equal(danProfile.publicWebHosting, false, 'should not have public web hosting')
-
-     
-
+                _sbot.aboutSelf.get(dan.id, (err, danProfile) => {
+                    t.error(err)
+                    t.equal(danProfile.publicWebHosting, false, 'should not have public web hosting')
+                })
+            })
+        })
     })
 })
 
