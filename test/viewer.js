@@ -10,7 +10,6 @@ const _ = {
     flatten: require('lodash.flatten')
 }
 const rimraf = require('rimraf')
-const after = require('after')
 const series = require('run-series')
 const Server = require('../viewer')
 const caps = require('./caps.json')
@@ -18,7 +17,6 @@ const user = require('./user.json')
 const userTwo = require('./user-two.json')
 const alice = user
 const bob = userTwo
-const runSeries = require('run-series')
 
 const { where, author, toCallback } = require('ssb-db2/operators')
 
@@ -183,7 +181,7 @@ test('get a thread given a child msg, when there are many responses', t => {
         msgs.push(Object.assign({}, msgs[0], { text: 'woooo ' + i }))
     }
 
-    runSeries(
+    series(
       msgs.map(msg => cb => sbot.db.publishAs(alice, msg, cb)),
       (err, res) => {
         // console.log('res', res)
@@ -275,32 +273,37 @@ test('feeds are paginated', t => {
 
     // post all the test content we just made
     series(
-      postsContent.map(content => cb => {
-          sbot.db.publishAs(alice, {
-              type: 'post',
-              text: 'test post ' + content
-          }, cb)
-      }),
-      async (err, data) => {
-        t.error(err)
-        t.equal(data?.length, 30, 'alice posts 30 root messages')
+        postsContent.map(content => {
+            return (cb) => {
+                sbot.db.publishAs(alice, {
+                    type: 'post',
+                    text: 'test post ' + content
+                }, (err, msg) => {
+                    if (err) return cb(err)
+                    setTimeout(() => cb(null, msg), 50)
+                })
+            }
+        }),
+        (err, data) => {
+            t.error(err)
+            t.equal(data?.length, 30, 'alice posts 30 root messages')
 
-        // call the http API
-        fetch(BASE_URL + '/feed/' + 'alice?cacheInvalidate=' + Date.now())
-            // NOTE - adding custom query invalidates the cache, which forces fresh results
-            .then(res => res.json())
-            .then(res => {
-                t.equal(res.length, 10, 'should paginate the results')
-                t.equal(res[0].value.content.text, 'test post 29', 'should return messages in reverse order')
-                t.end()
-            })
-            .catch(err => {
-                t.fail(err)
-                console.log('oh no', err)
-                t.end()
-            })
+            // call the http API
+            fetch(BASE_URL + '/feed/' + 'alice?cacheInvalidate=' + Date.now())
+                // NOTE - adding custom query invalidates the cache, which forces fresh results
+                .then(res => res.json())
+                .then(res => {
+                    t.equal(res.length, 10, 'should paginate the results')
+                    t.equal(res[0].value.content.text, 'test post 29', 'should return messages in reverse order')
+                    t.end()
+                })
+                .catch(err => {
+                    t.fail(err)
+                    console.log('oh no', err)
+                    t.end()
+                })
 
-      }
+        }
     )
 })
 

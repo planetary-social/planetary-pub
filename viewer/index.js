@@ -305,8 +305,11 @@ module.exports = function startServer (sbot) {
         //console.log("profile-by-id", id)
         //fastify.cache.set('profile-by-id', {id: id}, 3600000, (err) => {
 
-            sbot.db.onDrain('aboutSelf', () => {
-                const profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+            sbot.aboutSelf.get(id, (err, profile) => {
+                if (err) {
+                    console.log('error getting profile', err)
+                    return res.send(createError.InternalServerError(err))
+                }
 
                 // get the blob if they have a profile image
                 if (profile && profile.image) {
@@ -378,8 +381,10 @@ module.exports = function startServer (sbot) {
             const id = matches[0] && matches[0].id
             if (!id) return res.send(createError.NotFound())
 
-            sbot.db.onDrain('aboutSelf', () => {
-                const profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+            sbot.aboutSelf.get(id, (err, profile) => {
+                if (err) {
+                    return res.send(createError.InternalServerError(err))
+                }
 
                 // get the blob for avatar image
                 sbot.blobs.has(profile.image, (err, has) => {

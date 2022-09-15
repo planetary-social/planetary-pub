@@ -43,7 +43,7 @@
     "run-parallel": "^1.2.0",
     "run-series": "^1.1.9",
     "secret-stack": "^6.4.0",
-    "ssb-about-self": "github:ssbc/ssb-about-self#main",
+    "ssb-about-self": "^1.1.0",
     "ssb-blobs": "^2.0.1",
     "ssb-caps": "^1.1.0",
     "ssb-conn": "^6.0.1",
