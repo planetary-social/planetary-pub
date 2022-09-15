@@ -6,6 +6,7 @@ const Fastify = require('fastify')
 const fastifyResponseCaching = require('fastify-response-caching')
 
 var S = require('pull-stream')
+const paraMap = require('pull-paramap')
 var toStream = require('pull-stream-to-stream')
 var getThreads = require('./threads')
 // var getBlob = require('./get-blob')
@@ -280,7 +281,7 @@ module.exports = function startServer (sbot) {
         } catch (err) {
             return res.send(createError.BadRequest('Invalid json'))
         }
-        const idslist = ids.map(String)
+        // const idslist = ids.map(String)
 
         // this is a bit hacky, we should instead be recording each aboutSelf in redis
         // and then pulling them either from redis or from sbot - rabble
@@ -288,15 +289,23 @@ module.exports = function startServer (sbot) {
             // console.log('***req.body***', req.body)
             // console.log('ids', ids)
 
-            // how is there no async code here?
-            // TODO: replace with ssb-about-self API
-            var profiles = ids.map(id => {
-                var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
-                return Object.assign(profile, {
-                    id: id
+            S(
+                S.values(ids),
+                paraMap(
+                    (id, cb) => {
+                        sbot.aboutSelf.get(id, (err, profile) => {
+                            if (err) return cb(err)
+
+                            cb(null, Object.assign(profile, { id }))
+                        })
+                    },
+                    5
+                ),
+                S.collect((err, profiles) => {
+                    if (err) return res.send(createError.InternalServerError(err))
+                    res.send(profiles)
                 })
-            })
-            res.send(profiles)
+            )
         //})
     })
 
@@ -546,8 +555,6 @@ function getThread(sbot, rootId, cb) {
     S(
         sbot.threads.thread({
             root: rootId,
-            // @TODO
-            // allowlist: ['test', 'post'],
             reverse: true, // threads sorted from most recent to least recent
             threadMaxSize: 20, // at most 3 messages in each thread
         }),

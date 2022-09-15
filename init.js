@@ -105,8 +105,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
             }
         ],
 
-        function done (err, messages) {
-            // console.log({ messages: messages.map(m => m.value.content) })
+        function done (err) {
             cb(err)
         })
     }
@@ -183,13 +182,8 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
         ])
 
         series([
-            ...testMsgs.map(msg => {
-                return function postMsg (cb) {
-                    sbot.db.publishAs(alice, msg, (err, res) => {
-                        if (err) return cb(err)
-                        cb(null, res)
-                    })
-                }
+            ...testMsgs.map(msg => cb => {
+                sbot.db.publishAs(alice, msg, cb)
             }),
             cb => {
                 sbot.db.publishAs(bob, {
