@@ -6,9 +6,8 @@ const ssbKeys = require('ssb-keys')
 const path = require('path')
 const { read } = require('pull-files')
 const S = require('pull-stream')
-const _ = {
-    flatten: require('lodash.flatten')
-}
+const flatten = require('lodash.flatten')
+
 const rimraf = require('rimraf')
 const series = require('run-series')
 const Server = require('../viewer')
@@ -17,6 +16,7 @@ const user = require('./user.json')
 const userTwo = require('./user-two.json')
 const alice = user
 const bob = userTwo
+const dan = require('./test-data/non-public-user.json')
 
 const { where, author, toCallback } = require('ssb-db2/operators')
 
@@ -40,8 +40,8 @@ function setup (cb) {
         series(
           [
             cb => sbot.db.publishAs(alice, { type: 'about', about: alice.id, name: 'alice' }, cb),
-
             cb => sbot.db.publishAs(bob, { type: 'about', about: bob.id, name: 'bob' }, cb),
+            cb => sbot.db.publishAs(dan, { type: 'about', about: dan.id, name: 'dan', publicWebHosting: false }, cb),
 
             cb => sbot.db.publish({ type: 'post', text: 'woooo 1' }, (err, msg) => {
                 if (err) return cb(err)
@@ -49,7 +49,8 @@ function setup (cb) {
                 cb(null, msg)
             }),
 
-            cb => sbot.friends.follow(alice.id, { state: true }, cb)
+            cb => sbot.friends.follow(alice.id, { state: true }, cb),
+            cb => sbot.friends.follow(dan.id, { state: true }, cb)
             // NOTE we have to follow alice so that ssb-suggest-lite will recommend her
             // when we GET /feed/alice
           ],
@@ -242,7 +243,7 @@ test('get a feed', t => {
                         .then(res => res.ok ? res.json() : res.text())
                         .then(res => {
                             // console.log('**res here**', res)
-                            var flatMsgs = _.flatten(res)
+                            var flatMsgs = flatten(res)
 
                             var firstMsg = flatMsgs.find(el => {
                                 return el.key && (el.key === msg.key)
@@ -306,7 +307,6 @@ test('feeds are paginated', t => {
         }
     )
 })
-
 
 test('get counts by id', t => {
     fetch(BASE_URL + '/counts-by-id/' + encodeURIComponent(alice.id))
@@ -526,12 +526,74 @@ test('getProfiles route', t => {
         })
 })
 
-function hash (buf) {
-    buf = typeof buf === 'string' ? Buffer.from(buf) : buf
-    return '&' + crypto.createHash('sha256')
-        .update(buf)
-        .digest('base64') + '.sha256'
-}
+test('publicWebHosting=false, feed not found', t => {
+    sbot.aboutSelf.get(dan.id, (err, profile) => {
+        t.error(err, 'get about message')
+
+        t.false(profile.publicWebHosting, 'public web hosting is disabled')
+
+        // now post a message by them
+        sbot.db.publishAs(dan, {
+            type: 'post',
+            text: 'this isnt public'
+        }, (err, msg) => {
+            t.error(err, 'dan posts a message')
+            // finally get their feed
+            fetch(BASE_URL + '/feed/' + 'dan')
+                .then(res => res.ok ? res.json() : res.text())
+                .then(res => {
+                    t.deepEqual(res, 'not found', 'dan was not found')
+                    t.end()
+                })
+                .catch(err => {
+                    t.fail(err)
+                    t.end()
+                })
+        })
+    })
+})
+
+test('publicWebHosting=false, threads not found', t => {
+    // now post a message by alice
+    sbot.db.publishAs(alice, {
+        type: 'post',
+        text: 'say hi'
+        }, (err, msg) => {
+        t.error(err, 'alice posts')
+
+        // publish a threaded response by user who has opted out of public web hosting
+        sbot.db.publishAs(dan, {
+            type: 'post',
+            text: 'hi',
+            root: msg.key
+        }, (err) => {
+            t.error(err, 'dan posts a threaded response')
+
+            // finally get alice's feed
+            fetch(BASE_URL + '/feed/' + 'alice')
+                .then(res => res.ok ? res.json() : res.text())
+                .then(threads => {
+                    const flatThreads = flatten(threads)
+
+                    // find the message that alice posted
+                    const firstMsg = flatThreads.find(m => msg.key === m.key)
+                    t.true(firstMsg, 'should return alices post')
+
+                    // try find the threaded response that dan posted
+                    const threadedMsg = flatThreads.find(m => m.value.author === dan.id)
+
+                    // TODO: do we expect to get back any part of the message at all
+                    t.false(threadedMsg, 'should not return dans threaded response')
+
+                    t.end()
+                })
+                .catch(err => {
+                    t.fail(err)
+                    t.end()
+                })
+        })
+    })
+})
 
 test('all done', t => {
     server.close(err => {
@@ -549,6 +611,16 @@ test('all done', t => {
         })
     })
 })
+
+function hash (buf) {
+    buf = typeof buf === 'string' ? Buffer.from(buf) : buf
+    return '&' + crypto.createHash('sha256')
+        .update(buf)
+        .digest('base64') + '.sha256'
+}
+
+
+
 
 function createSbot ({ DB_PATH }) {
     const sbot = SecretStack({ caps })
