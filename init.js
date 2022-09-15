@@ -188,7 +188,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
             cb => {
                 sbot.db.publishAs(bob, {
                     type: 'post',
-                    text: 'aaa'
+                    text: 'Say Hi'
                 }, cb)
             }
         ],
@@ -204,7 +204,8 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(alice, {
                         type: 'post',
-                        text: `testing mentioning a user -- ${bob.id}
+                        text: `
+                            testing mentioning a user -- ${bob.id}
                             as a md link  -- [another name](${alice.id})
                             and a msg -- ${msg.key}
                             msg as md link -- [link](${msg.key})
@@ -226,7 +227,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(alice, {
                         type: 'post',
-                        text: `testing replies. **some markown**
+                        text: `Kia ora. **some markown**
                             [hurray](https://example.com/)`,
                         root: msg.key
                     }, cb)
@@ -235,7 +236,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(bob, {
                         type: 'post',
-                        text: 'four',
+                        text: 'Bonjour',
                         root: msg.key
                     }, cb)
                 },
@@ -243,7 +244,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(dan, {
                         type: 'post',
-                        text: 'aaa',
+                        text: 'Anyong',
                         root: msg.key
                     }, cb)
                 }

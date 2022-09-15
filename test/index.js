@@ -47,7 +47,7 @@ test('bobs messages have a reply root set properly', t => {
             t.error(err)
             t.equal(msgs.length, 2, 'should have 2 messages from bob')
             // console.log('**msgs**', JSON.stringify(msgs, null, 2))
-            t.equal(msgs[1].value.content.text, 'four',
+            t.equal(msgs[1].value.content.text, 'Bonjour',
                 'should have the right message content')
             t.equal(msgs[1].value.content.root, msgs[0].key,
                 'should have the first message as root')
