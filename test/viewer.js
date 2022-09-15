@@ -127,6 +127,43 @@ test('get a message', t => {
 
 })
 
+test('get a message (publicWebHosting=false)', t => {
+    // now post a message by alice
+    sbot.db.publishAs(alice, {
+        type: 'post',
+        text: 'say hi'
+        }, (err, msg) => {
+        t.error(err, 'alice posts')
+
+        // publish a threaded response by user who has opted out of public web hosting
+        sbot.db.publishAs(dan, {
+            type: 'post',
+            text: 'hi',
+            root: msg.key
+        }, (err) => {
+            t.error(err, 'dan posts a threaded response')
+
+            // finally get the message
+            fetch(BASE_URL + '/msg/' + encodeURIComponent(msg.key))
+            .then(res => res.json())
+            .then(({ messages }) => {
+                const firstMsg = messages.find(m => msg.key === m.key)
+                t.true(firstMsg, 'should return alices post')
+    
+                // try find the threaded response that dan posted
+                const threadedMsg = messages.find(m => m.value.author === dan.id)
+                t.false(threadedMsg, 'should not return dans threaded response')
+    
+                t.end()
+            })
+                .catch(err => {
+                    t.fail(err)
+                    t.end()
+                })
+        })
+    })
+})
+
 var childKey
 test('get a thread', t => {
     // var newKey
@@ -149,6 +186,33 @@ test('get a thread', t => {
                 t.equal(full, true, 'should have the full thread')
                 t.equal(messages.length, 2,
                     'should return all the messages in the thread')
+                t.equal(messages[0].key, msgKey,
+                    'should return messages in the right order')
+                t.end()
+            })
+            .catch(err => {
+                t.fail(err)
+                t.end()
+            })
+    })
+})
+
+test('get a thread (publicWebHosting=false)', t => {
+    sbot.db.publishAs(dan, {
+        type: 'post',
+        text: 'who can see this?',
+        root: msgKey
+    }, (err, msg) => {
+        t.error(err)
+
+        fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
+            .then(_res => _res.json())
+            .then((res) => {
+                var { messages, full } = res
+                console.log(messages, full)
+                t.equal(full, true, 'should have the full thread')
+                t.equal(messages.length, 2,
+                    'should return all but dans message in this thread')
                 t.equal(messages[0].key, msgKey,
                     'should return messages in the right order')
                 t.end()
@@ -268,6 +332,55 @@ test('get a feed', t => {
     })
 })
 
+test('get a feed (publicWebHosting=false)', t => {
+    //  checking there was an about message
+    sbot.aboutSelf.get(dan.id, (err, profile) => {
+        t.error(err, 'get message bout self')
+        t.true(profile.publicWebHosting === false, 'public web hosting is disabled')
+
+        sbot.db.publishAs(alice, {
+            type: 'post',
+            text: 'say hi'
+        }, (err, msg) => {
+            t.error(err)
+            // publish a threaded response by a different user
+            sbot.db.publishAs(dan, {
+                type: 'post',
+                text: 'hi',
+                root: msg.key
+            }, (err) => {
+                t.error(err)
+
+                // finally get their feed
+                fetch(BASE_URL + '/feed/' + 'alice')
+                    .then(res => res.ok ? res.json() : res.text())
+                    .then(res => {
+                        var flatMsgs = flatten(res)
+
+                        var firstMsg = flatMsgs.find(el => {
+                            return el.key && (el.key === msg.key)
+                        })
+                        t.ok(firstMsg, 'should return alices message')
+                        t.equal(firstMsg.value.author, user.id,
+                            'alice is the author')
+
+                        var threadedMsg = flatMsgs.find(el => {
+                            return el.value.author === userTwo.id
+                        })
+                        t.false(threadedMsg, 'should not return the threaded msg from dan')
+
+                        t.end()
+                    })
+                    .catch(err => {
+                        t.fail(err)
+                        t.end()
+                    })
+            })
+        })
+    })
+})
+
+
 test('feeds are paginated', t => {
     // create an array filled with 0...n
     var postsContent = Array.from({ length: 30 }, (_, i) => i)
@@ -313,7 +426,7 @@ test('get counts by id', t => {
         .then(res => res.json())
         .then(res => {
             t.equal(res.id, alice.id, 'should return the right user id')
-            t.equal(res.posts, 42, 'should count the posts')
+            t.equal(res.posts, 44, 'should count the posts')
             t.equal(res.followers, 1, 'should count the followers')
             t.equal(res.following, 0, 'should count following')
             t.end()
@@ -524,75 +637,6 @@ test('getProfiles route', t => {
             t.fail(err)
             t.end()
         })
-})
-
-test('publicWebHosting=false, feed not found', t => {
-    sbot.aboutSelf.get(dan.id, (err, profile) => {
-        t.error(err, 'get about message')
-
-        t.false(profile.publicWebHosting, 'public web hosting is disabled')
-
-        // now post a message by them
-        sbot.db.publishAs(dan, {
-            type: 'post',
-            text: 'this isnt public'
-        }, (err, msg) => {
-            t.error(err, 'dan posts a message')
-            // finally get their feed
-            fetch(BASE_URL + '/feed/' + 'dan')
-                .then(res => res.ok ? res.json() : res.text())
-                .then(res => {
-                    t.deepEqual(res, 'not found', 'dan was not found')
-                    t.end()
-                })
-                .catch(err => {
-                    t.fail(err)
-                    t.end()
-                })
-        })
-    })
-})
-
-test('publicWebHosting=false, threads not found', t => {
-    // now post a message by alice
-    sbot.db.publishAs(alice, {
-        type: 'post',
-        text: 'say hi'
-        }, (err, msg) => {
-        t.error(err, 'alice posts')
-
-        // publish a threaded response by user who has opted out of public web hosting
-        sbot.db.publishAs(dan, {
-            type: 'post',
-            text: 'hi',
-            root: msg.key
-        }, (err) => {
-            t.error(err, 'dan posts a threaded response')
-
-            // finally get alice's feed
-            fetch(BASE_URL + '/feed/' + 'alice')
-                .then(res => res.ok ? res.json() : res.text())
-                .then(threads => {
-                    const flatThreads = flatten(threads)
-
-                    // find the message that alice posted
-                    const firstMsg = flatThreads.find(m => msg.key === m.key)
-                    t.true(firstMsg, 'should return alices post')
-
-                    // try find the threaded response that dan posted
-                    const threadedMsg = flatThreads.find(m => m.value.author === dan.id)
-
-                    // TODO: do we expect to get back any part of the message at all
-                    t.false(threadedMsg, 'should not return dans threaded response')
-
-                    t.end()
-                })
-                .catch(err => {
-                    t.fail(err)
-                    t.end()
-                })
-        })
-    })
 })
 
 test('all done', t => {
