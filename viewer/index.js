@@ -1,5 +1,4 @@
-const { where,  and, type, contact,
-    author, toCallback,  } = require('ssb-db2/operators')
+const { where,  and, type, contact, author, toCallback,  } = require('ssb-db2/operators')
 var path = require('path')
 var createError = require('http-errors')
 const Fastify = require('fastify')
@@ -22,7 +21,11 @@ module.exports = function startServer (sbot) {
 
 
     // enable cors
-    fastify.register(require('fastify-cors'), {})
+    fastify.register(require('@fastify/cors'), {
+      origin: process.env.NODE_ENV === 'test'
+        ? false 
+        : 'https://planetary.link'
+    })
 
     fastify.register(require('fastify-static'), {
         root: path.join(__dirname, '..', 'public'),
