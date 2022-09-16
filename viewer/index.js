@@ -113,7 +113,7 @@ module.exports = function startServer (sbot) {
 
         sbot.aboutSelf.get(id, (err, profile) => {
             if (err) return res.send(createError.InternalServerError(err))
-            if (profile.publicWebHosting === false) return res.send([])
+            if (profile.publicWebHosting === false) return res.send(createError.NotFound())
 
             var source = page ?
                 getThreads({ sbot, id }, page) :
@@ -147,8 +147,8 @@ module.exports = function startServer (sbot) {
         sbot.aboutSelf.get(id, (err, profile) => {
             if (err) return res.send(createError.InternalServerError(err))
 
-            // TODO: decide whether to return 0, or just return empty
-            if (profile.publicWebHosting === false) return res.send({ id, posts: 0, following: 0, followers: 0 })
+            if (profile.publicWebHosting === false) return res.send(createError.NotFound())
+            // if (profile.publicWebHosting === false) return res.send({ id, posts: 0, following: 0, followers: 0 })
             
             Promise.all([
                 new Promise((resolve, reject) => {
@@ -288,6 +288,7 @@ module.exports = function startServer (sbot) {
 
             S(
                 source,
+                paraMap(mapPublicWebHosting(sbot), 5),
                 S.take(10),
                 S.collect(function (err, threads) {
                     if (err) return console.log('err', err)
@@ -601,7 +602,7 @@ function mapPublicWebHosting (sbot) {
                     if (err) return cb(err)
 
                     // check if the author has opted out of public web hosting
-                    if (profile.publicWebHosting === false) return cb(null, {}) // we return an empty message here instead
+                    if (profile.publicWebHosting === false) return cb(null, null) // we return an empty message here instead
                     
                     // TODO: decide whether to return null, empty object or just filter this message out entirely.. that means missing data...
                     
@@ -609,6 +610,7 @@ function mapPublicWebHosting (sbot) {
                     cb(null, message)
                 })
             }, 5),
+            S.filter(Boolean),
             S.collect((err, mappedMessages) => {
                 if (err) return cb(err)
 

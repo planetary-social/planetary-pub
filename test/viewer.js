@@ -228,9 +228,7 @@ test('get a thread 2 (publicWebHosting=false)', t => {
                     const firstMsg = messages.find(m => msg.key === m.key)
                     t.true(firstMsg, 'should return alices post')
         
-                    // try find the threaded response that dan posted
-                    const secondMsg = messages[1]
-                    t.deepEqual(secondMsg, {}, 'should not return dans threaded response')
+                    t.equal(messages.length, 1, 'should not return dans message')
         
                     t.end()
                 })
@@ -489,14 +487,18 @@ test('get counts by id', t => {
 
 test('get counts by id (publicWebHosting=false)', t => {
     fetch(BASE_URL + '/counts-by-id/' + encodeURIComponent(dan.id))
-        .then(res => res.json())
+        // .then(res => res.json())
         .then(res => {
-            t.equal(res.id, dan.id, 'should return the right user id')
+            // t.equal(res.id, dan.id, 'should return the right user id')
 
-            // TODO: decide whether to return 0, or return empty
-            t.equal(res.posts, 0, 'should count the posts')
-            t.equal(res.followers, 0, 'should count the followers')
-            t.equal(res.following, 0, 'should count following')
+            // // TODO: decide whether to return 0, or return empty
+            // t.equal(res.posts, 0, 'should count the posts')
+            // t.equal(res.followers, 0, 'should count the followers')
+            // t.equal(res.following, 0, 'should count following')
+
+            if (res.ok) t.fail('should return 404')
+            t.equal(res.status, 404, 'should return 404')
+
             t.end()
         })
 })
@@ -517,12 +519,14 @@ test('get a user by id', t => {
 test('get a user by id (publicWebHosting=false)', t => {
     var id = encodeURIComponent(dan.id)
 
-    // TODO: decide whether to show no feeds, or just show a 404 error instead
-    // see test below
     fetch(BASE_URL + '/feed-by-id/' + id)
-        .then(res => res.json())
         .then(res => {
-            t.equal(res.length, 0, 'should return no messages for dan')
+            if (res.ok) t.fail('should return 404')
+            t.equal(res.status, 404, 'should return 404')
+            t.end()
+        })
+        .catch(err => {
+            t.fail('should get a 404 response', err)
             t.end()
         })
 })

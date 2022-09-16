@@ -204,11 +204,11 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(alice, {
                         type: 'post',
-                        text: `
-                            testing mentioning a user -- ${bob.id}
+                        text: `testing mentioning a user -- ${bob.id}
                             as a md link  -- [another name](${alice.id})
                             and a msg -- ${msg.key}
                             msg as md link -- [link](${msg.key})
+                            heres dans id btw ${dan.id}
                         `
                     }, cb)
                 },
