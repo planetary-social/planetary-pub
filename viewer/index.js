@@ -146,7 +146,6 @@ module.exports = function startServer (sbot) {
 
         sbot.aboutSelf.get(id, (err, profile) => {
             if (err) return res.send(createError.InternalServerError(err))
-
             if (profile.publicWebHosting === false) return res.send(createError.NotFound())
             // if (profile.publicWebHosting === false) return res.send({ id, posts: 0, following: 0, followers: 0 })
             
@@ -237,7 +236,7 @@ module.exports = function startServer (sbot) {
              
             sbot.aboutSelf.get(id, (err, profile) => {
                 if (err) return res.send(createError.InternalServerError(err))
-                if (profile.publicWebHosting === false) return res.send([])
+                if (profile.publicWebHosting === false) return res.send(createError.NotFound())
 
                 S(
                     sbot.threads.profile({ id }),
@@ -321,11 +320,14 @@ module.exports = function startServer (sbot) {
                         sbot.aboutSelf.get(id, (err, profile) => {
                             if (err) return cb(err)
 
+                            if (profile.publicWebHosting === false) return cb(null, null)
+
                             cb(null, Object.assign(profile, { id }))
                         })
                     },
                     5
                 ),
+                S.filter(Boolean),
                 S.collect((err, profiles) => {
                     if (err) return res.send(createError.InternalServerError(err))
                     res.send(profiles)
@@ -344,6 +346,8 @@ module.exports = function startServer (sbot) {
                     console.log('error getting profile', err)
                     return res.send(createError.InternalServerError(err))
                 }
+
+                if (profile.publicWebHosting === false) return res.code(404).send('not found')
 
                 // get the blob if they have a profile image
                 if (profile && profile.image) {
@@ -419,6 +423,8 @@ module.exports = function startServer (sbot) {
                 if (err) {
                     return res.send(createError.InternalServerError(err))
                 }
+
+                if (profile.publicWebHosting === false) return res.code(404).send('not found')
 
                 // get the blob for avatar image
                 sbot.blobs.has(profile.image, (err, has) => {

@@ -417,9 +417,10 @@ test('get a feed from someone who has publicWebHosting=false', t => {
 
                 // finally get their feed
                 fetch(BASE_URL + '/feed/' + 'dan')
-                    .then(res => res.ok ? res.json() : res.text())
+                    // .then(res => res.ok ? res.json() : res.text())
                     .then(res => {
-                        t.equals(res.length, 0, 'returns no feed for dan')
+                        if (res.ok) t.fail('should return 404')
+                        t.equal(res.status, 404, 'should return 404')
 
                         t.end()
                     })
@@ -694,12 +695,48 @@ test('get a profile', t => {
     )
 })
 
+test('get a profile (publicWebHosting=false)', t => {
+    S(
+        read(__dirname + '/test-data/cinnamon-roll.jpg'),
+        S.map(file => file.data),
+        sbot.blobs.add(function (err, blobId) {
+            t.error(err)
+
+            // now save the message
+            sbot.db.publishAs(dan, {
+                type: 'about',
+                about: dan.id,
+                image: {
+                    link: blobId,       // required
+                    type: 'image/jpeg' // optional, but recommended
+                }
+            }, (err) => {
+                t.error(err)
+
+                // now get the profile
+                fetch(BASE_URL + '/profile/dan')
+                    .then(res => {
+                        if (res.ok) t.fail('should return 404')
+                        t.equal(res.status, 404, 'should return 404')
+                        t.end()
+                    })
+                    .catch(err => {
+                        t.fail(err)
+                        t.end()
+                    })
+
+            })
+
+        })
+    )
+})
+
 test('getProfiles route', t => {
     // here you get a profile by id
     fetch(BASE_URL + '/get-profiles', {
         method: 'POST',
         mode: 'cors',
-        body: JSON.stringify({ ids: [alice.id, bob.id] })
+        body: JSON.stringify({ ids: [alice.id, bob.id, dan.id] })
     })
         .then(res => {
             if (!res.ok) {
@@ -713,6 +750,7 @@ test('getProfiles route', t => {
             t.equal(res[0].name, 'alice', 'should have a name for alice')
             t.equal(res[0].id, alice.id, 'should return the user id')
             t.equal(res[1].name, 'bob', 'should have bob')
+
             t.end()
         })
         .catch(err => {
