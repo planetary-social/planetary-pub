@@ -39,9 +39,11 @@ function setup (cb) {
 
         series(
           [
-            cb => sbot.db.publishAs(alice, { type: 'about', about: alice.id, name: 'alice' }, cb),
-            cb => sbot.db.publishAs(bob, { type: 'about', about: bob.id, name: 'bob' }, cb),
+            cb => sbot.db.publish({ type: 'about', about: sbot.id, name: 'sbot', publicWebHosting: true }, cb),
+            cb => sbot.db.publishAs(alice, { type: 'about', about: alice.id, name: 'alice', publicWebHosting: true }, cb),
+            cb => sbot.db.publishAs(bob, { type: 'about', about: bob.id, name: 'bob', publicWebHosting: true }, cb),
             cb => sbot.db.publishAs(dan, { type: 'about', about: dan.id, name: 'dan', publicWebHosting: false }, cb),
+            // TODO: test on publicWebHosting=undefined
 
             cb => sbot.db.publish({ type: 'post', text: 'woooo 1' }, (err, msg) => {
                 if (err) return cb(err)
@@ -97,34 +99,23 @@ test('server', t => {
 })
 
 test('get a message', t => {
-    Promise.all([
-        fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
-            .then(res => {
-                if (!res.ok) {
-                    return res.text().then(text => {
-                        console.log('**failure text**', text)
-                        t.fail(text)
-                    })
-                }
+    fetch(BASE_URL + '/msg/' + encodeURIComponent(msgKey))
+        .then(res => res.json())
+        .then(res => {
+            t.equal(res.messages.length, 1, 'should return a single message')
+            t.equal(res.messages[0].key, msgKey, 'should return the right message')
+            t.end()
+        })
+})
 
-                return res.json()
-            }),
-
-        fetch(BASE_URL + '/msg/' + 'foo' + encodeURIComponent(msgKey))
-    ])
-        .then(([{ messages }, badMsg]) => {
-            // console.log('good msg', messages)
-            t.equal(messages.length, 1, 'should return a single message')
-            t.equal(messages[0].key, msgKey,
-                'should return the right message')
-
-            if (badMsg.ok) t.fail('should return a 404 status')
-            t.equal(badMsg.status, 404,
-                'should return 404 for missing msg')
+test('get a bad message', t => {
+    fetch(BASE_URL + '/msg/' + 'foo' + encodeURIComponent(msgKey))
+        .then(res => {
+            if (res.ok) t.fail('should return 404')
+            t.equal(res.status, 404, 'should return 404')
 
             t.end()
         })
-
 })
 
 test('get a message published by someone who has publicWebHosting=false', t => {

@@ -13,7 +13,7 @@ var getThreads = require('./threads')
 
 module.exports = function startServer (sbot) {
     var fastify = Fastify({
-        logger: false
+        logger: true
     })
 
     sbot.on('rpc:connect', (ev) => {
@@ -70,7 +70,7 @@ module.exports = function startServer (sbot) {
                 sbot.aboutSelf.get(msg.author, (err, profile) => {
                     if (err) return res.send(createError.InternalServerError(err))
 
-                    if (profile.publicWebHosting === false) return res.send({ messages: [], full: false }) // TODO what do i send back here... is full meant to be false?
+                    if (profile.publicWebHosting !== true) return res.send({ messages: [], full: false })
 
 
                     getThread(sbot, rootId, (err, msgs) => {
@@ -113,7 +113,7 @@ module.exports = function startServer (sbot) {
 
         sbot.aboutSelf.get(id, (err, profile) => {
             if (err) return res.send(createError.InternalServerError(err))
-            if (profile.publicWebHosting === false) return res.send(createError.NotFound())
+            if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
 
             var source = page ?
                 getThreads({ sbot, id }, page) :
@@ -146,8 +146,8 @@ module.exports = function startServer (sbot) {
 
         sbot.aboutSelf.get(id, (err, profile) => {
             if (err) return res.send(createError.InternalServerError(err))
-            if (profile.publicWebHosting === false) return res.send(createError.NotFound())
-            // if (profile.publicWebHosting === false) return res.send({ id, posts: 0, following: 0, followers: 0 })
+            if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
+
             
             Promise.all([
                 new Promise((resolve, reject) => {
@@ -236,7 +236,7 @@ module.exports = function startServer (sbot) {
              
             sbot.aboutSelf.get(id, (err, profile) => {
                 if (err) return res.send(createError.InternalServerError(err))
-                if (profile.publicWebHosting === false) return res.send(createError.NotFound())
+                if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
 
                 S(
                     sbot.threads.profile({ id }),
@@ -320,7 +320,7 @@ module.exports = function startServer (sbot) {
                         sbot.aboutSelf.get(id, (err, profile) => {
                             if (err) return cb(err)
 
-                            if (profile.publicWebHosting === false) return cb(null, null)
+                            if (profile.publicWebHosting !== true) return cb(null, null)
 
                             cb(null, Object.assign(profile, { id }))
                         })
@@ -347,7 +347,7 @@ module.exports = function startServer (sbot) {
                     return res.send(createError.InternalServerError(err))
                 }
 
-                if (profile.publicWebHosting === false) return res.code(404).send('not found')
+                if (profile.publicWebHosting !== true) return res.code(404).send('not found')
 
                 // get the blob if they have a profile image
                 if (profile && profile.image) {
@@ -424,7 +424,7 @@ module.exports = function startServer (sbot) {
                     return res.send(createError.InternalServerError(err))
                 }
 
-                if (profile.publicWebHosting === false) return res.code(404).send('not found')
+                if (profile.publicWebHosting !== true) return res.code(404).send('not found')
 
                 // get the blob for avatar image
                 sbot.blobs.has(profile.image, (err, has) => {
@@ -608,9 +608,8 @@ function mapPublicWebHosting (sbot) {
                     if (err) return cb(err)
 
                     // check if the author has opted out of public web hosting
-                    if (profile.publicWebHosting === false) return cb(null, null) // we return an empty message here instead
-                    
-                    // TODO: decide whether to return null, empty object or just filter this message out entirely.. that means missing data...
+                    if (profile.publicWebHosting !== true) return cb(null, null) // we return an empty message here instead
+
                     
                     // otherwise just return the message as usual
                     cb(null, message)
