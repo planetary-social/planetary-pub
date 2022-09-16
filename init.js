@@ -181,32 +181,23 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
             }
         ])
 
-        series(testMsgs.map(msg => {
-            return function postMsg (cb) {
-                sbot.db.publishAs(alice, msg, (err, res) => {
-                    if (err) return cb(err)
-                    cb(null, res)
-                })
-            }
-        }).concat([
+        series([
+            ...testMsgs.map(msg => cb => {
+                sbot.db.publishAs(alice, msg, cb)
+            }),
             cb => {
                 sbot.db.publishAs(bob, {
                     type: 'post',
-                    text: 'aaa'
+                    text: 'Say Hi'
                 }, cb)
             }
-        ]).concat([
-            cb => {
-                sbot.db.publishAs(dan, {
-                    type: 'post',
-                    text: 'aaa'
-                }, cb)
-            }
-        ]),
+        ],
 
         function allDone (err, msgs) {
             if (err) return _cb(err)
             var msg = msgs[msgs.length - 1]
+
+
 
             // more test data
             series([
@@ -217,6 +208,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                             as a md link  -- [another name](${alice.id})
                             and a msg -- ${msg.key}
                             msg as md link -- [link](${msg.key})
+                            heres dans id btw ${dan.id}
                         `
                     }, cb)
                 },
@@ -235,7 +227,7 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(alice, {
                         type: 'post',
-                        text: `testing replies. **some markown**
+                        text: `Kia ora. **some markown**
                             [hurray](https://example.com/)`,
                         root: msg.key
                     }, cb)
@@ -244,7 +236,15 @@ module.exports = function init (sbot, alice, bob, carol, dan, _cb) {
                 cb => {
                     sbot.db.publishAs(bob, {
                         type: 'post',
-                        text: 'four',
+                        text: 'Bonjour',
+                        root: msg.key
+                    }, cb)
+                },
+
+                cb => {
+                    sbot.db.publishAs(dan, {
+                        type: 'post',
+                        text: 'Anyong',
                         root: msg.key
                     }, cb)
                 }

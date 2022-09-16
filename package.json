@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build": "echo \"build\" && exit 0",
     "postversion": "git push --no-verify && git push --tags --no-verify && npm publish",
-    "test": "NODE_ENV=test tape test/*.js | tap-spec",
-    "test-viewer": "NODE_ENV=test node test/viewer.js | tap-spec",
-    "test-pub": "NODE_ENV=test tape test/index.js | tap-spec",
+    "test": "NODE_ENV=test tape test/*.js | tap-arc",
+    "test-viewer": "NODE_ENV=test node test/viewer.js | tap-arc --bail",
+    "test-pub": "NODE_ENV=test tape test/index.js | tap-arc --bail",
     "prepare": "husky install",
-    "pretty": "pretty-quick"
+    "pretty": "pretty-quick",
+    "lint": "pretty-quick"
   },
   "repository": {
     "type": "git",
@@ -43,10 +43,11 @@
     "run-parallel": "^1.2.0",
     "run-series": "^1.1.9",
     "secret-stack": "^6.4.0",
+    "ssb-about-self": "^1.1.0",
     "ssb-blobs": "^2.0.1",
     "ssb-caps": "^1.1.0",
     "ssb-conn": "^6.0.1",
-    "ssb-db2": "^5.1.0",
+    "ssb-db2": "^6.1.1",
     "ssb-ebt": "^9.0.0",
     "ssb-friends": "^5.1.0",
     "ssb-replication-scheduler": "^2.0.4",
@@ -59,11 +60,12 @@
     "dotenv": "^10.0.0",
     "husky": "^7.0.4",
     "lodash.flatten": "^4.4.0",
+    "node-fetch": "^2.6.7",
     "prettier": "^2.5.1",
     "pretty-quick": "^3.1.3",
     "rimraf": "^3.0.2",
     "ssb-ref": "^2.16.0",
-    "tap-spec": "^5.0.0",
+    "tap-arc": "^0.3.5",
     "tape": "^5.3.2"
   }
 }

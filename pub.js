@@ -162,7 +162,7 @@ function _start () {
         .use(require('ssb-db2'))
         .use(require('ssb-db2/full-mentions')) // include index
         .use(require('ssb-db2/compat')) // include all compatibility plugins
-        .use(require('ssb-db2/about-self'))
+        .use(require('ssb-about-self'))
         .use(require('ssb-friends'))
         .use(require('ssb-ebt'))
         .use(require('ssb-threads'))

@@ -6,6 +6,7 @@ const Fastify = require('fastify')
 const fastifyResponseCaching = require('fastify-response-caching')
 
 var S = require('pull-stream')
+const paraMap = require('pull-paramap')
 var toStream = require('pull-stream-to-stream')
 var getThreads = require('./threads')
 // var getBlob = require('./get-blob')
@@ -29,9 +30,10 @@ module.exports = function startServer (sbot) {
         prefix: '/public/' // optional: default '/'
     })
 
-    fastify.register(fastifyResponseCaching, {ttl: 500000})
+    if (process.env.NODE_ENV !== 'test') {
+      fastify.register(fastifyResponseCaching, {ttl: 600000}) // 10 min cache
+    }
 
-            
 
     fastify.get('/.well-known/apple-app-site-association', (_, res) => {
         return res.sendFile('/.well-known/apple-app-site-association')
@@ -49,7 +51,6 @@ module.exports = function startServer (sbot) {
         var { id } = req.params
         id = '%' + id
         id = decodeURIComponent(id)
-        console.log('request_message_id', id)
 
         //fastify.cache.set('msg', {id: id}, 3600000, (err) => {
             // get the message in question
@@ -57,8 +58,6 @@ module.exports = function startServer (sbot) {
             // see if there is a thread for this
             sbot.db.get(id, (err, msg) => {
                 if (err) {
-                    console.log('errrrr', err)
-
                     if (err.toString().includes('not found')) {
                         return res.send(createError.NotFound(err))
                     }
@@ -68,9 +67,16 @@ module.exports = function startServer (sbot) {
 
                 var rootId = (msg.content && msg.content.root) || id
 
-                getThread(sbot, rootId, (err, msgs) => {
+                sbot.aboutSelf.get(msg.author, (err, profile) => {
                     if (err) return res.send(createError.InternalServerError(err))
-                    res.send(msgs)
+
+                    if (profile.publicWebHosting !== true) return res.send({ messages: [], full: false })
+
+
+                    getThread(sbot, rootId, (err, msgs) => {
+                        if (err) return res.send(createError.InternalServerError(err))
+                        res.send(msgs)
+                    })
                 })
             })
         //})
@@ -105,6 +111,10 @@ module.exports = function startServer (sbot) {
             //     threadMaxSize: 3 // at most 3 messages in each thread
             // })
 
+        sbot.aboutSelf.get(id, (err, profile) => {
+            if (err) return res.send(createError.InternalServerError(err))
+            if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
+
             var source = page ?
                 getThreads({ sbot, id }, page) :
                 getThreads({ sbot, id })
@@ -112,6 +122,7 @@ module.exports = function startServer (sbot) {
             S(
                 source,
                 S.take(10),
+                paraMap(mapPublicWebHosting(sbot), 5),
                 S.map(thread => {
                     // if it's a thread, return the thread
                     // if not a thread, return a single message (not array)
@@ -124,13 +135,20 @@ module.exports = function startServer (sbot) {
                     res.send(threads)
                 })
             )
+        })
         //})
     })
 
     fastify.get('/counts-by-id/:id', (req, res) => {
         var { id } = req.params
+
         //fastify.cache.set('counts-by-id', {id: id}, 3600000, (err) => {
 
+        sbot.aboutSelf.get(id, (err, profile) => {
+            if (err) return res.send(createError.InternalServerError(err))
+            if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
+
+            
             Promise.all([
                 new Promise((resolve, reject) => {
                     // get thier posts so we can count them
@@ -195,6 +213,7 @@ module.exports = function startServer (sbot) {
                     res.send(createError.InternalServerError(err))
                 })
        // })
+            })
     })
 
     fastify.get('/feed/:userName', (req, res) => {
@@ -214,24 +233,31 @@ module.exports = function startServer (sbot) {
             if (!id) {
                 return res.code(404).send('not found')
             }
+             
+            sbot.aboutSelf.get(id, (err, profile) => {
+                if (err) return res.send(createError.InternalServerError(err))
+                if (profile.publicWebHosting !== true) return res.send(createError.NotFound())
 
-            var source = sbot.threads.profile({ id: id })
+                S(
+                    sbot.threads.profile({ id }),
+                    S.take(10),
+                    paraMap(mapPublicWebHosting(sbot), 5),
+                    S.map(thread => {
+                        // if it's a thread, return the thread
+                        // if not a thread, return a single message (not array)
+                        return thread.messages.length > 1
+                            ? thread.messages
+                            : thread.messages[0]
+                        // 2022-09-13 TODO (mix) AARRr why? review this to see if there is any sane
+                        // reason for the API to do this.
+                    }),
+                    S.collect(function (err, threads) {
+                        if (err) return console.log('err', err)
 
-            S(
-                source,
-                S.take(10),
-                S.map(thread => {
-                    // if it's a thread, return the thread
-                    // if not a thread, return a single message (not array)
-                    return thread.messages.length > 1 ?
-                        thread.messages :
-                        thread.messages[0]
-                }),
-                S.collect(function (err, threads) {
-                    if (err) return console.log('err', err)
-                    res.send(threads)
-                })
-            )
+                        res.send(threads)
+                    })
+                )
+            })
         })
     })
 
@@ -252,7 +278,6 @@ module.exports = function startServer (sbot) {
 
 
     fastify.get('/default', (req, res) => {
-        console.log("default path")
         //fastify.cache.set('default', {id: 'default'}, 3600000, (err) => {
 
             const { query } = req
@@ -262,6 +287,7 @@ module.exports = function startServer (sbot) {
 
             S(
                 source,
+                paraMap(mapPublicWebHosting(sbot), 5),
                 S.take(10),
                 S.collect(function (err, threads) {
                     if (err) return console.log('err', err)
@@ -279,7 +305,7 @@ module.exports = function startServer (sbot) {
         } catch (err) {
             return res.send(createError.BadRequest('Invalid json'))
         }
-        const idslist = ids.map(String)
+        // const idslist = ids.map(String)
 
         // this is a bit hacky, we should instead be recording each aboutSelf in redis
         // and then pulling them either from redis or from sbot - rabble
@@ -287,14 +313,26 @@ module.exports = function startServer (sbot) {
             // console.log('***req.body***', req.body)
             // console.log('ids', ids)
 
-            // how is there no async code here?
-            var profiles = ids.map(id => {
-                var profile = sbot.db.getIndex('aboutSelf').getProfile(id)
-                return Object.assign(profile, {
-                    id: id
+            S(
+                S.values(ids),
+                paraMap(
+                    (id, cb) => {
+                        sbot.aboutSelf.get(id, (err, profile) => {
+                            if (err) return cb(err)
+
+                            if (profile.publicWebHosting !== true) return cb(null, null)
+
+                            cb(null, Object.assign(profile, { id }))
+                        })
+                    },
+                    5
+                ),
+                S.filter(Boolean),
+                S.collect((err, profiles) => {
+                    if (err) return res.send(createError.InternalServerError(err))
+                    res.send(profiles)
                 })
-            })
-            res.send(profiles)
+            )
         //})
     })
 
@@ -303,8 +341,13 @@ module.exports = function startServer (sbot) {
         //console.log("profile-by-id", id)
         //fastify.cache.set('profile-by-id', {id: id}, 3600000, (err) => {
 
-            sbot.db.onDrain('aboutSelf', () => {
-                const profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+            sbot.aboutSelf.get(id, (err, profile) => {
+                if (err) {
+                    console.log('error getting profile', err)
+                    return res.send(createError.InternalServerError(err))
+                }
+
+                if (profile.publicWebHosting !== true) return res.code(404).send('not found')
 
                 // get the blob if they have a profile image
                 if (profile && profile.image) {
@@ -376,8 +419,12 @@ module.exports = function startServer (sbot) {
             const id = matches[0] && matches[0].id
             if (!id) return res.send(createError.NotFound())
 
-            sbot.db.onDrain('aboutSelf', () => {
-                const profile = sbot.db.getIndex('aboutSelf').getProfile(id)
+            sbot.aboutSelf.get(id, (err, profile) => {
+                if (err) {
+                    return res.send(createError.InternalServerError(err))
+                }
+
+                if (profile.publicWebHosting !== true) return res.code(404).send('not found')
 
                 // get the blob for avatar image
                 sbot.blobs.has(profile.image, (err, has) => {
@@ -539,16 +586,43 @@ function getThread(sbot, rootId, cb) {
     S(
         sbot.threads.thread({
             root: rootId,
-            // @TODO
-            allowlist: ['test', 'post'],
             reverse: true, // threads sorted from most recent to least recent
             threadMaxSize: 20, // at most 3 messages in each thread
         }),
+        S.take(1), // NOTE: takes one in the collect, so this just prevents the next step from doing more than it needs to
+        paraMap(mapPublicWebHosting(sbot), 5),
         S.collect((err, [thread]) => {
             if (err) return cb(err)
             cb(null, thread)
         })
     )
+}
+
+
+function mapPublicWebHosting (sbot) {
+    return function ({ messages, full }, cb) {
+        S(
+            S.values(messages),
+            paraMap((message, cb) => {
+                sbot.aboutSelf.get(message.value.author, (err, profile) => {
+                    if (err) return cb(err)
+
+                    // check if the author has opted out of public web hosting
+                    if (profile.publicWebHosting !== true) return cb(null, null) // we return an empty message here instead
+
+                    
+                    // otherwise just return the message as usual
+                    cb(null, message)
+                })
+            }, 5),
+            S.filter(Boolean),
+            S.collect((err, mappedMessages) => {
+                if (err) return cb(err)
+
+                cb(null, { messages: mappedMessages, full })
+            })
+        )
+    }
 }
 
 
